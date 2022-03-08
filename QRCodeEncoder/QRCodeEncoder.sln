@@ -5,9 +5,9 @@ VisualStudioVersion = 17.0.31919.166
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRCodeEncoderDemo", "QRCodeEncoderDemo\QRCodeEncoderDemo.csproj", "{3B5F0E41-C9E3-4C39-822A-B52991800B9D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRCodeEncoderLibrary", "QRCodeEncoderLibrary\QRCodeEncoderLibrary.csproj", "{D2FF4000-FD83-4557-98F5-1FB66144F1CB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRCodeEncoder.Core", "QRCodeEncoderLibrary\QRCodeEncoder.Core.csproj", "{D2FF4000-FD83-4557-98F5-1FB66144F1CB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QRCodeConsoleDemo", "QRCodeConsoleDemo\QRCodeConsoleDemo.csproj", "{F395D259-AD73-4EF5-83F5-5BB46B5434DA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRCodeConsoleDemo", "QRCodeConsoleDemo\QRCodeConsoleDemo.csproj", "{F395D259-AD73-4EF5-83F5-5BB46B5434DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
