@@ -33,42 +33,42 @@
 //	For full version history please look at QREncode.cs
 /////////////////////////////////////////////////////////////////////
 
-using QRCodeEncoderLibrary;
-
 namespace QRCodeEncoder
-	{
-	class Program
-		{
-		static void Main()
-			{
+{
+  using QRCodeEncoderLibrary;
+
+  public class Program
+  {
+    public static void Main()
+    {
 #if DEBUG
-			// change current directory to Work directory if exits
-			string CurDir = Environment.CurrentDirectory;
-			int Index = CurDir.IndexOf("bin\\Debug");
-			if (Index > 0)
-				{
-				string WorkDir = string.Concat(CurDir.AsSpan(0, Index), "\\Work");
-				if (Directory.Exists(WorkDir)) Environment.CurrentDirectory = WorkDir;
-				}
+      // change current directory to Work directory if exits
+      string CurDir = Environment.CurrentDirectory;
+      int Index = CurDir.IndexOf("bin\\Debug");
+      if (Index > 0)
+      {
+        string WorkDir = string.Concat(CurDir.AsSpan(0, Index), "\\Work");
+        if (Directory.Exists(WorkDir)) Environment.CurrentDirectory = WorkDir;
+      }
 #endif
 
-			try
-				{
-				QRCodeCommandLine.Encode(Environment.CommandLine);
-				Console.WriteLine("Success");
-				}
-			catch (Exception Ex)
-				{
-				if (Ex.Message == "help")
-					Console.WriteLine(QRCodeCommandLine.Help);
-				else
-					Console.WriteLine("Error:\r\n" + Ex.Message);
-				}
+      try
+      {
+        QRCodeCommandLine.Encode(Environment.CommandLine);
+        Console.WriteLine("Success");
+      }
+      catch (Exception Ex)
+      {
+        if (Ex.Message == "help")
+          Console.WriteLine(QRCodeCommandLine.Help);
+        else
+          Console.WriteLine("Error:\r\n" + Ex.Message);
+      }
 
 #if DEBUG
-			Console.WriteLine("Press any key to close window.");
-			Console.ReadKey();
+      Console.WriteLine("Press any key to close window.");
+      Console.ReadKey();
 #endif
-			}
-		}
-	}
+    }
+  }
+}
