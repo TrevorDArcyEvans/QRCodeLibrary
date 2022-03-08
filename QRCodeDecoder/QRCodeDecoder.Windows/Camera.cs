@@ -45,7 +45,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using Microsoft.Win32;
-using QRCodeDecoderLibrary;
+using QRCodeDecoder.Core;
 
 namespace QRCodeDecoder.Windows
 {

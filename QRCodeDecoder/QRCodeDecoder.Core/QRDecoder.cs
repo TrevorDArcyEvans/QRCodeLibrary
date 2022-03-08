@@ -52,7 +52,7 @@ using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace QRCodeDecoderLibrary
+namespace QRCodeDecoder.Core
 {
   /// <summary>
   /// QR Code error correction code enumeration
