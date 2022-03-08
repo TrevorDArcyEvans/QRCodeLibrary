@@ -301,7 +301,7 @@ namespace QRCodeDecoder.Core
         bool[,] BlackWhiteImage = ConvertImageToBlackAndWhite(InputImageBitmap);
         if (BlackWhiteImage is null)
         {
-          return null;
+          return Enumerable.Empty<QRCodeResult>();
         }
 
         _logger.Information($"Time: {Environment.TickCount - Start}");
@@ -310,7 +310,7 @@ namespace QRCodeDecoder.Core
         // horizontal search for finders
         if (!HorizontalFindersSearch(FinderList, BlackWhiteImage))
         {
-          return null;
+          return Enumerable.Empty<QRCodeResult>();
         }
 
         _logger.Information($"Horizontal Finders count: {FinderList.Count}");
@@ -332,7 +332,7 @@ namespace QRCodeDecoder.Core
         // remove unused finders
         if (!RemoveUnusedFinders(FinderList, BlackWhiteImage))
         {
-          return null;
+          return Enumerable.Empty<QRCodeResult>();
         }
 
         _logger.Information($"Time: {Environment.TickCount - Start}");
@@ -425,14 +425,14 @@ namespace QRCodeDecoder.Core
       catch (Exception Ex)
       {
         _logger.Error(Ex, "QR Code decoding failed (no finders).");
-        return null;
+        return Enumerable.Empty<QRCodeResult>();
       }
 
       // not found exit
       if (DataArrayList.Count == 0)
       {
         _logger.Information("No QR Code found");
-        return null;
+        return Enumerable.Empty<QRCodeResult>();
       }
 
       // successful exit
