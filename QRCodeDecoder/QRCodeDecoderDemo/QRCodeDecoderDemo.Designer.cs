@@ -1,4 +1,4 @@
-﻿namespace QRCodeDecoder
+﻿namespace QRCodeDecoderDemo
 {
 	partial class QRCodeDecoderDemo
 	{

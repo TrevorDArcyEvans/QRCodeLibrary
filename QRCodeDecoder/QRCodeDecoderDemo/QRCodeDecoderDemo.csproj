@@ -7,7 +7,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>preview</LangVersion>
-    <StartupObject>QRCodeDecoder.Program</StartupObject>
+    <StartupObject>QRCodeDecoderDemo.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>

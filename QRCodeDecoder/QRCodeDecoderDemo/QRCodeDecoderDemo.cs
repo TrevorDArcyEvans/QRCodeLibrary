@@ -41,14 +41,13 @@
 //	For version history please refer to QRDecoder.cs
 /////////////////////////////////////////////////////////////////////
 
-using QRCodeDecoderLibrary;
 using System.Diagnostics;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
-
+using QRCodeDecoderLibrary;
 using Timer = System.Windows.Forms.Timer;
 
-namespace QRCodeDecoder
+namespace QRCodeDecoderDemo
 {
   /// <summary>
   /// Test QR Code Decoder
