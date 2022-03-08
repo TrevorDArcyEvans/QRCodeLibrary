@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\QRCodeDecoderLibrary\QRCodeDecoderLibrary.csproj" />
+    <ProjectReference Include="..\QRCodeDecoderLibrary\QRCodeDecoder.Windows.csproj" />
   </ItemGroup>
 
 </Project>
