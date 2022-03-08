@@ -1,0 +1,83 @@
+2022/03/08 11:47:28 ----
+2022/03/08 11:47:28 QRCodeDecoder
+2022/03/08 11:47:36 Convert image to black and white
+2022/03/08 11:47:36 Time: 0
+2022/03/08 11:47:36 Finders search
+2022/03/08 11:47:36 Horizontal Finders count: 196
+2022/03/08 11:47:36 Matched Finders count: 25
+2022/03/08 11:47:36 Remove all unused finders
+2022/03/08 11:47:36 Time: 15
+2022/03/08 11:47:36 Finder: Row: 72, Col: 72, Module: 16.00, Distance: 0.00
+2022/03/08 11:47:36 Finder: Row: 72, Col: 360, Module: 16.00, Distance: 0.00
+2022/03/08 11:47:36 Finder: Row: 206, Col: 254, Module: 4.64, Distance: 1.00
+2022/03/08 11:47:36 Finder: Row: 227, Col: 178, Module: 4.57, Distance: 0.00
+2022/03/08 11:47:36 Finder: Row: 255, Col: 226, Module: 4.64, Distance: 0.00
+2022/03/08 11:47:36 Finder: Row: 360, Col: 72, Module: 16.00, Distance: 0.00
+2022/03/08 11:47:36 Search for QR corners
+2022/03/08 11:47:36 Decode Corner: Top Left:    Finder: Row: 255, Col: 226, Module: 4.64, Distance: 0.00
+2022/03/08 11:47:36 Decode Corner: Top Right:   Finder: Row: 72, Col: 72, Module: 16.00, Distance: 0.00
+2022/03/08 11:47:36 Decode Corner: Bottom Left: Finder: Row: 72, Col: 360, Module: 16.00, Distance: 0.00
+2022/03/08 11:47:36 Initial version number: 5, dimension: 37
+2022/03/08 11:47:36 Format info match with errors: 4BEC, EC: M, mask: 7, errors: 3
+2022/03/08 11:47:36 Decode QR code using three finders
+2022/03/08 11:47:36 Decode QR code exception.
+Index was outside the bounds of the array.
+2022/03/08 11:47:36 Estimated alignment mark: Row -74, Col 208
+2022/03/08 11:47:36 Decode corner failed. Index was outside the bounds of the array.
+2022/03/08 11:47:36 Decode Corner: Top Left:    Finder: Row: 72, Col: 72, Module: 16.00, Distance: 0.00
+2022/03/08 11:47:36 Decode Corner: Top Right:   Finder: Row: 72, Col: 360, Module: 16.00, Distance: 0.00
+2022/03/08 11:47:36 Decode Corner: Bottom Left: Finder: Row: 360, Col: 72, Module: 16.00, Distance: 0.00
+2022/03/08 11:47:36 Initial version number: 2, dimension: 25
+2022/03/08 11:47:36 Format info exact match: 1689, EC: H, mask: 0
+2022/03/08 11:47:36 Decode QR code using three finders
+2022/03/08 11:47:36 Fixed modules no error
+2022/03/08 11:47:36 Error correction applied to data. Total errors: 10
+2022/03/08 11:47:36 Version: 2, Dim: 25, ErrCorr: H, Generator: 28, Mask: 0, Group1: 1:16, Group2: 0:0
+2022/03/08 11:47:36 Data: Big QR Code
+2022/03/08 11:47:36 Decode Corner: Top Left:    Finder: Row: 206, Col: 254, Module: 4.64, Distance: 1.00
+2022/03/08 11:47:36 Decode Corner: Top Right:   Finder: Row: 360, Col: 72, Module: 16.00, Distance: 0.00
+2022/03/08 11:47:36 Decode Corner: Bottom Left: Finder: Row: 72, Col: 72, Module: 16.00, Distance: 0.00
+2022/03/08 11:47:36 Initial version number: 5, dimension: 37
+2022/03/08 11:47:36 Format info no match: 4B78
+2022/03/08 11:47:36 Format info match with errors: 6083, EC: L, mask: 5, errors: 2
+2022/03/08 11:47:36 Decode QR code using three finders
+2022/03/08 11:47:36 Decode QR code exception.
+Index was outside the bounds of the array.
+2022/03/08 11:47:36 Estimated alignment mark: Row 224, Col -74
+2022/03/08 11:47:36 Decode corner failed. Index was outside the bounds of the array.
+2022/03/08 11:47:36 Decode Corner: Top Left:    Finder: Row: 255, Col: 226, Module: 4.64, Distance: 0.00
+2022/03/08 11:47:36 Decode Corner: Top Right:   Finder: Row: 227, Col: 178, Module: 4.57, Distance: 0.00
+2022/03/08 11:47:36 Decode Corner: Bottom Left: Finder: Row: 206, Col: 254, Module: 4.64, Distance: 1.00
+2022/03/08 11:47:36 Initial version number: 1, dimension: 21
+2022/03/08 11:47:36 Format info exact match: 77C4, EC: L, mask: 0
+2022/03/08 11:47:36 Decode QR code using three finders
+2022/03/08 11:47:36 Fixed modules no error
+2022/03/08 11:47:36 No data errors
+2022/03/08 11:47:36 Version: 1, Dim: 21, ErrCorr: L, Generator: 7, Mask: 0, Group1: 1:19, Group2: 0:0
+2022/03/08 11:47:36 Data: Small QR Code
+2022/03/08 11:47:36 Time: 156
+2022/03/08 11:47:36 ****
+2022/03/08 11:47:36 Decode image: C:\dev\trevorde\QRCodeLibrary\QRCodeDecoder\QRCodeDecoderDemo\Work\DoubleQRCode.png 
+2022/03/08 11:47:36 Image width: 432, Height: 432
+2022/03/08 11:47:40 0: Dec 66, Hex 42
+2022/03/08 11:47:40 1: Dec 105, Hex 69
+2022/03/08 11:47:40 2: Dec 103, Hex 67
+2022/03/08 11:47:40 3: Dec 32, Hex 20
+2022/03/08 11:47:40 4: Dec 81, Hex 51
+2022/03/08 11:47:40 5: Dec 82, Hex 52
+2022/03/08 11:47:40 6: Dec 32, Hex 20
+2022/03/08 11:47:40 7: Dec 67, Hex 43
+2022/03/08 11:47:40 8: Dec 111, Hex 6f
+2022/03/08 11:47:40 9: Dec 100, Hex 64
+2022/03/08 11:47:40 10: Dec 101, Hex 65
+2022/03/08 11:47:40 0: Dec 66, Hex 42
+2022/03/08 11:47:40 1: Dec 105, Hex 69
+2022/03/08 11:47:40 2: Dec 103, Hex 67
+2022/03/08 11:47:40 3: Dec 32, Hex 20
+2022/03/08 11:47:40 4: Dec 81, Hex 51
+2022/03/08 11:47:40 5: Dec 82, Hex 52
+2022/03/08 11:47:40 6: Dec 32, Hex 20
+2022/03/08 11:47:40 7: Dec 67, Hex 43
+2022/03/08 11:47:40 8: Dec 111, Hex 6f
+2022/03/08 11:47:40 9: Dec 100, Hex 64
+2022/03/08 11:47:40 10: Dec 101, Hex 65
