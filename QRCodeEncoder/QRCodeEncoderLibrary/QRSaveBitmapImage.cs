@@ -28,14 +28,14 @@
 //	For full version history please look at QREncoder.cs
 /////////////////////////////////////////////////////////////////////
 
-using System.Drawing;
-using System.Drawing.Imaging;
-using Bitmap = System.Drawing.Bitmap;
-using Brush = System.Drawing.Brush;
-using Brushes = System.Drawing.Brushes;
-
 namespace QRCodeEncoderLibrary
 {
+  using System.Drawing;
+  using System.Drawing.Imaging;
+  using Bitmap = System.Drawing.Bitmap;
+  using Brush = System.Drawing.Brush;
+  using Brushes = System.Drawing.Brushes;
+
   /// <summary>
   /// Save QR Code image as Bitmap class
   /// </summary>
