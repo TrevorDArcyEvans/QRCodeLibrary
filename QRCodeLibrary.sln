@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRCodeDecoder.Core", "QRCodeDecoder\QRCodeDecoder.Core\QRCodeDecoder.Core.csproj", "{BA2001AA-D164-4B22-BECF-F7A94C29F790}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRCodeDecoder.Windows", "QRCodeDecoder\QRCodeDecoder.Windows\QRCodeDecoder.Windows.csproj", "{E7A4FDF8-CD6E-4684-985F-3C7DBC1F8F83}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRCodeDecoderDemo", "QRCodeDecoder\QRCodeDecoderDemo\QRCodeDecoderDemo.csproj", "{8E837233-9ED4-40CE-B0DD-785047D9010F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRCodeConsoleDemo", "QRCodeEncoder\QRCodeConsoleDemo\QRCodeConsoleDemo.csproj", "{4354A062-6997-4A8E-9CCC-607DD4711BD4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRCodeEncoder.Core", "QRCodeEncoder\QRCodeEncoder.Core\QRCodeEncoder.Core.csproj", "{4B4E498F-7274-43AD-84AB-0DC729501173}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRCodeEncoderDemo", "QRCodeEncoder\QRCodeEncoderDemo\QRCodeEncoderDemo.csproj", "{AE6613DD-8A2A-42C9-9870-F9C0C2BE49F1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BA2001AA-D164-4B22-BECF-F7A94C29F790}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA2001AA-D164-4B22-BECF-F7A94C29F790}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA2001AA-D164-4B22-BECF-F7A94C29F790}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA2001AA-D164-4B22-BECF-F7A94C29F790}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7A4FDF8-CD6E-4684-985F-3C7DBC1F8F83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7A4FDF8-CD6E-4684-985F-3C7DBC1F8F83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7A4FDF8-CD6E-4684-985F-3C7DBC1F8F83}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7A4FDF8-CD6E-4684-985F-3C7DBC1F8F83}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E837233-9ED4-40CE-B0DD-785047D9010F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E837233-9ED4-40CE-B0DD-785047D9010F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E837233-9ED4-40CE-B0DD-785047D9010F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E837233-9ED4-40CE-B0DD-785047D9010F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4354A062-6997-4A8E-9CCC-607DD4711BD4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4354A062-6997-4A8E-9CCC-607DD4711BD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4354A062-6997-4A8E-9CCC-607DD4711BD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4354A062-6997-4A8E-9CCC-607DD4711BD4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B4E498F-7274-43AD-84AB-0DC729501173}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B4E498F-7274-43AD-84AB-0DC729501173}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B4E498F-7274-43AD-84AB-0DC729501173}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B4E498F-7274-43AD-84AB-0DC729501173}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE6613DD-8A2A-42C9-9870-F9C0C2BE49F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE6613DD-8A2A-42C9-9870-F9C0C2BE49F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE6613DD-8A2A-42C9-9870-F9C0C2BE49F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE6613DD-8A2A-42C9-9870-F9C0C2BE49F1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D6A1ABC0-DB8D-4DF2-AEFC-D58D8EF59041}
+	EndGlobalSection
+EndGlobal
