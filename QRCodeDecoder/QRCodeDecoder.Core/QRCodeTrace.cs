@@ -43,7 +43,6 @@
 
 namespace QRCodeDecoder.Core
 {
-#if DEBUG
   /////////////////////////////////////////////////////////////////////
   // Trace Class
   /////////////////////////////////////////////////////////////////////
@@ -75,6 +74,7 @@ namespace QRCodeDecoder.Core
     /////////////////////////////////////////////////////////////////////
     public static void Write(string Message)
     {
+#if DEBUG
       // test file length
       TestSize();
 
@@ -89,6 +89,7 @@ namespace QRCodeDecoder.Core
 
       // close the file
       TraceFile.Close();
+#endif
     }
 
     /////////////////////////////////////////////////////////////////////
@@ -147,5 +148,4 @@ namespace QRCodeDecoder.Core
       TraceFile.Close();
     }
   }
-#endif
 }

@@ -47,6 +47,7 @@
 //	2022/03/01: Version 3.0.0 Software was upgraded to VS 2022 and C6.0
 /////////////////////////////////////////////////////////////////////
 
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
@@ -173,59 +174,6 @@ namespace QRCodeDecoder.Core
   {
     public const string VersionNumber = "Rev 3.0.0 - 2022-03-01";
 
-    internal ErrorCorrection ErrorCorrection;
-    internal int QRCodeVersion;
-    internal int ECIAssignValue;
-    internal int QRCodeDimension;
-    internal int MaskCode;
-
-    internal int ImageWidth;
-    internal int ImageHeight;
-    internal bool[,] BlackWhiteImage;
-    internal List<QRCodeFinder> FinderList;
-    internal List<QRCodeFinder> AlignList;
-    internal List<QRCodeResult> DataArrayList;
-    internal int MaxCodewords;
-    internal int MaxDataCodewords;
-    internal int MaxDataBits;
-    internal int ErrCorrCodewords;
-    internal int BlocksGroup1;
-    internal int DataCodewordsGroup1;
-    internal int BlocksGroup2;
-    internal int DataCodewordsGroup2;
-
-    internal byte[] CodewordsArray;
-    internal int CodewordsPtr;
-    internal uint BitBuffer;
-    internal int BitBufferLen;
-    internal byte[,] BaseMatrix;
-    internal byte[,] MaskMatrix;
-
-    internal bool Trans4Mode;
-
-    // transformation cooefficients from QR modules to image pixels
-    internal double Trans3a;
-    internal double Trans3b;
-    internal double Trans3c;
-    internal double Trans3d;
-    internal double Trans3e;
-    internal double Trans3f;
-
-    // transformation matrix based on three finders plus one more point
-    internal double Trans4a;
-    internal double Trans4b;
-    internal double Trans4c;
-    internal double Trans4d;
-    internal double Trans4e;
-    internal double Trans4f;
-    internal double Trans4g;
-    internal double Trans4h;
-
-    /// <summary>
-    /// Error correction percent (L, M, Q, H)
-    /// </summary>
-    internal int[] ErrCorrPercent = new[] { 7, 15, 25, 30 };
-
     // Change
     internal const double SIGNATURE_MAX_DEVIATION = 0.35; // 0.25
     internal const double HOR_VERT_SCAN_MAX_DISTANCE = 2.0;
@@ -233,6 +181,63 @@ namespace QRCodeDecoder.Core
     internal const double CORNER_SIDE_LENGTH_DEV = 0.8;
     internal const double CORNER_RIGHT_ANGLE_DEV = 0.25; // about Sin(4 deg)
     internal const double ALIGNMENT_SEARCH_AREA = 0.3;
+
+    #region private variables
+
+    private ErrorCorrection ErrorCorrection;
+    private int QRCodeVersion;
+    private int ECIAssignValue;
+    private int QRCodeDimension;
+    private int MaskCode;
+
+    private int ImageWidth;
+    private int ImageHeight;
+    private bool[,] BlackWhiteImage;
+    private List<QRCodeFinder> FinderList;
+    private List<QRCodeFinder> AlignList;
+    private List<QRCodeResult> DataArrayList;
+    private int MaxCodewords;
+    private int MaxDataCodewords;
+    private int MaxDataBits;
+    private int ErrCorrCodewords;
+    private int BlocksGroup1;
+    private int DataCodewordsGroup1;
+    private int BlocksGroup2;
+    private int DataCodewordsGroup2;
+
+    private byte[] CodewordsArray;
+    private int CodewordsPtr;
+    private uint BitBuffer;
+    private int BitBufferLen;
+    private byte[,] BaseMatrix;
+    private byte[,] MaskMatrix;
+
+    private bool Trans4Mode;
+
+    // transformation cooefficients from QR modules to image pixels
+    private double Trans3a;
+    private double Trans3b;
+    private double Trans3c;
+    private double Trans3d;
+    private double Trans3e;
+    private double Trans3f;
+
+    // transformation matrix based on three finders plus one more point
+    private double Trans4a;
+    private double Trans4b;
+    private double Trans4c;
+    private double Trans4d;
+    private double Trans4e;
+    private double Trans4f;
+    private double Trans4g;
+    private double Trans4h;
+
+    /// <summary>
+    /// Error correction percent (L, M, Q, H)
+    /// </summary>
+    private int[] ErrCorrPercent = new[] { 7, 15, 25, 30 };
+
+    #endregion
 
     /// <summary>
     /// Convert byte array to string using UTF8 encoding
@@ -276,9 +281,7 @@ namespace QRCodeDecoder.Core
     /// <returns>Output byte arrays</returns>
     public QRCodeResult[] ImageDecoder(Bitmap InputImageBitmap)
     {
-#if DEBUG
       int Start;
-#endif
       try
       {
         // empty data string output
@@ -288,30 +291,23 @@ namespace QRCodeDecoder.Core
         ImageWidth = InputImageBitmap.Width;
         ImageHeight = InputImageBitmap.Height;
 
-#if DEBUG
         Start = Environment.TickCount;
         QRCodeTrace.Write("Convert image to black and white");
-#endif
 
         // convert input image to black and white boolean image
         if (!ConvertImageToBlackAndWhite(InputImageBitmap)) return null;
 
-#if DEBUG
         QRCodeTrace.Format("Time: {0}", Environment.TickCount - Start);
         QRCodeTrace.Write("Finders search");
-#endif
 
         // horizontal search for finders
         if (!HorizontalFindersSearch()) return null;
 
-#if DEBUG
         QRCodeTrace.Format("Horizontal Finders count: {0}", FinderList.Count);
-#endif
 
         // vertical search for finders
         VerticalFindersSearch();
 
-#if DEBUG
         int MatchedCount = 0;
         foreach (QRCodeFinder HF in FinderList)
         {
@@ -319,11 +315,9 @@ namespace QRCodeDecoder.Core
           {
             MatchedCount++;
           }
-
         }
         QRCodeTrace.Format("Matched Finders count: {0}", MatchedCount);
         QRCodeTrace.Write("Remove all unused finders");
-#endif
 
         // remove unused finders
         if (!RemoveUnusedFinders())
@@ -331,28 +325,19 @@ namespace QRCodeDecoder.Core
           return null;
         }
 
-#if DEBUG
         QRCodeTrace.Format("Time: {0}", Environment.TickCount - Start);
         foreach (QRCodeFinder HF in FinderList)
         {
           QRCodeTrace.Write(HF.ToString());
         }
         QRCodeTrace.Write("Search for QR corners");
-#endif
       }
 
-#if DEBUG
       catch (Exception Ex)
       {
         QRCodeTrace.Write("QR Code decoding failed (no finders). " + Ex.Message);
         return null;
       }
-#else
-			catch
-				{
-				return null;
-				}
-#endif
 
       // look for all possible 3 finder patterns
       int Index1End = FinderList.Count - 2;
@@ -372,11 +357,9 @@ namespace QRCodeDecoder.Core
               // not a valid corner
               if (Corner == null) continue;
 
-#if DEBUG
               QRCodeTrace.Format("Decode Corner: Top Left:    {0}", Corner.TopLeftFinder.ToString());
               QRCodeTrace.Format("Decode Corner: Top Right:   {0}", Corner.TopRightFinder.ToString());
               QRCodeTrace.Format("Decode Corner: Bottom Left: {0}", Corner.BottomLeftFinder.ToString());
-#endif
 
               // get corner info (version, error code and mask)
               // continue if failed
@@ -385,9 +368,7 @@ namespace QRCodeDecoder.Core
                 continue;
               }
 
-#if DEBUG
               QRCodeTrace.Write("Decode QR code using three finders");
-#endif
 
               // decode corner using three finders
               // continue if successful
@@ -413,9 +394,7 @@ namespace QRCodeDecoder.Core
               // decode using 4 points
               foreach (QRCodeFinder Align in AlignList)
               {
-#if DEBUG
                 QRCodeTrace.Format("Calculated alignment mark: Row {0}, Col {1}", Align.Row, Align.Col);
-#endif
 
                 // calculate transformation based on 3 finders and bottom right alignment mark
                 SetTransMatrix(Corner, Align.Row, Align.Col);
@@ -428,31 +407,20 @@ namespace QRCodeDecoder.Core
               }
             }
 
-#if DEBUG
             catch (Exception Ex)
             {
               QRCodeTrace.Write("Decode corner failed. " + Ex.Message);
             }
-#else
-						catch
-							{
-							continue;
-							}
-#endif
           }
         }
       }
 
-#if DEBUG
       QRCodeTrace.Format("Time: {0}", Environment.TickCount - Start);
-#endif
 
       // not found exit
       if (DataArrayList.Count == 0)
       {
-#if DEBUG
         QRCodeTrace.Write("No QR Code found");
-#endif
         return null;
       }
 
@@ -476,9 +444,7 @@ namespace QRCodeDecoder.Core
       int ScanLineWidth = BitmapData.Stride;
       if (ScanLineWidth < 0)
       {
-#if DEBUG
         QRCodeTrace.Write("Convert image to back and white array. Invalid input image format (upside down).");
-#endif
         return false;
       }
 
@@ -492,12 +458,6 @@ namespace QRCodeDecoder.Core
       // unlock image
       InputImage.UnlockBits(BitmapData);
 
-#if DEBUGRGB
-		BinaryWriter BW = new BinaryWriter(new FileStream("TestImage.rgb", FileMode.Create));
-		int ImageWidthUp = 3 * 32 * ((ImageWidth + 31) / 32);
-		byte[] ImageBuf = new byte[ImageWidthUp];
-#endif
-
       // allocate gray image 
       byte[,] GrayImage = new byte[ImageHeight, ImageWidth];
       int[] GrayLevel = new int[256];
@@ -507,11 +467,6 @@ namespace QRCodeDecoder.Core
       int BitmapPtr = 0;
       for (int Row = 0; Row < ImageHeight; Row++)
       {
-#if DEBUGRGB
-				Array.Copy(BitmapArray, BitmapPtr, ImageBuf, 0, 3 * ImageWidth);
-				BW.Write(ImageBuf);
-#endif
-
         for (int Col = 0; Col < ImageWidth; Col++)
         {
           int Module =
@@ -523,10 +478,6 @@ namespace QRCodeDecoder.Core
 
         BitmapPtr += Delta;
       }
-
-#if DEBUGRGB
-				BW.Close();
-#endif
 
       // gray level cutoff between black and white
       int LevelStart;
@@ -545,9 +496,7 @@ namespace QRCodeDecoder.Core
       LevelEnd++;
       if (LevelEnd - LevelStart < 2)
       {
-#if DEBUG
         QRCodeTrace.Write("Convert image to back and white array. Input image has no color variations");
-#endif
         return false;
       }
 
@@ -559,49 +508,9 @@ namespace QRCodeDecoder.Core
         for (int Col = 0; Col < ImageWidth; Col++)
           BlackWhiteImage[Row, Col] = GrayImage[Row, Col] < CutoffLevel;
 
-      // save as black white image
-#if DEBUGBWIMAGE
-			QRCodeTrace.Write("Display black and white image");
-			DisplayBlackAndWhiteImage();
-#endif
-
       // exit;
       return true;
     }
-
-    ////////////////////////////////////////////////////////////////////
-    // Save and display black and white boolean image as png image
-    ////////////////////////////////////////////////////////////////////
-#if DEBUGX
-		internal void DisplayBlackAndWhiteImage()
-			{
-			int ModuleSize = Math.Min(16384 / Math.Max(ImageHeight, ImageWidth), 1);
-			SolidBrush BrushWhite = new SolidBrush(Color.White);
-			SolidBrush BrushBlack = new SolidBrush(Color.Black);
-			Bitmap Image = new Bitmap(ImageWidth * ModuleSize, ImageHeight * ModuleSize);
-			Graphics Graphics = Graphics.FromImage(Image);
-			Graphics.FillRectangle(BrushWhite, 0, 0, ImageWidth * ModuleSize, ImageHeight * ModuleSize);
-			for(int Row = 0; Row < ImageHeight; Row++) for(int Col = 0; Col < ImageWidth; Col++)
-				{
-				if(BlackWhiteImage[Row, Col]) Graphics.FillRectangle(BrushBlack, Col * ModuleSize, Row * ModuleSize, ModuleSize, ModuleSize);
-				}
-			string FileName = "DecodeImage.png";
-			try
-				{
-				FileStream fs = new FileStream(FileName, FileMode.Create);
-				Image.Save(fs, ImageFormat.Png);
-				fs.Close();
-				}
-			catch(IOException)
-				{
-				FileName = null;
-				}
-
-			// start image editor
-			if(FileName != null) Process.Start(FileName);
-			return;
-			}
-#endif
 
     ////////////////////////////////////////////////////////////////////
     // search row by row for finders blocks
@@ -620,8 +529,16 @@ namespace QRCodeDecoder.Core
       {
         // look for first black pixel
         int Col;
-        for (Col = 0; Col < ImageWidth && !BlackWhiteImage[Row, Col]; Col++) ;
-        if (Col == ImageWidth) continue;
+        for (Col = 0; Col < ImageWidth && !BlackWhiteImage[Row, Col]; Col++)
+        {
+          // DO_NOTHING
+          ;
+        }
+
+        if (Col == ImageWidth)
+        {
+          continue;
+        }
 
         // first black
         PosPtr = 0;
@@ -632,39 +549,57 @@ namespace QRCodeDecoder.Core
         {
           // look for next white
           // if black is all the way to the edge, set next white after the edge
-          for (; Col < ImageWidth && BlackWhiteImage[Row, Col]; Col++) ;
+          for (; Col < ImageWidth && BlackWhiteImage[Row, Col]; Col++)
+          {
+            // DO_NOTHING
+          }
           ColPos[PosPtr++] = Col;
-          if (Col == ImageWidth) break;
+          if (Col == ImageWidth)
+          {
+            break;
+          }
 
           // look for next black
-          for (; Col < ImageWidth && !BlackWhiteImage[Row, Col]; Col++) ;
-          if (Col == ImageWidth) break;
+          for (; Col < ImageWidth && !BlackWhiteImage[Row, Col]; Col++)
+          {
+            // DO_NOTHING
+          }
+          if (Col == ImageWidth)
+          {
+            break;
+          }
           ColPos[PosPtr++] = Col;
         }
 
         // we must have at least 6 positions
-        if (PosPtr < 6) continue;
+        if (PosPtr < 6)
+        {
+          continue;
+        }
 
         // build length array
         int PosLen = PosPtr - 1;
         int[] Len = new int[PosLen];
-        for (int Ptr = 0; Ptr < PosLen; Ptr++) Len[Ptr] = ColPos[Ptr + 1] - ColPos[Ptr];
+        for (int Ptr = 0; Ptr < PosLen; Ptr++)
+        {
+          Len[Ptr] = ColPos[Ptr + 1] - ColPos[Ptr];
+        }
 
         // test signature
         int SigLen = PosPtr - 5;
         for (int SigPtr = 0; SigPtr < SigLen; SigPtr += 2)
         {
           if (TestFinderSig(ColPos, Len, SigPtr, out double ModuleSize))
+          {
             FinderList.Add(new QRCodeFinder(Row, ColPos[SigPtr + 2], ColPos[SigPtr + 3], ModuleSize));
+          }
         }
       }
 
       // no finders found
       if (FinderList.Count < 3)
       {
-#if DEBUG
         QRCodeTrace.Write("Horizontal finders search. Less than 3 finders found");
-#endif
         return false;
       }
 
@@ -693,8 +628,15 @@ namespace QRCodeDecoder.Core
       {
         // look for first black pixel
         int Col;
-        for (Col = AreaLeft; Col < AreaRight && !BlackWhiteImage[Row, Col]; Col++) ;
-        if (Col == AreaRight) continue;
+        for (Col = AreaLeft; Col < AreaRight && !BlackWhiteImage[Row, Col]; Col++)
+        {
+          // DO_NOTHING
+        }
+
+        if (Col == AreaRight)
+        {
+          continue;
+        }
 
         // first black
         PosPtr = 0;
@@ -705,13 +647,27 @@ namespace QRCodeDecoder.Core
         {
           // look for next white
           // if black is all the way to the edge, set next white after the edge
-          for (; Col < AreaRight && BlackWhiteImage[Row, Col]; Col++) ;
+          for (; Col < AreaRight && BlackWhiteImage[Row, Col]; Col++)
+          {
+            // DO_NOTHING
+          }
+
           ColPos[PosPtr++] = Col;
-          if (Col == AreaRight) break;
+          if (Col == AreaRight)
+          {
+            break;
+          }
 
           // look for next black
-          for (; Col < AreaRight && !BlackWhiteImage[Row, Col]; Col++) ;
-          if (Col == AreaRight) break;
+          for (; Col < AreaRight && !BlackWhiteImage[Row, Col]; Col++)
+          {
+            // DO_NOTHING
+          }
+
+          if (Col == AreaRight)
+          {
+            break;
+          }
           ColPos[PosPtr++] = Col;
         }
 
@@ -729,15 +685,17 @@ namespace QRCodeDecoder.Core
         for (int SigPtr = 0; SigPtr < SigLen; SigPtr += 2)
         {
           if (TestAlignSig(ColPos, Len, SigPtr, out double ModuleSize))
+          {
             AlignList.Add(new QRCodeFinder(Row, ColPos[SigPtr + 2], ColPos[SigPtr + 3], ModuleSize));
+          }
         }
       }
 
       // list is now empty or has less than three finders
-#if DEBUG
       if (AlignList.Count == 0)
+      {
         QRCodeTrace.Write("Vertical align search.\r\nNo finders found");
-#endif
+      }
 
       // exit
       return AlignList.Count != 0;
@@ -752,7 +710,10 @@ namespace QRCodeDecoder.Core
       bool[] ActiveColumn = new bool[ImageWidth];
       foreach (QRCodeFinder HF in FinderList)
       {
-        for (int Col = HF.Col1; Col < HF.Col2; Col++) ActiveColumn[Col] = true;
+        for (int Col = HF.Col1; Col < HF.Col2; Col++)
+        {
+          ActiveColumn[Col] = true;
+        }
       }
 
       // look for finder patterns
@@ -762,12 +723,22 @@ namespace QRCodeDecoder.Core
       for (int Col = 0; Col < ImageWidth; Col++)
       {
         // not active column
-        if (!ActiveColumn[Col]) continue;
+        if (!ActiveColumn[Col])
+        {
+          continue;
+        }
 
         // look for first black pixel
         int Row;
-        for (Row = 0; Row < ImageHeight && !BlackWhiteImage[Row, Col]; Row++) ;
-        if (Row == ImageWidth) continue;
+        for (Row = 0; Row < ImageHeight && !BlackWhiteImage[Row, Col]; Row++)
+        {
+          // DO_NOTHING
+        }
+
+        if (Row == ImageWidth)
+        {
+          continue;
+        }
 
         // first black
         int PosPtr = 0;
@@ -778,29 +749,51 @@ namespace QRCodeDecoder.Core
         {
           // look for next white
           // if black is all the way to the edge, set next white after the edge
-          for (; Row < ImageHeight && BlackWhiteImage[Row, Col]; Row++) ;
+          for (; Row < ImageHeight && BlackWhiteImage[Row, Col]; Row++)
+          {
+            // DO_NOTHING
+          }
           RowPos[PosPtr++] = Row;
-          if (Row == ImageHeight) break;
+          if (Row == ImageHeight)
+          {
+            break;
+          }
 
           // look for next black
-          for (; Row < ImageHeight && !BlackWhiteImage[Row, Col]; Row++) ;
-          if (Row == ImageHeight) break;
+          for (; Row < ImageHeight && !BlackWhiteImage[Row, Col]; Row++)
+          {
+            // DO_NOTHING
+          }
+
+          if (Row == ImageHeight)
+          {
+            break;
+          }
           RowPos[PosPtr++] = Row;
         }
 
         // we must have at least 6 positions
-        if (PosPtr < 6) continue;
+        if (PosPtr < 6)
+        {
+          continue;
+        }
 
         // build length array
         int PosLen = PosPtr - 1;
         int[] Len = new int[PosLen];
-        for (int Ptr = 0; Ptr < PosLen; Ptr++) Len[Ptr] = RowPos[Ptr + 1] - RowPos[Ptr];
+        for (int Ptr = 0; Ptr < PosLen; Ptr++)
+        {
+          Len[Ptr] = RowPos[Ptr + 1] - RowPos[Ptr];
+        }
 
         // test signature
         int SigLen = PosPtr - 5;
         for (int SigPtr = 0; SigPtr < SigLen; SigPtr += 2)
         {
-          if (!TestFinderSig(RowPos, Len, SigPtr, out double ModuleSize)) continue;
+          if (!TestFinderSig(RowPos, Len, SigPtr, out double ModuleSize))
+          {
+            continue;
+          }
           foreach (QRCodeFinder HF in FinderList)
           {
             HF.Match(Col, RowPos[SigPtr + 2], RowPos[SigPtr + 3], ModuleSize);
@@ -818,7 +811,10 @@ namespace QRCodeDecoder.Core
       bool[] ActiveColumn = new bool[AreaWidth];
       foreach (QRCodeFinder HF in AlignList)
       {
-        for (int Col = HF.Col1; Col < HF.Col2; Col++) ActiveColumn[Col - AreaLeft] = true;
+        for (int Col = HF.Col1; Col < HF.Col2; Col++)
+        {
+          ActiveColumn[Col - AreaLeft] = true;
+        }
       }
 
       // look for finder patterns
@@ -833,12 +829,22 @@ namespace QRCodeDecoder.Core
       for (int Col = AreaLeft; Col < AreaRight; Col++)
       {
         // not active column
-        if (!ActiveColumn[Col - AreaLeft]) continue;
+        if (!ActiveColumn[Col - AreaLeft])
+        {
+          continue;
+        }
 
         // look for first black pixel
         int Row;
-        for (Row = AreaTop; Row < AreaBottom && !BlackWhiteImage[Row, Col]; Row++) ;
-        if (Row == AreaBottom) continue;
+        for (Row = AreaTop; Row < AreaBottom && !BlackWhiteImage[Row, Col]; Row++)
+        {
+          // DO_NOTHING
+        }
+
+        if (Row == AreaBottom)
+        {
+          continue;
+        }
 
         // first black
         PosPtr = 0;
@@ -849,29 +855,51 @@ namespace QRCodeDecoder.Core
         {
           // look for next white
           // if black is all the way to the edge, set next white after the edge
-          for (; Row < AreaBottom && BlackWhiteImage[Row, Col]; Row++) ;
+          for (; Row < AreaBottom && BlackWhiteImage[Row, Col]; Row++)
+          {
+            // DO_NOTHING
+          }
           RowPos[PosPtr++] = Row;
-          if (Row == AreaBottom) break;
+          if (Row == AreaBottom)
+          {
+            break;
+          }
 
           // look for next black
-          for (; Row < AreaBottom && !BlackWhiteImage[Row, Col]; Row++) ;
-          if (Row == AreaBottom) break;
+          for (; Row < AreaBottom && !BlackWhiteImage[Row, Col]; Row++)
+          {
+            // DO_NOTHING
+          }
+
+          if (Row == AreaBottom)
+          {
+            break;
+          }
           RowPos[PosPtr++] = Row;
         }
 
         // we must have at least 6 positions
-        if (PosPtr < 6) continue;
+        if (PosPtr < 6)
+        {
+          continue;
+        }
 
         // build length array
         int PosLen = PosPtr - 1;
         int[] Len = new int[PosLen];
-        for (int Ptr = 0; Ptr < PosLen; Ptr++) Len[Ptr] = RowPos[Ptr + 1] - RowPos[Ptr];
+        for (int Ptr = 0; Ptr < PosLen; Ptr++)
+        {
+          Len[Ptr] = RowPos[Ptr + 1] - RowPos[Ptr];
+        }
 
         // test signature
         int SigLen = PosPtr - 5;
         for (int SigPtr = 0; SigPtr < SigLen; SigPtr += 2)
         {
-          if (!TestAlignSig(RowPos, Len, SigPtr, out double ModuleSize)) continue;
+          if (!TestAlignSig(RowPos, Len, SigPtr, out double ModuleSize))
+          {
+            continue;
+          }
           foreach (QRCodeFinder HF in AlignList)
           {
             HF.Match(Col, RowPos[SigPtr + 2], RowPos[SigPtr + 3], ModuleSize);
@@ -898,9 +926,7 @@ namespace QRCodeDecoder.Core
       // list is now empty or has less than three finders
       if (FinderList.Count < 3)
       {
-#if DEBUG
         QRCodeTrace.Write("Remove unmatched finders. Less than 3 finders found");
-#endif
         return false;
       }
 
@@ -911,7 +937,10 @@ namespace QRCodeDecoder.Core
         for (int Index1 = Index + 1; Index1 < FinderList.Count; Index1++)
         {
           QRCodeFinder Finder1 = FinderList[Index1];
-          if (!Finder.Overlap(Finder1)) continue;
+          if (!Finder.Overlap(Finder1))
+          {
+            continue;
+          }
           if (Finder1.Distance < Finder.Distance)
           {
             Finder = Finder1;
@@ -926,9 +955,7 @@ namespace QRCodeDecoder.Core
       // list is now empty or has less than three finders
       if (FinderList.Count < 3)
       {
-#if DEBUG
         QRCodeTrace.Write("Keep best matched finders. Less than 3 finders found");
-#endif
         return false;
       }
 
@@ -958,7 +985,10 @@ namespace QRCodeDecoder.Core
         for (int Index1 = Index + 1; Index1 < AlignList.Count; Index1++)
         {
           QRCodeFinder Finder1 = AlignList[Index1];
-          if (!Finder.Overlap(Finder1)) continue;
+          if (!Finder.Overlap(Finder1))
+          {
+            continue;
+          }
           if (Finder1.Distance < Finder.Distance)
           {
             Finder = Finder1;
@@ -971,10 +1001,10 @@ namespace QRCodeDecoder.Core
       }
 
       // list is now empty or has less than three finders
-#if DEBUG
       if (AlignList.Count == 0)
+      {
         QRCodeTrace.Write("Remove unused alignment marks.\r\nNo alignment marks found");
-#endif
+      }
 
       // exit
       return AlignList.Count != 0;
@@ -1070,7 +1100,10 @@ namespace QRCodeDecoder.Core
             QRCodeCorner Corner = QRCodeCorner.CreateCorner(FinderList[Index1], FinderList[Index2], FinderList[Index3]);
 
             // add corner to list
-            if (Corner != null) Corners.Add(Corner);
+            if (Corner != null)
+            {
+              Corners.Add(Corner);
+            }
           }
 
       // exit
@@ -1090,9 +1123,7 @@ namespace QRCodeDecoder.Core
         // qr code dimension
         QRCodeDimension = 17 + 4 * QRCodeVersion;
 
-#if DEBUG
         QRCodeTrace.Format("Initial version number: {0}, dimension: {1}", QRCodeVersion, QRCodeDimension);
-#endif
 
         // set transformation matrix
         SetTransMatrix(Corner);
@@ -1104,7 +1135,10 @@ namespace QRCodeDecoder.Core
           if (Version == 0)
           {
             Version = GetVersionTwo();
-            if (Version == 0) return false;
+            if (Version == 0)
+            {
+              return false;
+            }
           }
 
           // QR Code version number is different than initial version
@@ -1116,9 +1150,7 @@ namespace QRCodeDecoder.Core
             // qr code dimension
             QRCodeDimension = 17 + 4 * QRCodeVersion;
 
-#if DEBUG
             QRCodeTrace.Format("Updated version number: {0}, dimension: {1}", QRCodeVersion, QRCodeDimension);
-#endif
 
             // set transformation matrix
             SetTransMatrix(Corner);
@@ -1141,7 +1173,6 @@ namespace QRCodeDecoder.Core
         return true;
       }
 
-#if DEBUG
       catch (Exception Ex)
       {
         QRCodeTrace.Format("Get QR Code corner info exception.\r\n{0}", Ex.Message);
@@ -1149,13 +1180,6 @@ namespace QRCodeDecoder.Core
         // failed exit
         return false;
       }
-#else
-			catch
-				{
-				// failed exit
-				return false;
-				}
-#endif
     }
 
     ////////////////////////////////////////////////////////////////////
@@ -1203,7 +1227,6 @@ namespace QRCodeDecoder.Core
         // add result to the list
         DataArrayList.Add(CodeResult);
 
-#if DEBUG
         // trace
         string DataString = ByteArrayToStr(DataArray);
         QRCodeTrace.Format(
@@ -1213,13 +1236,11 @@ namespace QRCodeDecoder.Core
           BlocksGroup1.ToString(), DataCodewordsGroup1.ToString(), BlocksGroup2.ToString(),
           DataCodewordsGroup2.ToString());
         QRCodeTrace.Format("Data: {0}", DataString);
-#endif
 
         // successful exit
         return true;
       }
 
-#if DEBUG
       catch (Exception Ex)
       {
         QRCodeTrace.Format("Decode QR code exception.\r\n{0}", Ex.Message);
@@ -1227,13 +1248,6 @@ namespace QRCodeDecoder.Core
         // failed exit
         return false;
       }
-#else
-			catch
-				{
-				// failed exit
-				return false;
-				}
-#endif
     }
 
     internal void SetTransMatrix(QRCodeCorner Corner)
@@ -1301,20 +1315,35 @@ namespace QRCodeDecoder.Core
         if (Matrix[Row, Row] == 0)
         {
           int Row1;
-          for (Row1 = Row + 1; Row1 < 3 && Matrix[Row1, Row] == 0; Row1++) ;
-          if (Row1 == 3) throw new ApplicationException("Solve linear equations failed");
+          for (Row1 = Row + 1; Row1 < 3 && Matrix[Row1, Row] == 0; Row1++)
+          {
+            // DO_NOTHING
+          }
 
-          for (int Col = Row; Col < 4; Col++) Matrix[Row, Col] += Matrix[Row1, Col];
+          if (Row1 == 3)
+          {
+            throw new ApplicationException("Solve linear equations failed");
+          }
+
+          for (int Col = Row; Col < 4; Col++)
+          {
+            Matrix[Row, Col] += Matrix[Row1, Col];
+          }
         }
 
         // make the diagonal element 1.0
-        for (int Col = 3; Col > Row; Col--) Matrix[Row, Col] /= Matrix[Row, Row];
+        for (int Col = 3; Col > Row; Col--)
+        {
+          Matrix[Row, Col] /= Matrix[Row, Row];
+        }
 
         // subtract current row from next rows to eliminate one value
         for (int Row1 = Row + 1; Row1 < 3; Row1++)
         {
           for (int Col = 3; Col > Row; Col--)
+          {
             Matrix[Row1, Col] -= Matrix[Row, Col] * Matrix[Row1, Row];
+          }
         }
       }
 
@@ -1355,9 +1384,7 @@ namespace QRCodeDecoder.Core
       int ImageCol = (int)Math.Round(Trans3a * AlignCol + Trans3c * AlignRow + Trans3e, 0, MidpointRounding.AwayFromZero);
       int ImageRow = (int)Math.Round(Trans3b * AlignCol + Trans3d * AlignRow + Trans3f, 0, MidpointRounding.AwayFromZero);
 
-#if DEBUG
       QRCodeTrace.Format("Estimated alignment mark: Row {0}, Col {1}", ImageRow, ImageCol);
-#endif
 
       // search area
       int Side = (int)Math.Round(ALIGNMENT_SEARCH_AREA * (Corner.TopLineLength + Corner.LeftLineLength), 0,
@@ -1367,10 +1394,6 @@ namespace QRCodeDecoder.Core
       int AreaTop = ImageRow - Side / 2;
       int AreaWidth = Side;
       int AreaHeight = Side;
-
-#if DEBUGBRCORNER
-			DisplayBottomRightCorder(AreaLeft, AreaTop, AreaWidth, AreaHeight);
-#endif
 
       // horizontal search for finders
       if (!HorizontalAlignmentSearch(AreaLeft, AreaTop, AreaWidth, AreaHeight))
@@ -1461,28 +1484,46 @@ namespace QRCodeDecoder.Core
         if (Matrix[Row, Row] == 0)
         {
           int Row1;
-          for (Row1 = Row + 1; Row1 < 8 && Matrix[Row1, Row] == 0; Row1++) ;
-          if (Row1 == 8) throw new ApplicationException("Solve linear equations failed");
+          for (Row1 = Row + 1; Row1 < 8 && Matrix[Row1, Row] == 0; Row1++)
+          {
+            // DO_NOTHING
+          }
 
-          for (int Col = Row; Col < 9; Col++) Matrix[Row, Col] += Matrix[Row1, Col];
+          if (Row1 == 8)
+          {
+            throw new ApplicationException("Solve linear equations failed");
+          }
+
+          for (int Col = Row; Col < 9; Col++)
+          {
+            Matrix[Row, Col] += Matrix[Row1, Col];
+          }
         }
 
         // make the diagonal element 1.0
-        for (int Col = 8; Col > Row; Col--) Matrix[Row, Col] /= Matrix[Row, Row];
+        for (int Col = 8; Col > Row; Col--)
+        {
+          Matrix[Row, Col] /= Matrix[Row, Row];
+        }
 
         // subtract current row from next rows to eliminate one value
         for (int Row1 = Row + 1; Row1 < 8; Row1++)
         {
-          for (int Col = 8; Col > Row; Col--) Matrix[Row1, Col] -= Matrix[Row, Col] * Matrix[Row1, Row];
+          for (int Col = 8; Col > Row; Col--)
+          {
+            Matrix[Row1, Col] -= Matrix[Row, Col] * Matrix[Row1, Row];
+          }
         }
       }
 
       // go up from last row and eliminate all solved values
       for (int Col = 7; Col > 0; Col--)
+      {
         for (int Row = Col - 1; Row >= 0; Row--)
         {
           Matrix[Row, 8] -= Matrix[Row, Col] * Matrix[Col, 8];
         }
+      }
 
       Trans4a = Matrix[0, 8];
       Trans4b = Matrix[1, 8];
@@ -1505,7 +1546,10 @@ namespace QRCodeDecoder.Core
       int VersionCode = 0;
       for (int Index = 0; Index < 18; Index++)
       {
-        if (GetModule(Index / 3, QRCodeDimension - 11 + (Index % 3))) VersionCode |= 1 << Index;
+        if (GetModule(Index / 3, QRCodeDimension - 11 + (Index % 3)))
+        {
+          VersionCode |= 1 << Index;
+        }
       }
 
       return TestVersionCode(VersionCode);
@@ -1519,7 +1563,10 @@ namespace QRCodeDecoder.Core
       int VersionCode = 0;
       for (int Index = 0; Index < 18; Index++)
       {
-        if (GetModule(QRCodeDimension - 11 + (Index % 3), Index / 3)) VersionCode |= 1 << Index;
+        if (GetModule(QRCodeDimension - 11 + (Index % 3), Index / 3))
+        {
+          VersionCode |= 1 << Index;
+        }
       }
 
       return TestVersionCode(VersionCode);
@@ -1536,9 +1583,7 @@ namespace QRCodeDecoder.Core
       // test for exact match
       if (Code >= 7 && Code <= 40 && VersionCodeArray[Code - 7] == VersionCode)
       {
-#if DEBUG
         QRCodeTrace.Format("Version code exact match: {0:X4}, Version: {1}", VersionCode, Code);
-#endif
         return Code;
       }
 
@@ -1549,7 +1594,10 @@ namespace QRCodeDecoder.Core
       {
         // test for exact match
         int ErrorBits = VersionCodeArray[Index] ^ VersionCode;
-        if (ErrorBits == 0) return VersionCode >> 12;
+        if (ErrorBits == 0)
+        {
+          return VersionCode >> 12;
+        }
 
         // count errors
         int ErrorCount = CountBits(ErrorBits);
@@ -1562,13 +1610,14 @@ namespace QRCodeDecoder.Core
         }
       }
 
-#if DEBUG
       if (Error <= 3)
-        QRCodeTrace.Format("Version code match with errors: {0:X4}, Version: {1}, Errors: {2}",
-          VersionCode, BestInfo + 7, Error);
+      {
+        QRCodeTrace.Format("Version code match with errors: {0:X4}, Version: {1}, Errors: {2}", VersionCode, BestInfo + 7, Error);
+      }
       else
+      {
         QRCodeTrace.Format("Version code no match: {0:X4}", VersionCode);
-#endif
+      }
 
       return Error <= 3 ? BestInfo + 7 : 0;
     }
@@ -1581,7 +1630,10 @@ namespace QRCodeDecoder.Core
       int Info = 0;
       for (int Index = 0; Index < 15; Index++)
       {
-        if (GetModule(FormatInfoOne[Index, 0], FormatInfoOne[Index, 1])) Info |= 1 << Index;
+        if (GetModule(FormatInfoOne[Index, 0], FormatInfoOne[Index, 1]))
+        {
+          Info |= 1 << Index;
+        }
       }
 
       return TestFormatInfo(Info);
@@ -1596,10 +1648,21 @@ namespace QRCodeDecoder.Core
       for (int Index = 0; Index < 15; Index++)
       {
         int Row = FormatInfoTwo[Index, 0];
-        if (Row < 0) Row += QRCodeDimension;
+        if (Row < 0)
+        {
+          Row += QRCodeDimension;
+        }
+
         int Col = FormatInfoTwo[Index, 1];
-        if (Col < 0) Col += QRCodeDimension;
-        if (GetModule(Row, Col)) Info |= 1 << Index;
+        if (Col < 0)
+        {
+          Col += QRCodeDimension;
+        }
+
+        if (GetModule(Row, Col))
+        {
+          Info |= 1 << Index;
+        }
       }
 
       return TestFormatInfo(Info);
@@ -1616,10 +1679,8 @@ namespace QRCodeDecoder.Core
       // test for exact match
       if (FormatInfoArray[Info] == FormatInfo)
       {
-#if DEBUG
         QRCodeTrace.Format("Format info exact match: {0:X4}, EC: {1}, mask: {2}",
           FormatInfo, FormatInfoToErrCode(Info >> 3).ToString(), Info & 7);
-#endif
         return Info;
       }
 
@@ -1636,14 +1697,16 @@ namespace QRCodeDecoder.Core
         }
       }
 
-#if DEBUG
       if (Error <= 3)
+      {
         QRCodeTrace.Format("Format info match with errors: {0:X4}, EC: {1}, mask: {2}, errors: {3}",
           FormatInfo, FormatInfoToErrCode(Info >> 3).ToString(), Info & 7, Error);
+      }
       else
+      {
         QRCodeTrace.Format("Format info no match: {0:X4}", FormatInfo);
+      }
 
-#endif
       return Error <= 3 ? BestInfo : -1;
     }
 
@@ -1654,8 +1717,12 @@ namespace QRCodeDecoder.Core
     {
       int Count = 0;
       for (int Mask = 0x4000; Mask != 0; Mask >>= 1)
+      {
         if ((Value & Mask) != 0)
+        {
           Count++;
+        }
+      }
       return Count;
     }
 
@@ -1668,14 +1735,17 @@ namespace QRCodeDecoder.Core
       int FixedCount = 0;
       int ErrorCount = 0;
       for (int Row = 0; Row < QRCodeDimension; Row++)
+      {
         for (int Col = 0; Col < QRCodeDimension; Col++)
         {
           // the module (Row, Col) is not a fixed module 
           if ((BaseMatrix[Row, Col] & Fixed) == 0)
           {
-            if (GetModule(Row, Col)) BaseMatrix[Row, Col] |= Black;
+            if (GetModule(Row, Col))
+            {
+              BaseMatrix[Row, Col] |= Black;
+            }
           }
-
           // fixed module
           else
           {
@@ -1683,11 +1753,14 @@ namespace QRCodeDecoder.Core
             FixedCount++;
 
             // test for error
-            if ((GetModule(Row, Col) ? Black : White) != (BaseMatrix[Row, Col] & 1)) ErrorCount++;
+            if ((GetModule(Row, Col) ? Black : White) != (BaseMatrix[Row, Col] & 1))
+            {
+              ErrorCount++;
+            }
           }
         }
+      }
 
-#if DEBUG
       if (ErrorCount == 0)
       {
         QRCodeTrace.Write("Fixed modules no error");
@@ -1700,9 +1773,11 @@ namespace QRCodeDecoder.Core
       {
         QRCodeTrace.Format("Fixed modules too many errors: {0} / {1}", ErrorCount, FixedCount);
       }
-#endif
+
       if (ErrorCount > FixedCount * ErrCorrPercent[(int)ErrorCorrection] / 100)
+      {
         throw new ApplicationException("Fixed modules error");
+      }
     }
 
     ////////////////////////////////////////////////////////////////////
@@ -1727,8 +1802,15 @@ namespace QRCodeDecoder.Core
         if ((MaskMatrix[Row, Col] & NonData) == 0)
         {
           // unload current module with
-          if ((MaskMatrix[Row, Col] & 1) != 0) CodewordsArray[Ptr >> 3] |= (byte)(1 << (7 - (Ptr & 7)));
-          if (++Ptr == PtrEnd) break;
+          if ((MaskMatrix[Row, Col] & 1) != 0)
+          {
+            CodewordsArray[Ptr >> 3] |= (byte)(1 << (7 - (Ptr & 7)));
+          }
+
+          if (++Ptr == PtrEnd)
+          {
+            break;
+          }
         }
 
         // current module is non data and vertical timing line condition is on
@@ -1800,7 +1882,9 @@ namespace QRCodeDecoder.Core
       // create array of data blocks starting point
       int[] Start = new int[TotalBlocks];
       for (int Index = 1; Index < TotalBlocks; Index++)
+      {
         Start[Index] = Start[Index - 1] + (Index <= BlocksGroup1 ? DataCodewordsGroup1 : DataCodewordsGroup2);
+      }
 
       // step one. iterleave base on group one length
       int PtrEnd = DataCodewordsGroup1 * TotalBlocks;
@@ -1813,7 +1897,10 @@ namespace QRCodeDecoder.Core
         TempArray[Start[Block]] = CodewordsArray[Ptr];
         Start[Block]++;
         Block++;
-        if (Block == TotalBlocks) Block = 0;
+        if (Block == TotalBlocks)
+        {
+          Block = 0;
+        }
       }
 
       // restore group two
@@ -1828,14 +1915,19 @@ namespace QRCodeDecoder.Core
           TempArray[Start[Block]] = CodewordsArray[Ptr];
           Start[Block]++;
           Block++;
-          if (Block == TotalBlocks) Block = BlocksGroup1;
+          if (Block == TotalBlocks)
+          {
+            Block = BlocksGroup1;
+          }
         }
       }
 
       // create array of error correction blocks starting point
       Start[0] = MaxDataCodewords;
       for (int Index = 1; Index < TotalBlocks; Index++)
+      {
         Start[Index] = Start[Index - 1] + ErrCorrCodewords;
+      }
 
       // restore all groups
       PtrEnd = MaxCodewords;
@@ -1845,7 +1937,10 @@ namespace QRCodeDecoder.Core
         TempArray[Start[Block]] = CodewordsArray[Ptr];
         Start[Block]++;
         Block++;
-        if (Block == TotalBlocks) Block = 0;
+        if (Block == TotalBlocks)
+        {
+          Block = 0;
+        }
       }
 
       // save result
@@ -1896,12 +1991,14 @@ namespace QRCodeDecoder.Core
         byte[] CorrectionBuffer = (byte[])ErrCorrBuff.Clone();
 
         // error correction polynomial division
-        PolynominalDivision(ErrCorrBuff, BuffLen, Generator, ErrCorrCodewords);
+        PolynomialDivision(ErrCorrBuff, BuffLen, Generator, ErrCorrCodewords);
 
         // test for error
         int Index;
         for (Index = 0; Index < ErrCorrCodewords && ErrCorrBuff[DataCodewords + Index] == 0; Index++)
-          ;
+        {
+          // DO_NOTHING
+        }
         if (Index < ErrCorrCodewords)
         {
           // correct the error
@@ -1924,12 +2021,14 @@ namespace QRCodeDecoder.Core
         CodewordsArrayErrCorrPtr += ErrCorrCodewords;
       }
 
-#if DEBUG
       if (TotalErrorCount == 0)
+      {
         QRCodeTrace.Write("No data errors");
+      }
       else
+      {
         QRCodeTrace.Write("Error correction applied to data. Total errors: " + TotalErrorCount.ToString());
-#endif
+      }
     }
 
     ////////////////////////////////////////////////////////////////////
@@ -1956,14 +2055,20 @@ namespace QRCodeDecoder.Core
         EncodingMode EncodingMode = (EncodingMode)ReadBitsFromCodewordsArray(4);
 
         // end of data
-        if (EncodingMode <= 0) break;
+        if (EncodingMode <= 0)
+        {
+          break;
+        }
 
         // test for encoding ECI assignment number
         if (EncodingMode == EncodingMode.ECI)
         {
           // one byte assinment value
           ECIAssignValue = ReadBitsFromCodewordsArray(8);
-          if ((ECIAssignValue & 0x80) == 0) continue;
+          if ((ECIAssignValue & 0x80) == 0)
+          {
+            continue;
+          }
 
           // two bytes assinment value
           ECIAssignValue = (ECIAssignValue << 8) | ReadBitsFromCodewordsArray(8);
@@ -2005,7 +2110,10 @@ namespace QRCodeDecoder.Core
             for (int Index = 0; Index < NumericEnd; Index += 3)
             {
               int Temp = ReadBitsFromCodewordsArray(10);
-              if (Temp < 0) throw new ApplicationException("Premature end of data (Numeric 1)");
+              if (Temp < 0)
+              {
+                throw new ApplicationException("Premature end of data (Numeric 1)");
+              }
               DataSeg.Add(DecodingTable[Temp / 100]);
               DataSeg.Add(DecodingTable[(Temp % 100) / 10]);
               DataSeg.Add(DecodingTable[Temp % 10]);
@@ -2015,7 +2123,10 @@ namespace QRCodeDecoder.Core
             if (DataLength - NumericEnd == 1)
             {
               int Temp = ReadBitsFromCodewordsArray(4);
-              if (Temp < 0) throw new ApplicationException("Premature end of data (Numeric 2)");
+              if (Temp < 0)
+              {
+                throw new ApplicationException("Premature end of data (Numeric 2)");
+              }
               DataSeg.Add(DecodingTable[Temp]);
             }
 
@@ -2023,11 +2134,13 @@ namespace QRCodeDecoder.Core
             else if (DataLength - NumericEnd == 2)
             {
               int Temp = ReadBitsFromCodewordsArray(7);
-              if (Temp < 0) throw new ApplicationException("Premature end of data (Numeric 3)");
+              if (Temp < 0)
+              {
+                throw new ApplicationException("Premature end of data (Numeric 3)");
+              }
               DataSeg.Add(DecodingTable[Temp / 10]);
               DataSeg.Add(DecodingTable[Temp % 10]);
             }
-
             break;
 
           // alphanumeric mode
@@ -2037,7 +2150,10 @@ namespace QRCodeDecoder.Core
             for (int Index = 0; Index < AlphaNumEnd; Index += 2)
             {
               int Temp = ReadBitsFromCodewordsArray(11);
-              if (Temp < 0) throw new ApplicationException("Premature end of data (Alpha Numeric 1)");
+              if (Temp < 0)
+              {
+                throw new ApplicationException("Premature end of data (Alpha Numeric 1)");
+              }
               DataSeg.Add(DecodingTable[Temp / 45]);
               DataSeg.Add(DecodingTable[Temp % 45]);
             }
@@ -2046,10 +2162,12 @@ namespace QRCodeDecoder.Core
             if (DataLength - AlphaNumEnd == 1)
             {
               int Temp = ReadBitsFromCodewordsArray(6);
-              if (Temp < 0) throw new ApplicationException("Premature end of data (Alpha Numeric 2)");
+              if (Temp < 0)
+              {
+                throw new ApplicationException("Premature end of data (Alpha Numeric 2)");
+              }
               DataSeg.Add(DecodingTable[Temp]);
             }
-
             break;
 
           // byte mode					
@@ -2058,10 +2176,12 @@ namespace QRCodeDecoder.Core
             for (int Index = 0; Index < DataLength; Index++)
             {
               int Temp = ReadBitsFromCodewordsArray(8);
-              if (Temp < 0) throw new ApplicationException("Premature end of data (byte mode)");
+              if (Temp < 0)
+              {
+                throw new ApplicationException("Premature end of data (byte mode)");
+              }
               DataSeg.Add((byte)Temp);
             }
-
             break;
 
           default:
@@ -2069,7 +2189,9 @@ namespace QRCodeDecoder.Core
         }
 
         if (DataLength != DataSeg.Count - SegStart)
+        {
           throw new ApplicationException("Data encoding length in error");
+        }
       }
 
       // save data
@@ -2172,23 +2294,37 @@ namespace QRCodeDecoder.Core
 
       // top left finder patterns
       for (int Row = 0; Row < 9; Row++)
+      {
         for (int Col = 0; Col < 9; Col++)
+        {
           BaseMatrix[Row, Col] = FinderPatternTopLeft[Row, Col];
+        }
+      }
 
       // top right finder patterns
       int Pos = QRCodeDimension - 8;
       for (int Row = 0; Row < 9; Row++)
+      {
         for (int Col = 0; Col < 8; Col++)
+        {
           BaseMatrix[Row, Pos + Col] = FinderPatternTopRight[Row, Col];
+        }
+      }
 
       // bottom left finder patterns
       for (int Row = 0; Row < 8; Row++)
+      {
         for (int Col = 0; Col < 9; Col++)
+        {
           BaseMatrix[Pos + Row, Col] = FinderPatternBottomLeft[Row, Col];
+        }
+      }
 
       // Timing pattern
       for (int Z = 8; Z < QRCodeDimension - 8; Z++)
+      {
         BaseMatrix[Z, 6] = BaseMatrix[6, Z] = (Z & 1) == 0 ? FixedBlack : FixedWhite;
+      }
 
       // alignment pattern
       if (QRCodeVersion > 1)
@@ -2196,20 +2332,27 @@ namespace QRCodeDecoder.Core
         byte[] AlignPos = AlignmentPositionArray[QRCodeVersion];
         int AlignmentDimension = AlignPos.Length;
         for (int Row = 0; Row < AlignmentDimension; Row++)
+        {
           for (int Col = 0; Col < AlignmentDimension; Col++)
           {
-            if (Col == 0 && Row == 0 || Col == AlignmentDimension - 1 && Row == 0 ||
+            if (Col == 0 && Row == 0 ||
+                Col == AlignmentDimension - 1 && Row == 0 ||
                 Col == 0 && Row == AlignmentDimension - 1)
+            {
               continue;
+            }
 
             int PosRow = AlignPos[Row];
             int PosCol = AlignPos[Col];
             for (int ARow = -2; ARow < 3; ARow++)
+            {
               for (int ACol = -2; ACol < 3; ACol++)
               {
                 BaseMatrix[PosRow + ARow, PosCol + ACol] = AlignmentPattern[ARow + 2, ACol + 2];
               }
+            }
           }
+        }
       }
 
       // reserve version information
@@ -2220,15 +2363,25 @@ namespace QRCodeDecoder.Core
 
         // top right
         for (int Row = 0; Row < 6; Row++)
+        {
           for (int Col = 0; Col < 3; Col++)
+          {
             BaseMatrix[Row, Pos + Col] = FormatWhite;
+          }
+        }
 
         // bottom right
         for (int Col = 0; Col < 6; Col++)
+        {
           for (int Row = 0; Row < 3; Row++)
+          {
             BaseMatrix[Pos + Row, Col] = FormatWhite;
+          }
+        }
       }
     }
+
+    #region Masks
 
     ////////////////////////////////////////////////////////////////////
     // Apply Mask
@@ -2279,13 +2432,20 @@ namespace QRCodeDecoder.Core
     internal void ApplyMask0()
     {
       for (int Row = 0; Row < QRCodeDimension; Row += 2)
+      {
         for (int Col = 0; Col < QRCodeDimension; Col += 2)
         {
           if ((MaskMatrix[Row, Col] & NonData) == 0)
+          {
             MaskMatrix[Row, Col] ^= 1;
+          }
+
           if ((MaskMatrix[Row + 1, Col + 1] & NonData) == 0)
+          {
             MaskMatrix[Row + 1, Col + 1] ^= 1;
+          }
         }
+      }
     }
 
     ////////////////////////////////////////////////////////////////////
@@ -2295,9 +2455,15 @@ namespace QRCodeDecoder.Core
     internal void ApplyMask1()
     {
       for (int Row = 0; Row < QRCodeDimension; Row += 2)
+      {
         for (int Col = 0; Col < QRCodeDimension; Col++)
+        {
           if ((MaskMatrix[Row, Col] & NonData) == 0)
+          {
             MaskMatrix[Row, Col] ^= 1;
+          }
+        }
+      }
     }
 
     ////////////////////////////////////////////////////////////////////
@@ -2307,9 +2473,15 @@ namespace QRCodeDecoder.Core
     internal void ApplyMask2()
     {
       for (int Row = 0; Row < QRCodeDimension; Row++)
+      {
         for (int Col = 0; Col < QRCodeDimension; Col += 3)
+        {
           if ((MaskMatrix[Row, Col] & NonData) == 0)
+          {
             MaskMatrix[Row, Col] ^= 1;
+          }
+        }
+      }
     }
 
     ////////////////////////////////////////////////////////////////////
@@ -2319,15 +2491,23 @@ namespace QRCodeDecoder.Core
     internal void ApplyMask3()
     {
       for (int Row = 0; Row < QRCodeDimension; Row += 3)
+      {
         for (int Col = 0; Col < QRCodeDimension; Col += 3)
         {
           if ((MaskMatrix[Row, Col] & NonData) == 0)
+          {
             MaskMatrix[Row, Col] ^= 1;
+          }
           if ((MaskMatrix[Row + 1, Col + 2] & NonData) == 0)
+          {
             MaskMatrix[Row + 1, Col + 2] ^= 1;
+          }
           if ((MaskMatrix[Row + 2, Col + 1] & NonData) == 0)
+          {
             MaskMatrix[Row + 2, Col + 1] ^= 1;
+          }
         }
+      }
     }
 
     ////////////////////////////////////////////////////////////////////
@@ -2337,36 +2517,62 @@ namespace QRCodeDecoder.Core
     internal void ApplyMask4()
     {
       for (int Row = 0; Row < QRCodeDimension; Row += 4)
+      {
         for (int Col = 0; Col < QRCodeDimension; Col += 6)
         {
           if ((MaskMatrix[Row, Col] & NonData) == 0)
+          {
             MaskMatrix[Row, Col] ^= 1;
+          }
           if ((MaskMatrix[Row, Col + 1] & NonData) == 0)
+          {
             MaskMatrix[Row, Col + 1] ^= 1;
+          }
           if ((MaskMatrix[Row, Col + 2] & NonData) == 0)
+          {
             MaskMatrix[Row, Col + 2] ^= 1;
+          }
 
           if ((MaskMatrix[Row + 1, Col] & NonData) == 0)
+          {
             MaskMatrix[Row + 1, Col] ^= 1;
+          }
           if ((MaskMatrix[Row + 1, Col + 1] & NonData) == 0)
+          {
             MaskMatrix[Row + 1, Col + 1] ^= 1;
+          }
           if ((MaskMatrix[Row + 1, Col + 2] & NonData) == 0)
+          {
             MaskMatrix[Row + 1, Col + 2] ^= 1;
+          }
 
           if ((MaskMatrix[Row + 2, Col + 3] & NonData) == 0)
+          {
             MaskMatrix[Row + 2, Col + 3] ^= 1;
+          }
           if ((MaskMatrix[Row + 2, Col + 4] & NonData) == 0)
+          {
             MaskMatrix[Row + 2, Col + 4] ^= 1;
+          }
           if ((MaskMatrix[Row + 2, Col + 5] & NonData) == 0)
+          {
             MaskMatrix[Row + 2, Col + 5] ^= 1;
+          }
 
           if ((MaskMatrix[Row + 3, Col + 3] & NonData) == 0)
+          {
             MaskMatrix[Row + 3, Col + 3] ^= 1;
+          }
           if ((MaskMatrix[Row + 3, Col + 4] & NonData) == 0)
+          {
             MaskMatrix[Row + 3, Col + 4] ^= 1;
+          }
           if ((MaskMatrix[Row + 3, Col + 5] & NonData) == 0)
+          {
             MaskMatrix[Row + 3, Col + 5] ^= 1;
+          }
         }
+      }
     }
 
     ////////////////////////////////////////////////////////////////////
@@ -2376,23 +2582,41 @@ namespace QRCodeDecoder.Core
     internal void ApplyMask5()
     {
       for (int Row = 0; Row < QRCodeDimension; Row += 6)
+      {
         for (int Col = 0; Col < QRCodeDimension; Col += 6)
         {
           for (int Delta = 0; Delta < 6; Delta++)
+          {
             if ((MaskMatrix[Row, Col + Delta] & NonData) == 0)
+            {
               MaskMatrix[Row, Col + Delta] ^= 1;
+            }
+          }
           for (int Delta = 1; Delta < 6; Delta++)
+          {
             if ((MaskMatrix[Row + Delta, Col] & NonData) == 0)
+            {
               MaskMatrix[Row + Delta, Col] ^= 1;
+            }
+          }
           if ((MaskMatrix[Row + 2, Col + 3] & NonData) == 0)
+          {
             MaskMatrix[Row + 2, Col + 3] ^= 1;
+          }
           if ((MaskMatrix[Row + 3, Col + 2] & NonData) == 0)
+          {
             MaskMatrix[Row + 3, Col + 2] ^= 1;
+          }
           if ((MaskMatrix[Row + 3, Col + 4] & NonData) == 0)
+          {
             MaskMatrix[Row + 3, Col + 4] ^= 1;
+          }
           if ((MaskMatrix[Row + 4, Col + 3] & NonData) == 0)
+          {
             MaskMatrix[Row + 4, Col + 3] ^= 1;
+          }
         }
+      }
     }
 
     ////////////////////////////////////////////////////////////////////
@@ -2402,39 +2626,73 @@ namespace QRCodeDecoder.Core
     internal void ApplyMask6()
     {
       for (int Row = 0; Row < QRCodeDimension; Row += 6)
+      {
         for (int Col = 0; Col < QRCodeDimension; Col += 6)
         {
           for (int Delta = 0; Delta < 6; Delta++)
+          {
             if ((MaskMatrix[Row, Col + Delta] & NonData) == 0)
+            {
               MaskMatrix[Row, Col + Delta] ^= 1;
+            }
+          }
           for (int Delta = 1; Delta < 6; Delta++)
+          {
             if ((MaskMatrix[Row + Delta, Col] & NonData) == 0)
+            {
               MaskMatrix[Row + Delta, Col] ^= 1;
+            }
+          }
           if ((MaskMatrix[Row + 1, Col + 1] & NonData) == 0)
+          {
             MaskMatrix[Row + 1, Col + 1] ^= 1;
+          }
           if ((MaskMatrix[Row + 1, Col + 2] & NonData) == 0)
+          {
             MaskMatrix[Row + 1, Col + 2] ^= 1;
+          }
           if ((MaskMatrix[Row + 2, Col + 1] & NonData) == 0)
+          {
             MaskMatrix[Row + 2, Col + 1] ^= 1;
+          }
           if ((MaskMatrix[Row + 2, Col + 3] & NonData) == 0)
+          {
             MaskMatrix[Row + 2, Col + 3] ^= 1;
+          }
           if ((MaskMatrix[Row + 2, Col + 4] & NonData) == 0)
+          {
             MaskMatrix[Row + 2, Col + 4] ^= 1;
+          }
           if ((MaskMatrix[Row + 3, Col + 2] & NonData) == 0)
+          {
             MaskMatrix[Row + 3, Col + 2] ^= 1;
+          }
           if ((MaskMatrix[Row + 3, Col + 4] & NonData) == 0)
+          {
             MaskMatrix[Row + 3, Col + 4] ^= 1;
+          }
           if ((MaskMatrix[Row + 4, Col + 2] & NonData) == 0)
+          {
             MaskMatrix[Row + 4, Col + 2] ^= 1;
+          }
           if ((MaskMatrix[Row + 4, Col + 3] & NonData) == 0)
+          {
             MaskMatrix[Row + 4, Col + 3] ^= 1;
+          }
           if ((MaskMatrix[Row + 4, Col + 5] & NonData) == 0)
+          {
             MaskMatrix[Row + 4, Col + 5] ^= 1;
+          }
           if ((MaskMatrix[Row + 5, Col + 4] & NonData) == 0)
+          {
             MaskMatrix[Row + 5, Col + 4] ^= 1;
+          }
           if ((MaskMatrix[Row + 5, Col + 5] & NonData) == 0)
+          {
             MaskMatrix[Row + 5, Col + 5] ^= 1;
+          }
         }
+      }
     }
 
     ////////////////////////////////////////////////////////////////////
@@ -2444,51 +2702,89 @@ namespace QRCodeDecoder.Core
     internal void ApplyMask7()
     {
       for (int Row = 0; Row < QRCodeDimension; Row += 6)
+      {
         for (int Col = 0; Col < QRCodeDimension; Col += 6)
         {
           if ((MaskMatrix[Row, Col] & NonData) == 0)
+          {
             MaskMatrix[Row, Col] ^= 1;
+          }
           if ((MaskMatrix[Row, Col + 2] & NonData) == 0)
+          {
             MaskMatrix[Row, Col + 2] ^= 1;
+          }
           if ((MaskMatrix[Row, Col + 4] & NonData) == 0)
+          {
             MaskMatrix[Row, Col + 4] ^= 1;
+          }
 
           if ((MaskMatrix[Row + 1, Col + 3] & NonData) == 0)
+          {
             MaskMatrix[Row + 1, Col + 3] ^= 1;
+          }
           if ((MaskMatrix[Row + 1, Col + 4] & NonData) == 0)
+          {
             MaskMatrix[Row + 1, Col + 4] ^= 1;
+          }
           if ((MaskMatrix[Row + 1, Col + 5] & NonData) == 0)
+          {
             MaskMatrix[Row + 1, Col + 5] ^= 1;
+          }
 
           if ((MaskMatrix[Row + 2, Col] & NonData) == 0)
+          {
             MaskMatrix[Row + 2, Col] ^= 1;
+          }
           if ((MaskMatrix[Row + 2, Col + 4] & NonData) == 0)
+          {
             MaskMatrix[Row + 2, Col + 4] ^= 1;
+          }
           if ((MaskMatrix[Row + 2, Col + 5] & NonData) == 0)
+          {
             MaskMatrix[Row + 2, Col + 5] ^= 1;
+          }
 
           if ((MaskMatrix[Row + 3, Col + 1] & NonData) == 0)
+          {
             MaskMatrix[Row + 3, Col + 1] ^= 1;
+          }
           if ((MaskMatrix[Row + 3, Col + 3] & NonData) == 0)
+          {
             MaskMatrix[Row + 3, Col + 3] ^= 1;
+          }
           if ((MaskMatrix[Row + 3, Col + 5] & NonData) == 0)
+          {
             MaskMatrix[Row + 3, Col + 5] ^= 1;
+          }
 
           if ((MaskMatrix[Row + 4, Col] & NonData) == 0)
+          {
             MaskMatrix[Row + 4, Col] ^= 1;
+          }
           if ((MaskMatrix[Row + 4, Col + 1] & NonData) == 0)
+          {
             MaskMatrix[Row + 4, Col + 1] ^= 1;
+          }
           if ((MaskMatrix[Row + 4, Col + 2] & NonData) == 0)
+          {
             MaskMatrix[Row + 4, Col + 2] ^= 1;
+          }
 
           if ((MaskMatrix[Row + 5, Col + 1] & NonData) == 0)
-            MaskMatrix[Row + 5, Col + 1] ^= 1;
+          { MaskMatrix[Row + 5, Col + 1] ^= 1; }
           if ((MaskMatrix[Row + 5, Col + 2] & NonData) == 0)
+          {
             MaskMatrix[Row + 5, Col + 2] ^= 1;
+          }
           if ((MaskMatrix[Row + 5, Col + 3] & NonData) == 0)
+          {
             MaskMatrix[Row + 5, Col + 3] ^= 1;
+          }
         }
+      }
     }
+
+    #endregion
 
     internal static int INCORRECTABLE_ERROR = -1;
 
@@ -2567,7 +2863,7 @@ namespace QRCodeDecoder.Core
         Error = true;
       }
 
-      // all other synsromes
+      // all other syndromes
       for (int Index = 1; Index < ErrCorrCodewords; Index++)
       {
         // Total = Data[0] + Data[1] * Alpha + Data[2] * Alpha ** 2 + ... Data[n] * Alpha ** n
@@ -2731,7 +3027,7 @@ namespace QRCodeDecoder.Core
       }
     }
 
-    internal static void PolynominalDivision(byte[] Polynomial, int PolyLength, byte[] Generator, int ErrCorrCodewords)
+    internal static void PolynomialDivision(byte[] Polynomial, int PolyLength, byte[] Generator, int ErrCorrCodewords)
     {
       int DataCodewords = PolyLength - ErrCorrCodewords;
 
@@ -2782,13 +3078,19 @@ namespace QRCodeDecoder.Core
       for (int Index1 = 0; Index1 < Poly1.Length; Index1++)
       {
         if (Poly1[Index1] == 0)
+        {
           continue;
+        }
         int loga = IntToExp[Poly1[Index1]];
         int Index2End = Math.Min(Poly2.Length, Result.Length - Index1);
         // = Sum(Poly1[Index1] * Poly2[Index2]) for all Index2
         for (int Index2 = 0; Index2 < Index2End; Index2++)
+        {
           if (Poly2[Index2] != 0)
+          {
             Result[Index1 + Index2] ^= ExpToInt[loga + IntToExp[Poly2[Index2]]];
+          }
+        }
       }
     }
 
@@ -2855,7 +3157,6 @@ namespace QRCodeDecoder.Core
     // 4) Kanji characters (Shift JIS character set in accordance with JIS X 0208 Annex 1 Shift Coded
     //    Representation. Note that Kanji characters in QR Code can have values 8140HEX -9FFCHEX and E040HEX -
     //    EBBFHEX , which can be compacted into 13 bits.)
-
     internal static readonly byte[] EncodingTable =
     {
       45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45,
@@ -3103,6 +3404,8 @@ namespace QRCodeDecoder.Core
       { 20, 15, 61, 16 }, // 40-H
     };
 
+    #region Generators
+
     internal static readonly byte[] Generator7 =
       { 87, 229, 146, 149, 238, 102, 21 };
 
@@ -3313,6 +3616,8 @@ namespace QRCodeDecoder.Core
       null, Generator58, null, Generator60, null, Generator62, null, Generator64, null, Generator66,
       null, Generator68
     };
+
+    #endregion
 
     internal static readonly byte[] ExpToInt = //	ExpToInt =
     {

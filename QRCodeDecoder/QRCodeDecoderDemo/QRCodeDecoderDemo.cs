@@ -42,6 +42,7 @@
 /////////////////////////////////////////////////////////////////////
 
 using System.Diagnostics;
+using System.Drawing.Imaging;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using QRCodeDecoder.Core;
@@ -85,24 +86,9 @@ namespace QRCodeDecoderDemo
       // program title
       Text = "QRCodeDecoder " + QRDecoder.VersionNumber + " \u00a9 2018-2022 Uzi Granot. All rights reserved.";
 
-#if DEBUG
-      // debug mode
-      // change current directory to work directory if exist
-      string CurDir = Environment.CurrentDirectory;
-      int Index = CurDir.IndexOf("bin\\Debug");
-      if (Index > 0)
-      {
-        string WorkDir = string.Concat(CurDir.AsSpan(0, Index), "Work");
-        if (Directory.Exists(WorkDir))
-        {
-          Environment.CurrentDirectory = WorkDir;
-        }
-      }
-
       // open trace file
       QRCodeTrace.Open("QRCodeDecoderTrace.txt");
       QRCodeTrace.Write("QRCodeDecoder");
-#endif
 
       // disable go to url button
       GoToUrlButton.Enabled = false;
@@ -185,12 +171,10 @@ namespace QRCodeDecoderDemo
       // each QR code matrix is made of one byte per module
       QRCodeResult[] QRCodeResultArray = QRCodeDecoder.ImageDecoder(QRCodeInputImage);
 
-#if DEBUG
       // trace
       QRCodeTrace.Format("****");
       QRCodeTrace.Format("Decode image: {0} ", Dialog.FileName);
       QRCodeTrace.Format("Image width: {0}, Height: {1}", QRCodeInputImage.Width, QRCodeInputImage.Height);
-#endif
 
       // we have at least one QR Code
       if (QRCodeResultArray != null)
@@ -207,7 +191,6 @@ namespace QRCodeDecoderDemo
         // convert results to text
         DataTextBox.Text = ConvertResultToDisplayString(QRCodeResultArray);
 
-#if DEBUG
         if (QRCodeResultArray != null && QRCodeResultArray.Length > 0)
         {
           byte[] Data = QRCodeResultArray[0].DataArray;
@@ -216,7 +199,6 @@ namespace QRCodeDecoderDemo
             QRCodeTrace.Format("{0}: Dec {1}, Hex {1:x2}", Index, Data[Index]);
           }
         }
-#endif
 
         // if the text is a valid url
         if (IsValidUrl(DataTextBox.Text))
@@ -224,7 +206,6 @@ namespace QRCodeDecoderDemo
           GoToUrlButton.Enabled = true;
         }
 
-#if DEBUG
         {
           byte[] Data = QRCodeResultArray[0].DataArray;
           for (int Index = 0; Index < Data.Length; Index++)
@@ -232,7 +213,6 @@ namespace QRCodeDecoderDemo
             QRCodeTrace.Format("{0}: Dec {1}, Hex {1:x2}", Index, Data[Index]);
           }
         }
-#endif
       }
 
       // enable buttons
@@ -332,10 +312,8 @@ namespace QRCodeDecoderDemo
         // get frame image
         QRCodeImage = VideoCamera.SnapshotSourceImage();
 
-#if DEBUG
         // trace
         QRCodeTrace.Format("Image width: {0}, Height: {1}", QRCodeImage.Width, QRCodeImage.Height);
-#endif
       }
       catch (Exception EX)
       {
@@ -348,10 +326,8 @@ namespace QRCodeDecoderDemo
       QRCodeResult[] DataByteArray = QRCodeDecoder.ImageDecoder(QRCodeImage);
       string Text = ConvertResultToDisplayString(DataByteArray);
 
-#if DEBUG
       // save image for debugging
-      // QRCodeImage.Save("VideoCaptureImage.png", ImageFormat.Png);
-#endif
+      QRCodeImage.Save("VideoCaptureImage.png", ImageFormat.Png);
 
       // dispose bitmap
       QRCodeImage.Dispose();
