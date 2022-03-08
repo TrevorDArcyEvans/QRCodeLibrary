@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\QRCodeEncoderLibrary\QRCodeEncoder.Core.csproj" />
+    <ProjectReference Include="..\QRCodeEncoder.Core\QRCodeEncoder.Core.csproj" />
   </ItemGroup>
 
 </Project>
