@@ -47,6 +47,8 @@ using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using QRCodeDecoder.Core;
 using QRCodeDecoder.Windows;
+using Serilog;
+using Serilog.Core;
 using Timer = System.Windows.Forms.Timer;
 
 namespace QRCodeDecoderDemo
@@ -68,12 +70,21 @@ namespace QRCodeDecoderDemo
     private Timer QRCodeTimer;
     private Panel CameraPanel;
 
+    private readonly ILogger _logger;
+
     /// <summary>
     /// Constructor
     /// </summary>
     public QRCodeDecoderDemo()
     {
       InitializeComponent();
+
+      // open trace file
+      _logger = new LoggerConfiguration()
+           .WriteTo.Console()
+           .WriteTo.File("QRCodeDecoderTrace.txt")
+           .CreateLogger();
+      _logger.Information("QRCodeDecoder");
     }
 
     /// <summary>
@@ -86,15 +97,11 @@ namespace QRCodeDecoderDemo
       // program title
       Text = "QRCodeDecoder " + QRDecoder.VersionNumber + " \u00a9 2018-2022 Uzi Granot. All rights reserved.";
 
-      // open trace file
-      QRCodeTrace.Open("QRCodeDecoderTrace.txt");
-      QRCodeTrace.Write("QRCodeDecoder");
-
       // disable go to url button
       GoToUrlButton.Enabled = false;
 
       // create decoder
-      QRCodeDecoder = new QRDecoder();
+      QRCodeDecoder = new QRDecoder(_logger);
 
       // test for video camera
       VideoCameraExists = TestForVideoCamera();
@@ -172,9 +179,9 @@ namespace QRCodeDecoderDemo
       QRCodeResult[] QRCodeResultArray = QRCodeDecoder.ImageDecoder(QRCodeInputImage);
 
       // trace
-      QRCodeTrace.Format("****");
-      QRCodeTrace.Format("Decode image: {0} ", Dialog.FileName);
-      QRCodeTrace.Format("Image width: {0}, Height: {1}", QRCodeInputImage.Width, QRCodeInputImage.Height);
+      _logger.Information("****");
+      _logger.Information($"Decode image: {Dialog.FileName}");
+      _logger.Information($"Image width: {QRCodeInputImage.Width}, Height: {QRCodeInputImage.Height}");
 
       // we have at least one QR Code
       if (QRCodeResultArray != null)
@@ -196,7 +203,7 @@ namespace QRCodeDecoderDemo
           byte[] Data = QRCodeResultArray[0].DataArray;
           for (int Index = 0; Index < Data.Length; Index++)
           {
-            QRCodeTrace.Format("{0}: Dec {1}, Hex {1:x2}", Index, Data[Index]);
+            _logger.Information($"{Index}: Dec {Data[Index]}, Hex {Data[Index]:x2}");
           }
         }
 
@@ -210,7 +217,7 @@ namespace QRCodeDecoderDemo
           byte[] Data = QRCodeResultArray[0].DataArray;
           for (int Index = 0; Index < Data.Length; Index++)
           {
-            QRCodeTrace.Format("{0}: Dec {1}, Hex {1:x2}", Index, Data[Index]);
+            _logger.Information($"{Index}: Dec {Data[Index]}, Hex {Data[Index]:x2}");
           }
         }
       }
@@ -313,7 +320,7 @@ namespace QRCodeDecoderDemo
         QRCodeImage = VideoCamera.SnapshotSourceImage();
 
         // trace
-        QRCodeTrace.Format("Image width: {0}, Height: {1}", QRCodeImage.Width, QRCodeImage.Height);
+        _logger.Information($"Image width: {QRCodeImage.Width}, Height: {QRCodeImage.Height}");
       }
       catch (Exception EX)
       {
@@ -618,6 +625,7 @@ namespace QRCodeDecoderDemo
     {
       QRCodeInputImage?.Dispose();
       VideoCamera?.Dispose();
+      Log.CloseAndFlush();
     }
   }
 }
