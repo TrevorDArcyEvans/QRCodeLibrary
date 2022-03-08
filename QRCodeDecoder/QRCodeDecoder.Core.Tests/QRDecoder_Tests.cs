@@ -17,7 +17,7 @@ namespace QRCodeDecoder.Core.Tests
         }
 
         [Test]
-        public void Test1()
+        public void Constructor_Succeeds()
         {
           Action act = () => Create();
 
