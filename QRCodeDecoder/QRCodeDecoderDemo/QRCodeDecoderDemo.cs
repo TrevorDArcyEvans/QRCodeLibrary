@@ -419,6 +419,20 @@ namespace QRCodeDecoderDemo
     }
 
     /// <summary>
+    /// Convert byte array to string using UTF8 encoding
+    /// </summary>
+    /// <param name="DataArray">Input array</param>
+    /// <returns>Output string</returns>
+    private static string ByteArrayToStr(byte[] DataArray)
+    {
+      Decoder Decoder = Encoding.UTF8.GetDecoder();
+      int CharCount = Decoder.GetCharCount(DataArray, 0, DataArray.Length);
+      char[] CharArray = new char[CharCount];
+      Decoder.GetChars(DataArray, 0, DataArray.Length, CharArray, 0);
+      return new string(CharArray);
+    }
+
+    /// <summary>
     /// Format result for display
     /// </summary>
     /// <param name="DataByteArray">QR Decoded byte arrays</param>
@@ -434,7 +448,7 @@ namespace QRCodeDecoderDemo
       // image has one QR code
       if (DataByteArray.Count == 1)
       {
-        return SingleQRCodeResult(QRDecoder.ByteArrayToStr(DataByteArray[0].DataArray));
+        return SingleQRCodeResult(ByteArrayToStr(DataByteArray[0].DataArray));
       }
 
       // image has more than one QR code
@@ -446,7 +460,7 @@ namespace QRCodeDecoderDemo
           Str.Append("\r\n");
         }
         Str.AppendFormat("QR Code {0}\r\n", Index + 1);
-        Str.Append(SingleQRCodeResult(QRDecoder.ByteArrayToStr(DataByteArray[Index].DataArray)));
+        Str.Append(SingleQRCodeResult(ByteArrayToStr(DataByteArray[Index].DataArray)));
       }
       return Str.ToString();
     }
