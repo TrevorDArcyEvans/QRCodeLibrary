@@ -1,4 +1,4 @@
-﻿namespace QRCodeEncoder
+﻿namespace QRCodeEncoderDemo
 	{
 	partial class SaveImage
 		{

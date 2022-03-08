@@ -28,114 +28,114 @@
 //	For full version history please look at QREncode.cs
 /////////////////////////////////////////////////////////////////////
 
-using System.Drawing.Imaging;
+namespace QRCodeEncoderDemo
+{
+  using System.Drawing.Imaging;
 
-namespace QRCodeEncoder
-	{
-	public enum SaveType
-		{
-		Png,
-		Bitmap,
-		Special
-		}
+  public enum SaveType
+  {
+    Png,
+    Bitmap,
+    Special
+  }
 
-	public partial class SaveImage : Form
-		{
-		public int ModuleSize;
-		public int QuietZone;
-		public ImageFormat FileFormat;
-		public SaveType SaveIndex;
+  public partial class SaveImage : Form
+  {
+    public int ModuleSize;
+    public int QuietZone;
+    public ImageFormat FileFormat;
+    public SaveType SaveIndex;
 
-		/// <summary>
-		/// Image file format
-		/// </summary>
-		public static readonly ImageFormat[] FileFormatArray = { ImageFormat.Png, ImageFormat.Jpeg, ImageFormat.Bmp, ImageFormat.Gif };
+    /// <summary>
+    /// Image file format
+    /// </summary>
+    public static readonly ImageFormat[] FileFormatArray = { ImageFormat.Png, ImageFormat.Jpeg, ImageFormat.Bmp, ImageFormat.Gif };
 
-		public SaveImage()
-			{
-			InitializeComponent();
-			return;
-			}
+    public SaveImage()
+    {
+      InitializeComponent();
+      return;
+    }
 
-		private void OnLoad(object sender, EventArgs e)
-			{
-			// initialize module size and quiet zone text boxes
-			ModuleSizeTextBox.Text = ModuleSize.ToString();
-			QuietZoneTextBox.Text = QuietZone.ToString();
+    private void OnLoad(object sender, EventArgs e)
+    {
+      // initialize module size and quiet zone text boxes
+      ModuleSizeTextBox.Text = ModuleSize.ToString();
+      QuietZoneTextBox.Text = QuietZone.ToString();
 
-			// load image file type combo box
-			int SelectedIndex = 0;
-			for(int Index = 0; Index < FileFormatArray.Length; Index++)
-				{
-				ImageFormatComboBox.Items.Add(FileFormatArray[Index]);
-				if(FileFormatArray[Index] == FileFormat) SelectedIndex = Index;
-				}
-			ImageFormatComboBox.SelectedIndex = SelectedIndex;
-			return;
-			}
+      // load image file type combo box
+      int SelectedIndex = 0;
+      for (int Index = 0; Index < FileFormatArray.Length; Index++)
+      {
+        ImageFormatComboBox.Items.Add(FileFormatArray[Index]);
+        if (FileFormatArray[Index] == FileFormat) SelectedIndex = Index;
+      }
+      ImageFormatComboBox.SelectedIndex = SelectedIndex;
+      return;
+    }
 
 
-		private void OnSavePng(object sender, EventArgs e)
-			{
-			if (!TestFields()) return;
-			SaveIndex = SaveType.Png;
-			DialogResult = DialogResult.OK;
-			return;
-			}
+    private void OnSavePng(object sender, EventArgs e)
+    {
+      if (!TestFields()) return;
+      SaveIndex = SaveType.Png;
+      DialogResult = DialogResult.OK;
+      return;
+    }
 
-		private void OnSaveBitmap(object sender, EventArgs e)
-			{
-			if (!TestFields()) return;
-			SaveIndex = SaveType.Bitmap;
-			DialogResult = DialogResult.OK;
-			return;
-			}
+    private void OnSaveBitmap(object sender, EventArgs e)
+    {
+      if (!TestFields()) return;
+      SaveIndex = SaveType.Bitmap;
+      DialogResult = DialogResult.OK;
+      return;
+    }
 
-		private void OnSaveSpecial(object sender, EventArgs e)
-			{
-			if (!TestFields()) return;
-			SaveIndex = SaveType.Special;
-			DialogResult = DialogResult.OK;
-			return;
-			}
+    private void OnSaveSpecial(object sender, EventArgs e)
+    {
+      if (!TestFields()) return;
+      SaveIndex = SaveType.Special;
+      DialogResult = DialogResult.OK;
+      return;
+    }
 
-		private void OnCancel(object sender, EventArgs e)
-			{
-			DialogResult = DialogResult.Cancel;
-			return;
-			}
+    private void OnCancel(object sender, EventArgs e)
+    {
+      DialogResult = DialogResult.Cancel;
+      return;
+    }
 
-		private bool TestFields()
-			{ 
-			// get module size
-			string ModuleStr = ModuleSizeTextBox.Text.Trim();
-				if(!int.TryParse(ModuleStr, out ModuleSize) || ModuleSize< 1 || ModuleSize> 100)
-					{
-					MessageBox.Show("Module size error.");
-					return false;
-					}
+    private bool TestFields()
+    {
+      // get module size
+      string ModuleStr = ModuleSizeTextBox.Text.Trim();
+      if (!int.TryParse(ModuleStr, out ModuleSize) || ModuleSize < 1 || ModuleSize > 100)
+      {
+        MessageBox.Show("Module size error.");
+        return false;
+      }
 
-			// get quiet zone
-			string QuietStr = QuietZoneTextBox.Text.Trim();
-				if(!int.TryParse(QuietStr, out QuietZone) || QuietZone< 1 || QuietZone> 100)
-					{
-					MessageBox.Show("Quiet zone error.");
-					return false;
-					}
+      // get quiet zone
+      string QuietStr = QuietZoneTextBox.Text.Trim();
+      if (!int.TryParse(QuietStr, out QuietZone) || QuietZone < 1 || QuietZone > 100)
+      {
+        MessageBox.Show("Quiet zone error.");
+        return false;
+      }
 
-			FileFormat = (ImageFormat) ImageFormatComboBox.SelectedItem;
-			return true;
-			}
+      FileFormat = (ImageFormat)ImageFormatComboBox.SelectedItem;
+      return true;
+    }
 
-		private void OnImageFileFormat
-				(
-				object sender,
-				ListControlConvertEventArgs e
-				)
-			{
-			ImageFormat Format = (ImageFormat)e.ListItem;
-			e.Value = string.Format("{0} (*.{1})", Format.ToString(), Format.ToString().ToLower());
-			return;
-			}
-		}
-	}
+    private void OnImageFileFormat
+        (
+        object sender,
+        ListControlConvertEventArgs e
+        )
+    {
+      ImageFormat Format = (ImageFormat)e.ListItem;
+      e.Value = string.Format("{0} (*.{1})", Format.ToString(), Format.ToString().ToLower());
+      return;
+    }
+  }
+}

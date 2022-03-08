@@ -28,7 +28,7 @@
 //
 /////////////////////////////////////////////////////////////////////
 
-namespace QRCodeEncoderLibrary
+namespace QRCodeEncoder.Core
 {
   using System.IO.Compression;
 

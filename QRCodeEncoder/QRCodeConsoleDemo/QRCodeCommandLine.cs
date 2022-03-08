@@ -30,7 +30,7 @@
 
 namespace QRCodeConsoleDemo
 {
-  using QRCodeEncoderLibrary;
+  using QRCodeEncoder.Core;
 
   // calling example for console application
   //

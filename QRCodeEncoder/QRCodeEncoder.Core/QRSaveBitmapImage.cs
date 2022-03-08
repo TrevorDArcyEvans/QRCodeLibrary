@@ -28,7 +28,7 @@
 //	For full version history please look at QREncoder.cs
 /////////////////////////////////////////////////////////////////////
 
-namespace QRCodeEncoderLibrary
+namespace QRCodeEncoder.Core
 {
   using System.Drawing;
   using System.Drawing.Imaging;

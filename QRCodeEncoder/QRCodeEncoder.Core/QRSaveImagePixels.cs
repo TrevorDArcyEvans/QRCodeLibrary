@@ -28,7 +28,7 @@
 //
 /////////////////////////////////////////////////////////////////////
 
-namespace QRCodeEncoderLibrary
+namespace QRCodeEncoder.Core
 {
   /// <summary>
   /// Convert QR code matrix to boolean image class

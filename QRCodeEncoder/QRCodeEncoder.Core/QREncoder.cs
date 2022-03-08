@@ -39,10 +39,10 @@
 //	2022/03/01: Version 3.0.0 Software was upgraded to VS 2022 and C6.0
 /////////////////////////////////////////////////////////////////////
 
-using System.Text;
-
-namespace QRCodeEncoderLibrary
+namespace QRCodeEncoder.Core
 {
+  using System.Text;
+
   /// <summary>
   /// QR Code error correction code enumeration
   /// </summary>
