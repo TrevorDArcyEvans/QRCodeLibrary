@@ -47,7 +47,7 @@ using System.Runtime.InteropServices.ComTypes;
 using System.Security;
 using System.Text;
 
-namespace QRCodeDecoderLibrary
+namespace QRCodeDecoder.Windows
 {
   /// <summary>
   /// From AMPROPERTY_PIN

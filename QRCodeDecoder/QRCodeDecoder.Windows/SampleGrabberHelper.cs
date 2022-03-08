@@ -45,7 +45,7 @@ using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 
-namespace QRCodeDecoderLibrary
+namespace QRCodeDecoder.Windows
 {
   /// <summary>
   /// Helper for SampleGrabber. Used to make screenshots (snapshots).

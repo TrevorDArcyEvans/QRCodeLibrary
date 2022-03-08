@@ -44,6 +44,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
+using QRCodeDecoder.Windows;
 using QRCodeDecoderLibrary;
 using Timer = System.Windows.Forms.Timer;
 
