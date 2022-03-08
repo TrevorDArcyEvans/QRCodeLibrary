@@ -41,18 +41,17 @@
 //	For version history please refer to QRDecoder.cs
 /////////////////////////////////////////////////////////////////////
 
-using System.Diagnostics;
-using System.Drawing.Imaging;
-using System.Runtime.InteropServices.ComTypes;
-using System.Text;
-using QRCodeDecoder.Core;
-using QRCodeDecoder.Windows;
-using Serilog;
-using Serilog.Core;
-using Timer = System.Windows.Forms.Timer;
-
 namespace QRCodeDecoderDemo
 {
+  using System.Diagnostics;
+  using System.Drawing.Imaging;
+  using System.Runtime.InteropServices.ComTypes;
+  using System.Text;
+  using QRCodeDecoder.Core;
+  using QRCodeDecoder.Windows;
+  using Serilog;
+  using Timer = System.Windows.Forms.Timer;
+
   /// <summary>
   /// Test QR Code Decoder
   /// </summary>

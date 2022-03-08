@@ -41,14 +41,14 @@
 //	For version history please refer to QRDecoder.cs
 /////////////////////////////////////////////////////////////////////
 
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.ComTypes;
-using Microsoft.Win32;
-using QRCodeDecoder.Core;
-
 namespace QRCodeDecoder.Windows
 {
+  using System.Diagnostics;
+  using System.Runtime.InteropServices;
+  using System.Runtime.InteropServices.ComTypes;
+  using Microsoft.Win32;
+  using Core;
+
   /// <summary>
   /// The Camera class is an main class that is a wrapper for video device.
   /// </summary>

@@ -41,12 +41,12 @@
 //	For version history please refer to QRDecoder.cs
 /////////////////////////////////////////////////////////////////////
 
-using System.Diagnostics;
-using System.Drawing.Imaging;
-using System.Runtime.InteropServices;
-
 namespace QRCodeDecoder.Windows
 {
+  using System.Diagnostics;
+  using System.Drawing.Imaging;
+  using System.Runtime.InteropServices;
+
   /// <summary>
   /// Helper for SampleGrabber. Used to make screenshots (snapshots).
   /// </summary>

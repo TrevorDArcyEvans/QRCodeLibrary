@@ -41,14 +41,14 @@
 //	For version history please refer to QRDecoder.cs
 /////////////////////////////////////////////////////////////////////
 
-using System.Collections;
-using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.ComTypes;
-using System.Security;
-using System.Text;
-
 namespace QRCodeDecoder.Windows
 {
+  using System.Collections;
+  using System.Runtime.InteropServices;
+  using System.Runtime.InteropServices.ComTypes;
+  using System.Security;
+  using System.Text;
+
   /// <summary>
   /// From AMPROPERTY_PIN
   /// </summary>
@@ -1633,11 +1633,11 @@ namespace QRCodeDecoder.Windows
     }
   }
 
-// This abstract class contains definitions for use in implementing a custom marshaler.
-//
-// MarshalManagedToNative() gets called before the COM method, and MarshalNativeToManaged() gets
-// called after.  This allows for allocating a correctly sized memory block for the COM call,
-// then to break up the memory block and build an object that c# can digest.
+  // This abstract class contains definitions for use in implementing a custom marshaler.
+  //
+  // MarshalManagedToNative() gets called before the COM method, and MarshalNativeToManaged() gets
+  // called after.  This allows for allocating a correctly sized memory block for the COM call,
+  // then to break up the memory block and build an object that c# can digest.
 
   abstract internal class DsMarshaler : ICustomMarshaler
   {
@@ -1703,8 +1703,8 @@ namespace QRCodeDecoder.Windows
     //public static ICustomMarshaler GetInstance(string cookie)
   }
 
-// c# does not correctly marshal arrays of pointers.
-//
+  // c# does not correctly marshal arrays of pointers.
+  //
   internal class EMTMarshaler : DsMarshaler
   {
     public EMTMarshaler(string cookie) : base(cookie)
