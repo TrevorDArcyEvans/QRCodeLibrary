@@ -8,4 +8,8 @@
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\QRCodeDecoder.Core\QRCodeDecoder.Core.csproj" />
+  </ItemGroup>
+
 </Project>
