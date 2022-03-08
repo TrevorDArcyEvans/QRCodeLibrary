@@ -431,7 +431,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Convert image to black and white boolean matrix
     ////////////////////////////////////////////////////////////////////
-    internal bool ConvertImageToBlackAndWhite(Bitmap InputImage)
+    private bool ConvertImageToBlackAndWhite(Bitmap InputImage)
     {
       // lock image bits
       BitmapData BitmapData = InputImage.LockBits(new Rectangle(0, 0, ImageWidth, ImageHeight),
@@ -515,7 +515,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // search row by row for finders blocks
     ////////////////////////////////////////////////////////////////////
-    internal bool HorizontalFindersSearch()
+    private bool HorizontalFindersSearch()
     {
       // create empty finders list
       FinderList = new List<QRCodeFinder>();
@@ -610,7 +610,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // search row by row for alignment blocks
     ////////////////////////////////////////////////////////////////////
-    internal bool HorizontalAlignmentSearch(int AreaLeft, int AreaTop, int AreaWidth, int AreaHeight)
+    private bool HorizontalAlignmentSearch(int AreaLeft, int AreaTop, int AreaWidth, int AreaHeight)
     {
       // create empty finders list
       AlignList = new List<QRCodeFinder>();
@@ -704,7 +704,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // search column by column for finders blocks
     ////////////////////////////////////////////////////////////////////
-    internal void VerticalFindersSearch()
+    private void VerticalFindersSearch()
     {
       // active columns
       bool[] ActiveColumn = new bool[ImageWidth];
@@ -805,7 +805,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // search column by column for finders blocks
     ////////////////////////////////////////////////////////////////////
-    internal void VerticalAlignmentSearch(int AreaLeft, int AreaTop, int AreaWidth, int AreaHeight)
+    private void VerticalAlignmentSearch(int AreaLeft, int AreaTop, int AreaWidth, int AreaHeight)
     {
       // active columns
       bool[] ActiveColumn = new bool[AreaWidth];
@@ -911,7 +911,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // search column by column for finders blocks
     ////////////////////////////////////////////////////////////////////
-    internal bool RemoveUnusedFinders()
+    private bool RemoveUnusedFinders()
     {
       // remove all entries without a match
       for (int Index = 0; Index < FinderList.Count; Index++)
@@ -966,7 +966,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // search column by column for finders blocks
     ////////////////////////////////////////////////////////////////////
-    internal bool RemoveUnusedAlignMarks()
+    private bool RemoveUnusedAlignMarks()
     {
       // remove all entries without a match
       for (int Index = 0; Index < AlignList.Count; Index++)
@@ -1013,7 +1013,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // test finder signature 1 1 3 1 1
     ////////////////////////////////////////////////////////////////////
-    internal static bool TestFinderSig(int[] Pos, int[] Len, int Index, out double Module)
+    private static bool TestFinderSig(int[] Pos, int[] Len, int Index, out double Module)
     {
       Module = (Pos[Index + 5] - Pos[Index]) / 7.0;
       double MaxDev = SIGNATURE_MAX_DEVIATION * Module;
@@ -1048,7 +1048,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // test alignment signature n 1 1 1 n
     ////////////////////////////////////////////////////////////////////
-    internal static bool TestAlignSig(int[] Pos, int[] Len, int Index, out double Module)
+    private static bool TestAlignSig(int[] Pos, int[] Len, int Index, out double Module)
     {
       Module = (Pos[Index + 4] - Pos[Index + 1]) / 3.0;
       double MaxDev = SIGNATURE_MAX_DEVIATION * Module;
@@ -1083,7 +1083,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Build corner list
     ////////////////////////////////////////////////////////////////////
-    internal List<QRCodeCorner> BuildCornerList()
+    private List<QRCodeCorner> BuildCornerList()
     {
       // empty list
       List<QRCodeCorner> Corners = new();
@@ -1113,7 +1113,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Get QR Code corner info
     ////////////////////////////////////////////////////////////////////
-    internal bool GetQRCodeCornerInfo(QRCodeCorner Corner)
+    private bool GetQRCodeCornerInfo(QRCodeCorner Corner)
     {
       try
       {
@@ -1185,7 +1185,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Search for QR Code version
     ////////////////////////////////////////////////////////////////////
-    internal bool DecodeQRCodeCorner(QRCodeCorner Corner)
+    private bool DecodeQRCodeCorner(QRCodeCorner Corner)
     {
       try
       {
@@ -1250,7 +1250,7 @@ namespace QRCodeDecoder.Core
       }
     }
 
-    internal void SetTransMatrix(QRCodeCorner Corner)
+    private void SetTransMatrix(QRCodeCorner Corner)
     {
       // save
       int BottomRightPos = QRCodeDimension - 4;
@@ -1307,7 +1307,7 @@ namespace QRCodeDecoder.Core
       Trans4Mode = false;
     }
 
-    internal static void SolveMatrixOne(double[,] Matrix)
+    private static void SolveMatrixOne(double[,] Matrix)
     {
       for (int Row = 0; Row < 3; Row++)
       {
@@ -1356,7 +1356,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Get image pixel color
     ////////////////////////////////////////////////////////////////////
-    internal bool GetModule(int Row, int Col)
+    private bool GetModule(int Row, int Col)
     {
       // get module based on three finders
       if (!Trans4Mode)
@@ -1376,7 +1376,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // search row by row for finders blocks
     ////////////////////////////////////////////////////////////////////
-    internal bool FindAlignmentMark(QRCodeCorner Corner)
+    private bool FindAlignmentMark(QRCodeCorner Corner)
     {
       // alignment mark estimated position
       int AlignRow = QRCodeDimension - 7;
@@ -1414,7 +1414,7 @@ namespace QRCodeDecoder.Core
       return true;
     }
 
-    internal void SetTransMatrix(QRCodeCorner Corner, double ImageAlignRow, double ImageAlignCol)
+    private void SetTransMatrix(QRCodeCorner Corner, double ImageAlignRow, double ImageAlignCol)
     {
       // top right and bottom left QR code position
       int FarFinder = QRCodeDimension - 4;
@@ -1541,7 +1541,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Get version code bits top right
     ////////////////////////////////////////////////////////////////////
-    internal int GetVersionOne()
+    private int GetVersionOne()
     {
       int VersionCode = 0;
       for (int Index = 0; Index < 18; Index++)
@@ -1558,7 +1558,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Get version code bits bottom left
     ////////////////////////////////////////////////////////////////////
-    internal int GetVersionTwo()
+    private int GetVersionTwo()
     {
       int VersionCode = 0;
       for (int Index = 0; Index < 18; Index++)
@@ -1575,7 +1575,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Test version code bits
     ////////////////////////////////////////////////////////////////////
-    internal static int TestVersionCode(int VersionCode)
+    private static int TestVersionCode(int VersionCode)
     {
       // format info
       int Code = VersionCode >> 12;
@@ -1625,7 +1625,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Get format info around top left corner
     ////////////////////////////////////////////////////////////////////
-    public int GetFormatInfoOne()
+    private int GetFormatInfoOne()
     {
       int Info = 0;
       for (int Index = 0; Index < 15; Index++)
@@ -1642,7 +1642,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Get format info around top right and bottom left corners
     ////////////////////////////////////////////////////////////////////
-    internal int GetFormatInfoTwo()
+    private int GetFormatInfoTwo()
     {
       int Info = 0;
       for (int Index = 0; Index < 15; Index++)
@@ -1671,7 +1671,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Test format info bits
     ////////////////////////////////////////////////////////////////////
-    internal static int TestFormatInfo(int FormatInfo)
+    private static int TestFormatInfo(int FormatInfo)
     {
       // format info
       int Info = (FormatInfo ^ 0x5412) >> 10;
@@ -1713,7 +1713,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Count Bits
     ////////////////////////////////////////////////////////////////////
-    internal static int CountBits(int Value)
+    private static int CountBits(int Value)
     {
       int Count = 0;
       for (int Mask = 0x4000; Mask != 0; Mask >>= 1)
@@ -1729,7 +1729,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Convert image to qr code matrix and test fixed modules
     ////////////////////////////////////////////////////////////////////
-    internal void ConvertImageToMatrix()
+    private void ConvertImageToMatrix()
     {
       // loop for all modules
       int FixedCount = 0;
@@ -1783,7 +1783,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Unload matrix data from base matrix
     ////////////////////////////////////////////////////////////////////
-    internal void UnloadDataFromMatrix()
+    private void UnloadDataFromMatrix()
     {
       // input array pointer initialization
       int Ptr = 0;
@@ -1871,7 +1871,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Restore interleave data and error correction blocks
     ////////////////////////////////////////////////////////////////////
-    internal void RestoreBlocks()
+    private void RestoreBlocks()
     {
       // allocate temp codewords array
       byte[] TempArray = new byte[MaxCodewords];
@@ -2034,7 +2034,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Convert bit array to byte array
     ////////////////////////////////////////////////////////////////////
-    internal byte[] DecodeData()
+    private byte[] DecodeData()
     {
       // bit buffer initial condition
       BitBuffer = (UInt32)((CodewordsArray[0] << 24) | (CodewordsArray[1] << 16) | (CodewordsArray[2] << 8) |
@@ -2201,7 +2201,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Read data from codeword array
     ////////////////////////////////////////////////////////////////////
-    internal int ReadBitsFromCodewordsArray(int Bits)
+    private int ReadBitsFromCodewordsArray(int Bits)
     {
       if (Bits > BitBufferLen)
       {
@@ -2222,7 +2222,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Set encoded data bits length
     ////////////////////////////////////////////////////////////////////
-    internal int DataLengthBits(EncodingMode EncodingMode)
+    private int DataLengthBits(EncodingMode EncodingMode)
     {
       // Data length bits
 #pragma warning disable IDE0066
@@ -2248,7 +2248,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Set data and error correction codewords length
     ////////////////////////////////////////////////////////////////////
-    internal void SetDataCodewordsLength()
+    private void SetDataCodewordsLength()
     {
       // index shortcut
       int BlockInfoIndex = (QRCodeVersion - 1) * 4 + (int)ErrorCorrection;
@@ -2279,7 +2279,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Format info to error correction code
     ////////////////////////////////////////////////////////////////////
-    internal static ErrorCorrection FormatInfoToErrCode(int Info)
+    private static ErrorCorrection FormatInfoToErrCode(int Info)
     {
       return (ErrorCorrection)(Info ^ 1);
     }
@@ -2287,7 +2287,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Build Base Matrix
     ////////////////////////////////////////////////////////////////////
-    internal void BuildBaseMatrix()
+    private void BuildBaseMatrix()
     {
       // allocate base matrix
       BaseMatrix = new byte[QRCodeDimension + 5, QRCodeDimension + 5];
@@ -2386,7 +2386,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Apply Mask
     ////////////////////////////////////////////////////////////////////
-    internal void ApplyMask(int Mask)
+    private void ApplyMask(int Mask)
     {
       MaskMatrix = (byte[,])BaseMatrix.Clone();
       switch (Mask)
@@ -2429,7 +2429,7 @@ namespace QRCodeDecoder.Core
     // Apply Mask 0
     // (row + column) % 2 == 0
     ////////////////////////////////////////////////////////////////////
-    internal void ApplyMask0()
+    private void ApplyMask0()
     {
       for (int Row = 0; Row < QRCodeDimension; Row += 2)
       {
@@ -2452,7 +2452,7 @@ namespace QRCodeDecoder.Core
     // Apply Mask 1
     // row % 2 == 0
     ////////////////////////////////////////////////////////////////////
-    internal void ApplyMask1()
+    private void ApplyMask1()
     {
       for (int Row = 0; Row < QRCodeDimension; Row += 2)
       {
@@ -2470,7 +2470,7 @@ namespace QRCodeDecoder.Core
     // Apply Mask 2
     // column % 3 == 0
     ////////////////////////////////////////////////////////////////////
-    internal void ApplyMask2()
+    private void ApplyMask2()
     {
       for (int Row = 0; Row < QRCodeDimension; Row++)
       {
@@ -2488,7 +2488,7 @@ namespace QRCodeDecoder.Core
     // Apply Mask 3
     // (row + column) % 3 == 0
     ////////////////////////////////////////////////////////////////////
-    internal void ApplyMask3()
+    private void ApplyMask3()
     {
       for (int Row = 0; Row < QRCodeDimension; Row += 3)
       {
@@ -2514,7 +2514,7 @@ namespace QRCodeDecoder.Core
     // Apply Mask 4
     // ((row / 2) + (column / 3)) % 2 == 0
     ////////////////////////////////////////////////////////////////////
-    internal void ApplyMask4()
+    private void ApplyMask4()
     {
       for (int Row = 0; Row < QRCodeDimension; Row += 4)
       {
@@ -2579,7 +2579,7 @@ namespace QRCodeDecoder.Core
     // Apply Mask 5
     // ((row * column) % 2) + ((row * column) % 3) == 0
     ////////////////////////////////////////////////////////////////////
-    internal void ApplyMask5()
+    private void ApplyMask5()
     {
       for (int Row = 0; Row < QRCodeDimension; Row += 6)
       {
@@ -2623,7 +2623,7 @@ namespace QRCodeDecoder.Core
     // Apply Mask 6
     // (((row * column) % 2) + ((row * column) mod 3)) mod 2 == 0
     ////////////////////////////////////////////////////////////////////
-    internal void ApplyMask6()
+    private void ApplyMask6()
     {
       for (int Row = 0; Row < QRCodeDimension; Row += 6)
       {
@@ -2699,7 +2699,7 @@ namespace QRCodeDecoder.Core
     // Apply Mask 7
     // (((row + column) % 2) + ((row * column) mod 3)) mod 2 == 0
     ////////////////////////////////////////////////////////////////////
-    internal void ApplyMask7()
+    private void ApplyMask7()
     {
       for (int Row = 0; Row < QRCodeDimension; Row += 6)
       {
@@ -2786,9 +2786,9 @@ namespace QRCodeDecoder.Core
 
     #endregion
 
-    internal static int INCORRECTABLE_ERROR = -1;
+    private static int INCORRECTABLE_ERROR = -1;
 
-    internal static int CorrectData
+    private static int CorrectData
     (
       byte[] ReceivedData, // received data buffer with data and error correction code
       int DataLength, // length of data in the buffer (note sometimes the array is longer than data) 
@@ -2837,7 +2837,7 @@ namespace QRCodeDecoder.Core
     // S2 = R0 + R1 * A**2 + R2 * A**4 + .... + Rn * A**2n
     // ....
     // Sm = R0 + R1 * A**m + R2 * A**2m + .... + Rn * A**mn
-    internal static int[] CalculateSyndrome
+    private static int[] CalculateSyndrome
     (
       byte[] ReceivedData, // received data buffer with data and error correction code
       int DataLength, // length of data in the buffer (note sometimes the array is longer than data) 
@@ -2884,7 +2884,7 @@ namespace QRCodeDecoder.Core
     }
 
     // Modified Berlekamp-Massey
-    internal static int CalculateSigmaMBM(int[] Sigma, int[] Omega, int[] Syndrome, int ErrCorrCodewords)
+    private static int CalculateSigmaMBM(int[] Sigma, int[] Omega, int[] Syndrome, int ErrCorrCodewords)
     {
       int[] PolyC = new int[ErrCorrCodewords];
       int[] PolyB = new int[ErrCorrCodewords];
@@ -3027,7 +3027,7 @@ namespace QRCodeDecoder.Core
       }
     }
 
-    internal static void PolynomialDivision(byte[] Polynomial, int PolyLength, byte[] Generator, int ErrCorrCodewords)
+    private static void PolynomialDivision(byte[] Polynomial, int PolyLength, byte[] Generator, int ErrCorrCodewords)
     {
       int DataCodewords = PolyLength - ErrCorrCodewords;
 
@@ -3052,27 +3052,27 @@ namespace QRCodeDecoder.Core
       }
     }
 
-    internal static int Multiply(int Int1, int Int2)
+    private static int Multiply(int Int1, int Int2)
     {
       return (Int1 == 0 || Int2 == 0) ? 0 : ExpToInt[IntToExp[Int1] + IntToExp[Int2]];
     }
 
-    internal static int MultiplyIntByExp(int Int, int Exp)
+    private static int MultiplyIntByExp(int Int, int Exp)
     {
       return Int == 0 ? 0 : ExpToInt[IntToExp[Int] + Exp];
     }
 
-    internal static int MultiplyDivide(int Int1, int Int2, int Int3)
+    private static int MultiplyDivide(int Int1, int Int2, int Int3)
     {
       return (Int1 == 0 || Int2 == 0) ? 0 : ExpToInt[(IntToExp[Int1] + IntToExp[Int2] - IntToExp[Int3] + 255) % 255];
     }
 
-    internal static int DivideIntByExp(int Int, int Exp)
+    private static int DivideIntByExp(int Int, int Exp)
     {
       return Int == 0 ? 0 : ExpToInt[IntToExp[Int] - Exp + 255];
     }
 
-    internal static void PolynomialMultiply(int[] Result, int[] Poly1, int[] Poly2)
+    private static void PolynomialMultiply(int[] Result, int[] Poly1, int[] Poly2)
     {
       Array.Clear(Result, 0, Result.Length);
       for (int Index1 = 0; Index1 < Poly1.Length; Index1++)
@@ -3095,7 +3095,7 @@ namespace QRCodeDecoder.Core
     }
 
     // alignment symbols position as function of dimension
-    internal static readonly byte[][] AlignmentPositionArray =
+    private static readonly byte[][] AlignmentPositionArray =
     {
       null,
       null,
@@ -3141,7 +3141,7 @@ namespace QRCodeDecoder.Core
     };
 
     // maximum code words as function of dimension
-    internal static readonly int[] MaxCodewordsArray =
+    private static readonly int[] MaxCodewordsArray =
     {
       0,
       26, 44, 70, 100, 134, 172, 196, 242, 292, 346,
@@ -3157,7 +3157,7 @@ namespace QRCodeDecoder.Core
     // 4) Kanji characters (Shift JIS character set in accordance with JIS X 0208 Annex 1 Shift Coded
     //    Representation. Note that Kanji characters in QR Code can have values 8140HEX -9FFCHEX and E040HEX -
     //    EBBFHEX , which can be compacted into 13 bits.)
-    internal static readonly byte[] EncodingTable =
+    private static readonly byte[] EncodingTable =
     {
       45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45,
       45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45,
@@ -3177,7 +3177,7 @@ namespace QRCodeDecoder.Core
       45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45,
     };
 
-    internal static readonly byte[] DecodingTable =
+    private static readonly byte[] DecodingTable =
     {
       (byte)'0', // 0
       (byte)'1', // 1
@@ -3228,18 +3228,18 @@ namespace QRCodeDecoder.Core
 
     // Error correction block information
     // A-Number of blocks in group 1
-    internal const int BLOCKS_GROUP1 = 0;
+    private const int BLOCKS_GROUP1 = 0;
 
     // B-Number of data codewords in blocks of group 1
-    internal const int DATA_CODEWORDS_GROUP1 = 1;
+    private const int DATA_CODEWORDS_GROUP1 = 1;
 
     // C-Number of blocks in group 2
-    internal const int BLOCKS_GROUP2 = 2;
+    private const int BLOCKS_GROUP2 = 2;
 
     // D-Number of data codewords in blocks of group 2
-    internal const int DATA_CODEWORDS_GROUP2 = 3;
+    private const int DATA_CODEWORDS_GROUP2 = 3;
 
-    internal static readonly byte[,] ECBlockInfo =
+    private static readonly byte[,] ECBlockInfo =
     {
       // A,   B,   C,   D 
       { 1, 19, 0, 0 }, // 1-L
@@ -3406,125 +3406,125 @@ namespace QRCodeDecoder.Core
 
     #region Generators
 
-    internal static readonly byte[] Generator7 =
+    private static readonly byte[] Generator7 =
       { 87, 229, 146, 149, 238, 102, 21 };
 
-    internal static readonly byte[] Generator10 =
+    private static readonly byte[] Generator10 =
       { 251, 67, 46, 61, 118, 70, 64, 94, 32, 45 };
 
-    internal static readonly byte[] Generator13 =
+    private static readonly byte[] Generator13 =
       { 74, 152, 176, 100, 86, 100, 106, 104, 130, 218, 206, 140, 78 };
 
-    internal static readonly byte[] Generator15 =
+    private static readonly byte[] Generator15 =
       { 8, 183, 61, 91, 202, 37, 51, 58, 58, 237, 140, 124, 5, 99, 105 };
 
-    internal static readonly byte[] Generator16 =
+    private static readonly byte[] Generator16 =
       { 120, 104, 107, 109, 102, 161, 76, 3, 91, 191, 147, 169, 182, 194, 225, 120 };
 
-    internal static readonly byte[] Generator17 =
+    private static readonly byte[] Generator17 =
     {
       43, 139, 206, 78, 43, 239, 123, 206, 214, 147, 24, 99, 150, 39, 243, 163,
       136
     };
 
-    internal static readonly byte[] Generator18 =
+    private static readonly byte[] Generator18 =
     {
       215, 234, 158, 94, 184, 97, 118, 170, 79, 187, 152, 148, 252, 179, 5, 98,
       96, 153
     };
 
-    internal static readonly byte[] Generator20 =
+    private static readonly byte[] Generator20 =
     {
       17, 60, 79, 50, 61, 163, 26, 187, 202, 180, 221, 225, 83, 239, 156, 164,
       212, 212, 188, 190
     };
 
-    internal static readonly byte[] Generator22 =
+    private static readonly byte[] Generator22 =
     {
       210, 171, 247, 242, 93, 230, 14, 109, 221, 53, 200, 74, 8, 172, 98, 80,
       219, 134, 160, 105, 165, 231
     };
 
-    internal static readonly byte[] Generator24 =
+    private static readonly byte[] Generator24 =
     {
       229, 121, 135, 48, 211, 117, 251, 126, 159, 180, 169, 152, 192, 226, 228, 218,
       111, 0, 117, 232, 87, 96, 227, 21
     };
 
-    internal static readonly byte[] Generator26 =
+    private static readonly byte[] Generator26 =
     {
       173, 125, 158, 2, 103, 182, 118, 17, 145, 201, 111, 28, 165, 53, 161, 21,
       245, 142, 13, 102, 48, 227, 153, 145, 218, 70
     };
 
-    internal static readonly byte[] Generator28 =
+    private static readonly byte[] Generator28 =
     {
       168, 223, 200, 104, 224, 234, 108, 180, 110, 190, 195, 147, 205, 27, 232, 201,
       21, 43, 245, 87, 42, 195, 212, 119, 242, 37, 9, 123
     };
 
-    internal static readonly byte[] Generator30 =
+    private static readonly byte[] Generator30 =
     {
       41, 173, 145, 152, 216, 31, 179, 182, 50, 48, 110, 86, 239, 96, 222, 125,
       42, 173, 226, 193, 224, 130, 156, 37, 251, 216, 238, 40, 192, 180
     };
 
-    internal static readonly byte[] Generator32 =
+    private static readonly byte[] Generator32 =
     {
       10, 6, 106, 190, 249, 167, 4, 67, 209, 138, 138, 32, 242, 123, 89, 27,
       120, 185, 80, 156, 38, 60, 171, 60, 28, 222, 80, 52, 254, 185, 220, 241
     };
 
-    internal static readonly byte[] Generator34 =
+    private static readonly byte[] Generator34 =
     {
       111, 77, 146, 94, 26, 21, 108, 19, 105, 94, 113, 193, 86, 140, 163, 125,
       58, 158, 229, 239, 218, 103, 56, 70, 114, 61, 183, 129, 167, 13, 98, 62,
       129, 51
     };
 
-    internal static readonly byte[] Generator36 =
+    private static readonly byte[] Generator36 =
     {
       200, 183, 98, 16, 172, 31, 246, 234, 60, 152, 115, 0, 167, 152, 113, 248,
       238, 107, 18, 63, 218, 37, 87, 210, 105, 177, 120, 74, 121, 196, 117, 251,
       113, 233, 30, 120
     };
 
-    internal static readonly byte[] Generator40 =
+    private static readonly byte[] Generator40 =
     {
       59, 116, 79, 161, 252, 98, 128, 205, 128, 161, 247, 57, 163, 56, 235, 106,
       53, 26, 187, 174, 226, 104, 170, 7, 175, 35, 181, 114, 88, 41, 47, 163,
       125, 134, 72, 20, 232, 53, 35, 15
     };
 
-    internal static readonly byte[] Generator42 =
+    private static readonly byte[] Generator42 =
     {
       250, 103, 221, 230, 25, 18, 137, 231, 0, 3, 58, 242, 221, 191, 110, 84,
       230, 8, 188, 106, 96, 147, 15, 131, 139, 34, 101, 223, 39, 101, 213, 199,
       237, 254, 201, 123, 171, 162, 194, 117, 50, 96
     };
 
-    internal static readonly byte[] Generator44 =
+    private static readonly byte[] Generator44 =
     {
       190, 7, 61, 121, 71, 246, 69, 55, 168, 188, 89, 243, 191, 25, 72, 123,
       9, 145, 14, 247, 1, 238, 44, 78, 143, 62, 224, 126, 118, 114, 68, 163,
       52, 194, 217, 147, 204, 169, 37, 130, 113, 102, 73, 181
     };
 
-    internal static readonly byte[] Generator46 =
+    private static readonly byte[] Generator46 =
     {
       112, 94, 88, 112, 253, 224, 202, 115, 187, 99, 89, 5, 54, 113, 129, 44,
       58, 16, 135, 216, 169, 211, 36, 1, 4, 96, 60, 241, 73, 104, 234, 8,
       249, 245, 119, 174, 52, 25, 157, 224, 43, 202, 223, 19, 82, 15
     };
 
-    internal static readonly byte[] Generator48 =
+    private static readonly byte[] Generator48 =
     {
       228, 25, 196, 130, 211, 146, 60, 24, 251, 90, 39, 102, 240, 61, 178, 63,
       46, 123, 115, 18, 221, 111, 135, 160, 182, 205, 107, 206, 95, 150, 120, 184,
       91, 21, 247, 156, 140, 238, 191, 11, 94, 227, 84, 50, 163, 39, 34, 108
     };
 
-    internal static readonly byte[] Generator50 =
+    private static readonly byte[] Generator50 =
     {
       232, 125, 157, 161, 164, 9, 118, 46, 209, 99, 203, 193, 35, 3, 209, 111,
       195, 242, 203, 225, 46, 13, 32, 160, 126, 209, 130, 160, 242, 215, 242, 75,
@@ -3532,7 +3532,7 @@ namespace QRCodeDecoder.Core
       133, 205
     };
 
-    internal static readonly byte[] Generator52 =
+    private static readonly byte[] Generator52 =
     {
       116, 50, 86, 186, 50, 220, 251, 89, 192, 46, 86, 127, 124, 19, 184, 233,
       151, 215, 22, 14, 59, 145, 37, 242, 203, 134, 254, 89, 190, 94, 59, 65,
@@ -3540,7 +3540,7 @@ namespace QRCodeDecoder.Core
       239, 254, 116, 51
     };
 
-    internal static readonly byte[] Generator54 =
+    private static readonly byte[] Generator54 =
     {
       183, 26, 201, 84, 210, 221, 113, 21, 46, 65, 45, 50, 238, 184, 249, 225,
       102, 58, 209, 218, 109, 165, 26, 95, 184, 192, 52, 245, 35, 254, 238, 175,
@@ -3548,7 +3548,7 @@ namespace QRCodeDecoder.Core
       101, 31, 198, 76, 31, 156
     };
 
-    internal static readonly byte[] Generator56 =
+    private static readonly byte[] Generator56 =
     {
       106, 120, 107, 157, 164, 216, 112, 116, 2, 91, 248, 163, 36, 201, 202, 229,
       6, 144, 254, 155, 135, 208, 170, 209, 12, 139, 127, 142, 182, 249, 177, 174,
@@ -3556,7 +3556,7 @@ namespace QRCodeDecoder.Core
       247, 151, 154, 202, 207, 20, 61, 10
     };
 
-    internal static readonly byte[] Generator58 =
+    private static readonly byte[] Generator58 =
     {
       82, 116, 26, 247, 66, 27, 62, 107, 252, 182, 200, 185, 235, 55, 251, 242,
       210, 144, 154, 237, 176, 141, 192, 248, 152, 249, 206, 85, 253, 142, 65, 165,
@@ -3564,7 +3564,7 @@ namespace QRCodeDecoder.Core
       117, 29, 41, 63, 159, 142, 233, 125, 148, 123
     };
 
-    internal static readonly byte[] Generator60 =
+    private static readonly byte[] Generator60 =
     {
       107, 140, 26, 12, 9, 141, 243, 197, 226, 197, 219, 45, 211, 101, 219, 120,
       28, 181, 127, 6, 100, 247, 2, 205, 198, 57, 115, 219, 101, 109, 160, 82,
@@ -3572,7 +3572,7 @@ namespace QRCodeDecoder.Core
       65, 102, 190, 220, 70, 27, 209, 16, 89, 7, 33, 240
     };
 
-    internal static readonly byte[] Generator62 =
+    private static readonly byte[] Generator62 =
     {
       65, 202, 113, 98, 71, 223, 248, 118, 214, 94, 0, 122, 37, 23, 2, 228,
       58, 121, 7, 105, 135, 78, 243, 118, 70, 76, 223, 89, 72, 50, 70, 111,
@@ -3580,7 +3580,7 @@ namespace QRCodeDecoder.Core
       115, 6, 200, 100, 26, 246, 182, 218, 127, 215, 36, 186, 110, 106
     };
 
-    internal static readonly byte[] Generator64 =
+    private static readonly byte[] Generator64 =
     {
       45, 51, 175, 9, 7, 158, 159, 49, 68, 119, 92, 123, 177, 204, 187, 254,
       200, 78, 141, 149, 119, 26, 127, 53, 160, 93, 199, 212, 29, 24, 145, 156,
@@ -3588,7 +3588,7 @@ namespace QRCodeDecoder.Core
       238, 63, 99, 108, 140, 230, 242, 31, 204, 11, 178, 243, 217, 156, 213, 231
     };
 
-    internal static readonly byte[] Generator66 =
+    private static readonly byte[] Generator66 =
     {
       5, 118, 222, 180, 136, 136, 162, 51, 46, 117, 13, 215, 81, 17, 139, 247,
       197, 171, 95, 173, 65, 137, 178, 68, 111, 95, 101, 41, 72, 214, 169, 197,
@@ -3597,7 +3597,7 @@ namespace QRCodeDecoder.Core
       45, 105
     };
 
-    internal static readonly byte[] Generator68 =
+    private static readonly byte[] Generator68 =
     {
       247, 159, 223, 33, 224, 93, 77, 70, 90, 160, 32, 254, 43, 150, 84, 101,
       190, 205, 133, 52, 60, 202, 165, 220, 203, 151, 93, 84, 15, 84, 253, 173,
@@ -3606,7 +3606,7 @@ namespace QRCodeDecoder.Core
       5, 8, 163, 238
     };
 
-    internal static readonly byte[][] GenArray =
+    private static readonly byte[][] GenArray =
     {
       Generator7, null, null, Generator10, null, null, Generator13, null, Generator15, Generator16,
       Generator17, Generator18, null, Generator20, null, Generator22, null, Generator24, null, Generator26,
@@ -3619,7 +3619,7 @@ namespace QRCodeDecoder.Core
 
     #endregion
 
-    internal static readonly byte[] ExpToInt = //	ExpToInt =
+    private static readonly byte[] ExpToInt = //	ExpToInt =
     {
       1, 2, 4, 8, 16, 32, 64, 128, 29, 58, 116, 232, 205, 135, 19, 38,
       76, 152, 45, 90, 180, 117, 234, 201, 143, 3, 6, 12, 24, 48, 96, 192,
@@ -3656,7 +3656,7 @@ namespace QRCodeDecoder.Core
       44, 88, 176, 125, 250, 233, 207, 131, 27, 54, 108, 216, 173, 71, 142, 1
     };
 
-    internal static readonly byte[] IntToExp = //	IntToExp =
+    private static readonly byte[] IntToExp = //	IntToExp =
     {
       0, 0, 1, 25, 2, 50, 26, 198, 3, 223, 51, 238, 27, 104, 199, 75,
       4, 100, 224, 14, 52, 141, 239, 129, 28, 193, 105, 248, 200, 8, 76, 113,
@@ -3676,7 +3676,7 @@ namespace QRCodeDecoder.Core
       79, 174, 213, 233, 230, 231, 173, 232, 116, 214, 244, 234, 168, 80, 88, 175
     };
 
-    internal static readonly int[] FormatInfoArray =
+    private static readonly int[] FormatInfoArray =
     {
       0x5412, 0x5125, 0x5E7C, 0x5B4B, 0x45F9, 0x40CE, 0x4F97, 0x4AA0, // M = 00
       0x77C4, 0x72F3, 0x7DAA, 0x789D, 0x662F, 0x6318, 0x6C41, 0x6976, // L = 01
@@ -3684,17 +3684,17 @@ namespace QRCodeDecoder.Core
       0x355F, 0x3068, 0x3F31, 0x3A06, 0x24B4, 0x2183, 0x2EDA, 0x2BED, // Q = 11
     };
 
-    internal static readonly int[,] FormatInfoOne = {
+    private static readonly int[,] FormatInfoOne = {
       { 0, 8 }, { 1, 8 }, { 2, 8 }, { 3, 8 }, { 4, 8 }, { 5, 8 }, { 7, 8 }, { 8, 8 },
       { 8, 7 }, { 8, 5 }, { 8, 4 }, { 8, 3 }, { 8, 2 }, { 8, 1 }, { 8, 0 }
     };
 
-    internal static readonly int[,] FormatInfoTwo = {
+    private static readonly int[,] FormatInfoTwo = {
       { 8, -1 }, { 8, -2 }, { 8, -3 }, { 8, -4 }, { 8, -5 }, { 8, -6 }, { 8, -7 }, { 8, -8 },
       { -7, 8 }, { -6, 8 }, { -5, 8 }, { -4, 8 }, { -3, 8 }, { -2, 8 }, { -1, 8 }
     };
 
-    internal static readonly int[] VersionCodeArray =
+    private static readonly int[] VersionCodeArray =
     {
       0x7c94, 0x85bc, 0x9a99, 0xa4d3, 0xbbf6, 0xc762, 0xd847, 0xe60d, 0xf928, 0x10b78,
       0x1145d, 0x12a17, 0x13532, 0x149a6, 0x15683, 0x168c9, 0x177ec, 0x18ec4, 0x191e1, 0x1afab,
@@ -3702,18 +3702,18 @@ namespace QRCodeDecoder.Core
       0x2542e, 0x26a64, 0x27541, 0x28c69
     };
 
-    internal const byte White = 0;
-    internal const byte Black = 1;
-    internal const byte NonData = 2;
-    internal const byte Fixed = 4;
-    internal const byte DataWhite = White;
-    internal const byte DataBlack = Black;
-    internal const byte FormatWhite = NonData | White;
-    internal const byte FormatBlack = NonData | Black;
-    internal const byte FixedWhite = Fixed | NonData | White;
-    internal const byte FixedBlack = Fixed | NonData | Black;
+    private const byte White = 0;
+    private const byte Black = 1;
+    private const byte NonData = 2;
+    private const byte Fixed = 4;
+    private const byte DataWhite = White;
+    private const byte DataBlack = Black;
+    private const byte FormatWhite = NonData | White;
+    private const byte FormatBlack = NonData | Black;
+    private const byte FixedWhite = Fixed | NonData | White;
+    private const byte FixedBlack = Fixed | NonData | Black;
 
-    internal static readonly byte[,] FinderPatternTopLeft =
+    private static readonly byte[,] FinderPatternTopLeft =
     {
       { FixedBlack, FixedBlack, FixedBlack, FixedBlack, FixedBlack, FixedBlack, FixedBlack, FixedWhite, FormatWhite },
       { FixedBlack, FixedWhite, FixedWhite, FixedWhite, FixedWhite, FixedWhite, FixedBlack, FixedWhite, FormatWhite },
@@ -3729,7 +3729,7 @@ namespace QRCodeDecoder.Core
       },
     };
 
-    internal static readonly byte[,] FinderPatternTopRight =
+    private static readonly byte[,] FinderPatternTopRight =
     {
       { FixedWhite, FixedBlack, FixedBlack, FixedBlack, FixedBlack, FixedBlack, FixedBlack, FixedBlack },
       { FixedWhite, FixedBlack, FixedWhite, FixedWhite, FixedWhite, FixedWhite, FixedWhite, FixedBlack },
@@ -3742,7 +3742,7 @@ namespace QRCodeDecoder.Core
       { FormatWhite, FormatWhite, FormatWhite, FormatWhite, FormatWhite, FormatWhite, FormatWhite, FormatWhite },
     };
 
-    internal static readonly byte[,] FinderPatternBottomLeft =
+    private static readonly byte[,] FinderPatternBottomLeft =
     {
       { FixedWhite, FixedWhite, FixedWhite, FixedWhite, FixedWhite, FixedWhite, FixedWhite, FixedWhite, FixedBlack },
       { FixedBlack, FixedBlack, FixedBlack, FixedBlack, FixedBlack, FixedBlack, FixedBlack, FixedWhite, FormatWhite },
@@ -3754,7 +3754,7 @@ namespace QRCodeDecoder.Core
       { FixedBlack, FixedBlack, FixedBlack, FixedBlack, FixedBlack, FixedBlack, FixedBlack, FixedWhite, FormatWhite },
     };
 
-    internal static readonly byte[,] AlignmentPattern =
+    private static readonly byte[,] AlignmentPattern =
     {
       { FixedBlack, FixedBlack, FixedBlack, FixedBlack, FixedBlack },
       { FixedBlack, FixedWhite, FixedWhite, FixedWhite, FixedBlack },
