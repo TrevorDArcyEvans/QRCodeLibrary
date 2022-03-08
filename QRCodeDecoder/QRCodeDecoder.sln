@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRCodeDecoder.Windows", "QR
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRCodeDecoder.Core", "QRCodeDecoder.Core\QRCodeDecoder.Core.csproj", "{F380FA00-4E8B-4E5C-8F52-3680E53EAF17}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QRCodeDecoder.Core.Tests", "QRCodeDecoder.Core.Tests\QRCodeDecoder.Core.Tests.csproj", "{3C51CF48-D10F-405E-9649-EC91A117C029}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{F380FA00-4E8B-4E5C-8F52-3680E53EAF17}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F380FA00-4E8B-4E5C-8F52-3680E53EAF17}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F380FA00-4E8B-4E5C-8F52-3680E53EAF17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C51CF48-D10F-405E-9649-EC91A117C029}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C51CF48-D10F-405E-9649-EC91A117C029}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C51CF48-D10F-405E-9649-EC91A117C029}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C51CF48-D10F-405E-9649-EC91A117C029}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

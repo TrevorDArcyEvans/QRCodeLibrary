@@ -15,6 +15,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRCodeEncoder.Core", "QRCod
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRCodeEncoderDemo", "QRCodeEncoder\QRCodeEncoderDemo\QRCodeEncoderDemo.csproj", "{AE6613DD-8A2A-42C9-9870-F9C0C2BE49F1}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "QRCodeDecoder", "QRCodeDecoder", "{6F605768-550B-422F-AC02-8738556704B4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QRCodeDecoder.Core.Tests", "QRCodeDecoder\QRCodeDecoder.Core.Tests\QRCodeDecoder.Core.Tests.csproj", "{A9CF60CC-2DE6-4F85-BE9D-61A63F028DE4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,11 +49,18 @@ Global
 		{AE6613DD-8A2A-42C9-9870-F9C0C2BE49F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AE6613DD-8A2A-42C9-9870-F9C0C2BE49F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE6613DD-8A2A-42C9-9870-F9C0C2BE49F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9CF60CC-2DE6-4F85-BE9D-61A63F028DE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9CF60CC-2DE6-4F85-BE9D-61A63F028DE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9CF60CC-2DE6-4F85-BE9D-61A63F028DE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9CF60CC-2DE6-4F85-BE9D-61A63F028DE4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D6A1ABC0-DB8D-4DF2-AEFC-D58D8EF59041}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A9CF60CC-2DE6-4F85-BE9D-61A63F028DE4} = {6F605768-550B-422F-AC02-8738556704B4}
 	EndGlobalSection
 EndGlobal
