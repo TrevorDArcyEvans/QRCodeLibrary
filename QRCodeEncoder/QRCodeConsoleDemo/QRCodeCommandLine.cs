@@ -28,8 +28,10 @@
 //	For full version history please look at QREncode.cs
 /////////////////////////////////////////////////////////////////////
 
-namespace QRCodeEncoderLibrary
+namespace QRCodeConsoleDemo
 {
+  using QRCodeEncoderLibrary;
+
   // calling example for console application
   //
   // try

@@ -33,10 +33,8 @@
 //	For full version history please look at QREncode.cs
 /////////////////////////////////////////////////////////////////////
 
-namespace QRCodeEncoder
+namespace QRCodeConsoleDemo
 {
-  using QRCodeEncoderLibrary;
-
   public class Program
   {
     public static void Main()
