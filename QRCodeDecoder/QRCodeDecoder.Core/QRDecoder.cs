@@ -205,12 +205,9 @@ namespace QRCodeDecoder.Core
     private int BlocksGroup2;
     private int DataCodewordsGroup2;
 
-    private byte[] CodewordsArray = { };
     private int CodewordsPtr;
     private uint BitBuffer;
     private int BitBufferLen;
-    private byte[,] BaseMatrix = new byte[1, 1];
-    private byte[,] MaskMatrix = new byte[1, 1];
 
     private bool Trans4Mode;
 
@@ -235,7 +232,7 @@ namespace QRCodeDecoder.Core
     /// <summary>
     /// Error correction percent (L, M, Q, H)
     /// </summary>
-    private int[] ErrCorrPercent = new[] { 7, 15, 25, 30 };
+    private readonly int[] ErrCorrPercent = new[] { 7, 15, 25, 30 };
 
     private readonly ILogger _logger;
 
@@ -1207,30 +1204,30 @@ namespace QRCodeDecoder.Core
       try
       {
         // create base matrix
-        BuildBaseMatrix();
+        var BaseMatrix = BuildBaseMatrix();
 
         // create data matrix and test fixed modules
-        ConvertImageToMatrix();
+        ConvertImageToMatrix(BaseMatrix);
 
         // based on version and format information
         // set number of data and error correction codewords length  
         SetDataCodewordsLength();
 
         // apply mask as per get format information step
-        ApplyMask(MaskCode);
+        var MaskMatrix = ApplyMask(MaskCode, BaseMatrix);
 
         // unload data from binary matrix to byte format
-        UnloadDataFromMatrix();
+        var CodewordsArray = UnloadDataFromMatrix(MaskMatrix);
 
         // restore blocks (undo interleave)
-        RestoreBlocks();
+        RestoreBlocks(CodewordsArray);
 
         // calculate error correction
         // in case of error try to correct it
-        CalculateErrorCorrection();
+        CalculateErrorCorrection(CodewordsArray);
 
         // decode data
-        byte[] DataArray = DecodeData();
+        byte[] DataArray = DecodeData(CodewordsArray);
 
         // create result class
         QRCodeResult CodeResult = new(DataArray)
@@ -1740,7 +1737,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Convert image to qr code matrix and test fixed modules
     ////////////////////////////////////////////////////////////////////
-    private void ConvertImageToMatrix()
+    private void ConvertImageToMatrix(byte[,] BaseMatrix)
     {
       // loop for all modules
       int FixedCount = 0;
@@ -1794,12 +1791,12 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Unload matrix data from base matrix
     ////////////////////////////////////////////////////////////////////
-    private void UnloadDataFromMatrix()
+    private byte[] UnloadDataFromMatrix(byte[,] MaskMatrix)
     {
       // input array pointer initialization
       int Ptr = 0;
       int PtrEnd = 8 * MaxCodewords;
-      CodewordsArray = new byte[MaxCodewords];
+      var  CodewordsArray = new byte[MaxCodewords];
 
       // bottom right corner of output matrix
       int Row = QRCodeDimension - 1;
@@ -1877,12 +1874,14 @@ namespace QRCodeDecoder.Core
             continue;
         }
       }
+
+      return CodewordsArray;
     }
 
     ////////////////////////////////////////////////////////////////////
     // Restore interleave data and error correction blocks
     ////////////////////////////////////////////////////////////////////
-    private void RestoreBlocks()
+    private void RestoreBlocks(byte[] CodewordsArray)
     {
       // allocate temp codewords array
       byte[] TempArray = new byte[MaxCodewords];
@@ -1961,7 +1960,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Calculate Error Correction
     ////////////////////////////////////////////////////////////////////
-    protected void CalculateErrorCorrection()
+    protected void CalculateErrorCorrection(byte[] CodewordsArray)
     {
       // total error count
       int TotalErrorCount = 0;
@@ -2045,7 +2044,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Convert bit array to byte array
     ////////////////////////////////////////////////////////////////////
-    private byte[] DecodeData()
+    private byte[] DecodeData(byte[] CodewordsArray)
     {
       // bit buffer initial condition
       BitBuffer = (UInt32)((CodewordsArray[0] << 24) | (CodewordsArray[1] << 16) | (CodewordsArray[2] << 8) |
@@ -2063,7 +2062,7 @@ namespace QRCodeDecoder.Core
       for (; ; )
       {
         // first 4 bits is mode indicator
-        EncodingMode EncodingMode = (EncodingMode)ReadBitsFromCodewordsArray(4);
+        EncodingMode EncodingMode = (EncodingMode)ReadBitsFromCodewordsArray(4, CodewordsArray);
 
         // end of data
         if (EncodingMode <= 0)
@@ -2075,14 +2074,14 @@ namespace QRCodeDecoder.Core
         if (EncodingMode == EncodingMode.ECI)
         {
           // one byte assinment value
-          ECIAssignValue = ReadBitsFromCodewordsArray(8);
+          ECIAssignValue = ReadBitsFromCodewordsArray(8, CodewordsArray);
           if ((ECIAssignValue & 0x80) == 0)
           {
             continue;
           }
 
           // two bytes assinment value
-          ECIAssignValue = (ECIAssignValue << 8) | ReadBitsFromCodewordsArray(8);
+          ECIAssignValue = (ECIAssignValue << 8) | ReadBitsFromCodewordsArray(8, CodewordsArray);
           if ((ECIAssignValue & 0x4000) == 0)
           {
             ECIAssignValue &= 0x3fff;
@@ -2090,7 +2089,7 @@ namespace QRCodeDecoder.Core
           }
 
           // three bytes assinment value
-          ECIAssignValue = (ECIAssignValue << 8) | ReadBitsFromCodewordsArray(8);
+          ECIAssignValue = (ECIAssignValue << 8) | ReadBitsFromCodewordsArray(8, CodewordsArray);
           if ((ECIAssignValue & 0x200000) == 0)
           {
             ECIAssignValue &= 0x1fffff;
@@ -2101,7 +2100,7 @@ namespace QRCodeDecoder.Core
         }
 
         // read data length
-        int DataLength = ReadBitsFromCodewordsArray(DataLengthBits(EncodingMode));
+        int DataLength = ReadBitsFromCodewordsArray(DataLengthBits(EncodingMode), CodewordsArray);
         if (DataLength < 0)
         {
           throw new ApplicationException("Premature end of data (DataLengh)");
@@ -2120,7 +2119,7 @@ namespace QRCodeDecoder.Core
             int NumericEnd = (DataLength / 3) * 3;
             for (int Index = 0; Index < NumericEnd; Index += 3)
             {
-              int Temp = ReadBitsFromCodewordsArray(10);
+              int Temp = ReadBitsFromCodewordsArray(10, CodewordsArray);
               if (Temp < 0)
               {
                 throw new ApplicationException("Premature end of data (Numeric 1)");
@@ -2133,7 +2132,7 @@ namespace QRCodeDecoder.Core
             // we have one character remaining
             if (DataLength - NumericEnd == 1)
             {
-              int Temp = ReadBitsFromCodewordsArray(4);
+              int Temp = ReadBitsFromCodewordsArray(4, CodewordsArray);
               if (Temp < 0)
               {
                 throw new ApplicationException("Premature end of data (Numeric 2)");
@@ -2144,7 +2143,7 @@ namespace QRCodeDecoder.Core
             // we have two character remaining
             else if (DataLength - NumericEnd == 2)
             {
-              int Temp = ReadBitsFromCodewordsArray(7);
+              int Temp = ReadBitsFromCodewordsArray(7, CodewordsArray);
               if (Temp < 0)
               {
                 throw new ApplicationException("Premature end of data (Numeric 3)");
@@ -2160,7 +2159,7 @@ namespace QRCodeDecoder.Core
             int AlphaNumEnd = (DataLength / 2) * 2;
             for (int Index = 0; Index < AlphaNumEnd; Index += 2)
             {
-              int Temp = ReadBitsFromCodewordsArray(11);
+              int Temp = ReadBitsFromCodewordsArray(11, CodewordsArray);
               if (Temp < 0)
               {
                 throw new ApplicationException("Premature end of data (Alpha Numeric 1)");
@@ -2172,7 +2171,7 @@ namespace QRCodeDecoder.Core
             // we have one character remaining
             if (DataLength - AlphaNumEnd == 1)
             {
-              int Temp = ReadBitsFromCodewordsArray(6);
+              int Temp = ReadBitsFromCodewordsArray(6, CodewordsArray);
               if (Temp < 0)
               {
                 throw new ApplicationException("Premature end of data (Alpha Numeric 2)");
@@ -2186,7 +2185,7 @@ namespace QRCodeDecoder.Core
             // append the data after mode and character count
             for (int Index = 0; Index < DataLength; Index++)
             {
-              int Temp = ReadBitsFromCodewordsArray(8);
+              int Temp = ReadBitsFromCodewordsArray(8, CodewordsArray);
               if (Temp < 0)
               {
                 throw new ApplicationException("Premature end of data (byte mode)");
@@ -2212,7 +2211,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Read data from codeword array
     ////////////////////////////////////////////////////////////////////
-    private int ReadBitsFromCodewordsArray(int Bits)
+    private int ReadBitsFromCodewordsArray(int Bits, byte[] CodewordsArray)
     {
       if (Bits > BitBufferLen)
       {
@@ -2298,10 +2297,10 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Build Base Matrix
     ////////////////////////////////////////////////////////////////////
-    private void BuildBaseMatrix()
+    private byte[,] BuildBaseMatrix()
     {
       // allocate base matrix
-      BaseMatrix = new byte[QRCodeDimension + 5, QRCodeDimension + 5];
+      var BaseMatrix = new byte[QRCodeDimension + 5, QRCodeDimension + 5];
 
       // top left finder patterns
       for (int Row = 0; Row < 9; Row++)
@@ -2390,6 +2389,8 @@ namespace QRCodeDecoder.Core
           }
         }
       }
+
+      return BaseMatrix;
     }
 
     #region Masks
@@ -2397,50 +2398,52 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Apply Mask
     ////////////////////////////////////////////////////////////////////
-    private void ApplyMask(int Mask)
+    private byte[,] ApplyMask(int Mask, byte[,] BaseMatrix)
     {
-      MaskMatrix = (byte[,])BaseMatrix.Clone();
+      var MaskMatrix = (byte[,])BaseMatrix.Clone();
       switch (Mask)
       {
         case 0:
-          ApplyMask0();
+          ApplyMask0(MaskMatrix);
           break;
 
         case 1:
-          ApplyMask1();
+          ApplyMask1(MaskMatrix);
           break;
 
         case 2:
-          ApplyMask2();
+          ApplyMask2(MaskMatrix);
           break;
 
         case 3:
-          ApplyMask3();
+          ApplyMask3(MaskMatrix);
           break;
 
         case 4:
-          ApplyMask4();
+          ApplyMask4(MaskMatrix);
           break;
 
         case 5:
-          ApplyMask5();
+          ApplyMask5(MaskMatrix);
           break;
 
         case 6:
-          ApplyMask6();
+          ApplyMask6(MaskMatrix);
           break;
 
         case 7:
-          ApplyMask7();
+          ApplyMask7(MaskMatrix);
           break;
       }
+
+      return MaskMatrix;
     }
 
     ////////////////////////////////////////////////////////////////////
     // Apply Mask 0
     // (row + column) % 2 == 0
     ////////////////////////////////////////////////////////////////////
-    private void ApplyMask0()
+    private void ApplyMask0(byte[,] MaskMatrix)
     {
       for (int Row = 0; Row < QRCodeDimension; Row += 2)
       {
@@ -2463,7 +2466,7 @@ namespace QRCodeDecoder.Core
     // Apply Mask 1
     // row % 2 == 0
     ////////////////////////////////////////////////////////////////////
-    private void ApplyMask1()
+    private void ApplyMask1(byte[,] MaskMatrix)
     {
       for (int Row = 0; Row < QRCodeDimension; Row += 2)
       {
@@ -2481,7 +2484,7 @@ namespace QRCodeDecoder.Core
     // Apply Mask 2
     // column % 3 == 0
     ////////////////////////////////////////////////////////////////////
-    private void ApplyMask2()
+    private void ApplyMask2(byte[,] MaskMatrix)
     {
       for (int Row = 0; Row < QRCodeDimension; Row++)
       {
@@ -2499,7 +2502,7 @@ namespace QRCodeDecoder.Core
     // Apply Mask 3
     // (row + column) % 3 == 0
     ////////////////////////////////////////////////////////////////////
-    private void ApplyMask3()
+    private void ApplyMask3(byte[,] MaskMatrix)
     {
       for (int Row = 0; Row < QRCodeDimension; Row += 3)
       {
@@ -2525,7 +2528,7 @@ namespace QRCodeDecoder.Core
     // Apply Mask 4
     // ((row / 2) + (column / 3)) % 2 == 0
     ////////////////////////////////////////////////////////////////////
-    private void ApplyMask4()
+    private void ApplyMask4(byte[,] MaskMatrix)
     {
       for (int Row = 0; Row < QRCodeDimension; Row += 4)
       {
@@ -2590,7 +2593,7 @@ namespace QRCodeDecoder.Core
     // Apply Mask 5
     // ((row * column) % 2) + ((row * column) % 3) == 0
     ////////////////////////////////////////////////////////////////////
-    private void ApplyMask5()
+    private void ApplyMask5(byte[,] MaskMatrix)
     {
       for (int Row = 0; Row < QRCodeDimension; Row += 6)
       {
@@ -2634,7 +2637,7 @@ namespace QRCodeDecoder.Core
     // Apply Mask 6
     // (((row * column) % 2) + ((row * column) mod 3)) mod 2 == 0
     ////////////////////////////////////////////////////////////////////
-    private void ApplyMask6()
+    private void ApplyMask6(byte[,] MaskMatrix)
     {
       for (int Row = 0; Row < QRCodeDimension; Row += 6)
       {
@@ -2710,7 +2713,7 @@ namespace QRCodeDecoder.Core
     // Apply Mask 7
     // (((row + column) % 2) + ((row * column) mod 3)) mod 2 == 0
     ////////////////////////////////////////////////////////////////////
-    private void ApplyMask7()
+    private void ApplyMask7(byte[,] MaskMatrix)
     {
       for (int Row = 0; Row < QRCodeDimension; Row += 6)
       {
