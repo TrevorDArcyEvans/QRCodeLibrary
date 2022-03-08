@@ -272,3 +272,4 @@ CodeCoverage/
 
 # Sonarqube
 .sonarqube
+/QRCodeDecoder/QRCodeDecoderDemo/Work/QRCodeDecoderTrace.txt
