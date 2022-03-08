@@ -267,7 +267,7 @@ namespace QRCodeDecoder.Core
     /// <returns>Output byte arrays</returns>
     public IEnumerable<QRCodeResult> ImageDecoder(Bitmap InputImageBitmap)
     {
-      int Start;
+      int Start = Environment.TickCount;
       var FinderList = new List<QRCodeFinder>();
       var AlignList = new List<QRCodeFinder>();
 
@@ -280,11 +280,10 @@ namespace QRCodeDecoder.Core
         ImageWidth = InputImageBitmap.Width;
         ImageHeight = InputImageBitmap.Height;
 
-        Start = Environment.TickCount;
         _logger.Information("Convert image to black and white");
 
         // convert input image to black and white boolean image
-        bool[,] BlackWhiteImage = ConvertImageToBlackAndWhite(InputImageBitmap);
+        var BlackWhiteImage = ConvertImageToBlackAndWhite(InputImageBitmap);
         if (BlackWhiteImage is null)
         {
           return Enumerable.Empty<QRCodeResult>();
@@ -487,8 +486,8 @@ namespace QRCodeDecoder.Core
       for (LevelEnd = 255; LevelEnd >= LevelStart && GrayLevel[LevelEnd] == 0; LevelEnd--)
       {
         // DO_NOTHING
-        ;
       }
+
       LevelEnd++;
       if (LevelEnd - LevelStart < 2)
       {
@@ -529,7 +528,6 @@ namespace QRCodeDecoder.Core
         for (Col = 0; Col < ImageWidth && !BlackWhiteImage[Row, Col]; Col++)
         {
           // DO_NOTHING
-          ;
         }
 
         if (Col == ImageWidth)
@@ -550,6 +548,7 @@ namespace QRCodeDecoder.Core
           {
             // DO_NOTHING
           }
+
           ColPos[PosPtr++] = Col;
           if (Col == ImageWidth)
           {
@@ -561,6 +560,7 @@ namespace QRCodeDecoder.Core
           {
             // DO_NOTHING
           }
+
           if (Col == ImageWidth)
           {
             break;
@@ -747,6 +747,7 @@ namespace QRCodeDecoder.Core
           {
             // DO_NOTHING
           }
+
           RowPos[PosPtr++] = Row;
           if (Row == ImageHeight)
           {
@@ -853,6 +854,7 @@ namespace QRCodeDecoder.Core
           {
             // DO_NOTHING
           }
+
           RowPos[PosPtr++] = Row;
           if (Row == AreaBottom)
           {
@@ -2003,6 +2005,7 @@ namespace QRCodeDecoder.Core
         {
           // DO_NOTHING
         }
+
         if (Index < ErrCorrCodewords)
         {
           // correct the error

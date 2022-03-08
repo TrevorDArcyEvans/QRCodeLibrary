@@ -400,7 +400,6 @@ namespace QRCodeDecoderDemo
            Index++)
       {
         // DO_NOTHING
-        ;
       }
 
       // our default frame size is available
@@ -478,7 +477,6 @@ namespace QRCodeDecoderDemo
            Index++)
       {
         // DO_NOTHING
-        ;
       }
 
       if (Index == Result.Length)
