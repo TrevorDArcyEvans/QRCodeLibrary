@@ -259,7 +259,7 @@ namespace QRCodeDecoder.Core
     /// <param name="FileName"></param>
     /// <returns>Array of QRCodeResult</returns>
     /// <exception cref="ApplicationException"></exception>
-    public QRCodeResult[] ImageDecoder(string FileName)
+    public IEnumerable<QRCodeResult> ImageDecoder(string FileName)
     {
       // test argument
       if (FileName == null)
@@ -279,7 +279,7 @@ namespace QRCodeDecoder.Core
     /// </summary>
     /// <param name="InputImageBitmap">Input image</param>
     /// <returns>Output byte arrays</returns>
-    public QRCodeResult[] ImageDecoder(Bitmap InputImageBitmap)
+    public IEnumerable<QRCodeResult> ImageDecoder(Bitmap InputImageBitmap)
     {
       int Start;
       var FinderList = new List<QRCodeFinder>();

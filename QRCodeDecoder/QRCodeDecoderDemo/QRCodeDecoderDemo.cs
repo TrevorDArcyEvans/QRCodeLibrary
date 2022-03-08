@@ -175,7 +175,7 @@ namespace QRCodeDecoderDemo
 
       // decode image into array of QR codes
       // each QR code matrix is made of one byte per module
-      QRCodeResult[] QRCodeResultArray = QRCodeDecoder.ImageDecoder(QRCodeInputImage);
+      var QRCodeResultArray = QRCodeDecoder.ImageDecoder(QRCodeInputImage).ToList();
 
       // trace
       _logger.Information("****");
@@ -197,7 +197,7 @@ namespace QRCodeDecoderDemo
         // convert results to text
         DataTextBox.Text = ConvertResultToDisplayString(QRCodeResultArray);
 
-        if (QRCodeResultArray != null && QRCodeResultArray.Length > 0)
+        if (QRCodeResultArray != null && QRCodeResultArray.Count > 0)
         {
           byte[] Data = QRCodeResultArray[0].DataArray;
           for (int Index = 0; Index < Data.Length; Index++)
@@ -329,7 +329,7 @@ namespace QRCodeDecoderDemo
       }
 
       // decode image
-      QRCodeResult[] DataByteArray = QRCodeDecoder.ImageDecoder(QRCodeImage);
+      var DataByteArray = QRCodeDecoder.ImageDecoder(QRCodeImage).ToList();
       string Text = ConvertResultToDisplayString(DataByteArray);
 
       // save image for debugging
@@ -423,7 +423,7 @@ namespace QRCodeDecoderDemo
     /// </summary>
     /// <param name="DataByteArray">QR Decoded byte arrays</param>
     /// <returns>Display string</returns>
-    private static string ConvertResultToDisplayString(QRCodeResult[] DataByteArray)
+    private static string ConvertResultToDisplayString(List<QRCodeResult> DataByteArray)
     {
       // no QR code
       if (DataByteArray == null)
@@ -432,14 +432,14 @@ namespace QRCodeDecoderDemo
       }
 
       // image has one QR code
-      if (DataByteArray.Length == 1)
+      if (DataByteArray.Count == 1)
       {
         return SingleQRCodeResult(QRDecoder.ByteArrayToStr(DataByteArray[0].DataArray));
       }
 
       // image has more than one QR code
       StringBuilder Str = new();
-      for (int Index = 0; Index < DataByteArray.Length; Index++)
+      for (int Index = 0; Index < DataByteArray.Count; Index++)
       {
         if (Index != 0)
         {
