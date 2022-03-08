@@ -257,7 +257,10 @@ namespace QRCodeDecoder.Core
     public QRCodeResult[] ImageDecoder(string FileName)
     {
       // test argument
-      if (FileName == null) throw new ApplicationException("QRDecode.ImageDecoder File name is null");
+      if (FileName == null)
+      {
+        throw new ApplicationException("QRDecode.ImageDecoder File name is null");
+      }
 
       // load file image to bitmap
       Bitmap InputImageBitmap = new(FileName);
@@ -311,18 +314,29 @@ namespace QRCodeDecoder.Core
 #if DEBUG
         int MatchedCount = 0;
         foreach (QRCodeFinder HF in FinderList)
+        {
           if (HF.Distance != double.MaxValue)
+          {
             MatchedCount++;
+          }
+
+        }
         QRCodeTrace.Format("Matched Finders count: {0}", MatchedCount);
         QRCodeTrace.Write("Remove all unused finders");
 #endif
 
         // remove unused finders
-        if (!RemoveUnusedFinders()) return null;
+        if (!RemoveUnusedFinders())
+        {
+          return null;
+        }
 
 #if DEBUG
         QRCodeTrace.Format("Time: {0}", Environment.TickCount - Start);
-        foreach (QRCodeFinder HF in FinderList) QRCodeTrace.Write(HF.ToString());
+        foreach (QRCodeFinder HF in FinderList)
+        {
+          QRCodeTrace.Write(HF.ToString());
+        }
         QRCodeTrace.Write("Search for QR corners");
 #endif
       }
@@ -345,7 +359,9 @@ namespace QRCodeDecoder.Core
       int Index2End = FinderList.Count - 1;
       int Index3End = FinderList.Count;
       for (int Index1 = 0; Index1 < Index1End; Index1++)
+      {
         for (int Index2 = Index1 + 1; Index2 < Index2End; Index2++)
+        {
           for (int Index3 = Index2 + 1; Index3 < Index3End; Index3++)
           {
             try
@@ -364,7 +380,10 @@ namespace QRCodeDecoder.Core
 
               // get corner info (version, error code and mask)
               // continue if failed
-              if (!GetQRCodeCornerInfo(Corner)) continue;
+              if (!GetQRCodeCornerInfo(Corner))
+              {
+                continue;
+              }
 
 #if DEBUG
               QRCodeTrace.Write("Decode QR code using three finders");
@@ -372,15 +391,24 @@ namespace QRCodeDecoder.Core
 
               // decode corner using three finders
               // continue if successful
-              if (DecodeQRCodeCorner(Corner)) continue;
+              if (DecodeQRCodeCorner(Corner))
+              {
+                continue;
+              }
 
               // qr code version 1 has no alignment mark
               // in other words decode failed 
-              if (QRCodeVersion == 1) continue;
+              if (QRCodeVersion == 1)
+              {
+                continue;
+              }
 
               // find bottom right alignment mark
               // continue if failed
-              if (!FindAlignmentMark(Corner)) continue;
+              if (!FindAlignmentMark(Corner))
+              {
+                continue;
+              }
 
               // decode using 4 points
               foreach (QRCodeFinder Align in AlignList)
@@ -393,7 +421,10 @@ namespace QRCodeDecoder.Core
                 SetTransMatrix(Corner, Align.Row, Align.Col);
 
                 // decode corner using three finders and one alignment mark
-                if (DecodeQRCodeCorner(Corner)) break;
+                if (DecodeQRCodeCorner(Corner))
+                {
+                  break;
+                }
               }
             }
 
@@ -401,7 +432,6 @@ namespace QRCodeDecoder.Core
             catch (Exception Ex)
             {
               QRCodeTrace.Write("Decode corner failed. " + Ex.Message);
-              continue;
             }
 #else
 						catch
@@ -410,6 +440,8 @@ namespace QRCodeDecoder.Core
 							}
 #endif
           }
+        }
+      }
 
 #if DEBUG
       QRCodeTrace.Format("Time: {0}", Environment.TickCount - Start);
@@ -540,7 +572,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Save and display black and white boolean image as png image
     ////////////////////////////////////////////////////////////////////
-    #if DEBUGX
+#if DEBUGX
 		internal void DisplayBlackAndWhiteImage()
 			{
 			int ModuleSize = Math.Min(16384 / Math.Max(ImageHeight, ImageWidth), 1);
