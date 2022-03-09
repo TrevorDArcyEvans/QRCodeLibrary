@@ -40,14 +40,13 @@ namespace QRCodeEncoder.Core
     /// </summary>
     public int ModuleSize
     {
-      get
-      {
-        return _ModuleSize;
-      }
+      get => _ModuleSize;
       set
       {
         if (value < 1 || value > 100)
+        {
           throw new ArgumentException("QRSaveImagePixels: Module size error. Default is 2.");
+        }
         _ModuleSize = value;
       }
     }
@@ -60,14 +59,13 @@ namespace QRCodeEncoder.Core
     /// </summary>
     public int QuietZone
     {
-      get
-      {
-        return _QuietZone;
-      }
+      get => _QuietZone;
       set
       {
         if (value < 0 || value > 400)
+        {
           throw new ArgumentException("QRSaveImagePixels: Quiet zone must be 0 to 400. Default is 8.");
+        }
         _QuietZone = value;
       }
     }
@@ -91,15 +89,22 @@ namespace QRCodeEncoder.Core
     {
       // test argument
       if (QRCodeMatrix == null)
+      {
         throw new ArgumentException("QRSaveImagePixels: QRCodeMatrix is null");
+      }
 
       // test matrix dimensions
       int Width = QRCodeMatrix.GetLength(0);
       int Height = QRCodeMatrix.GetLength(1);
       if (Width != Height)
+      {
         throw new ArgumentException("QRSaveImagePixels: QRCodeMatrix width is not equals height");
+      }
+
       if (Width < 21 || Width > 177 || ((Width - 21) % 4) != 0)
+      {
         throw new ArgumentException("QRSaveImagePixels: Invalid QRCodeMatrix dimension");
+      }
 
       // save argument
       this.QRCodeMatrix = QRCodeMatrix;
@@ -132,7 +137,9 @@ namespace QRCodeEncoder.Core
             for (int Y = 0; Y < ModuleSize; Y++)
             {
               for (int X = 0; X < ModuleSize; X++)
+              {
                 BWImage[YOffset + Y, XOffset + X] = true;
+              }
             }
           }
           XOffset += ModuleSize;
