@@ -98,10 +98,7 @@ namespace QRCodeEncoder.Core
     /// <summary>
     /// Save QR Code as PNG image constructor
     /// </summary>
-    public QRSavePngImage
-        (
-        bool[,] QRCodeMatrix
-        )
+    public QRSavePngImage(bool[,] QRCodeMatrix)
     {
       // test argument
       if (QRCodeMatrix == null)
@@ -124,10 +121,7 @@ namespace QRCodeEncoder.Core
     /// Save QRCode image to PNG file
     /// </summary>
     /// <param name="FileName">PNG file name</param>
-    public void SaveQRCodeToPngFile
-        (
-        string FileName
-        )
+    public void SaveQRCodeToPngFile(string FileName)
     {
       // exceptions
       if (FileName == null)
@@ -147,10 +141,7 @@ namespace QRCodeEncoder.Core
     /// Save QRCode image to PNG stream
     /// </summary>
     /// <param name="OutputStream">PNG output stream</param>
-    public void SaveQRCodeToPngFile
-        (
-        Stream OutputStream
-        )
+    public void SaveQRCodeToPngFile(Stream OutputStream)
     {
       // convert code to PNG file
       byte[] PngFile = QRCodeToPngFormat();
@@ -331,10 +322,7 @@ namespace QRCodeEncoder.Core
     /// </summary>
     /// <param name="InputBuf">PNG data</param>
     /// <returns>Compressed PNG data as byte array</returns>
-    private static byte[] PngImageData
-        (
-        byte[] InputBuf
-        )
+    private static byte[] PngImageData(byte[] InputBuf)
     {
       // output buffer is:
       // Png IDAT length 4 bytes
@@ -448,12 +436,7 @@ namespace QRCodeEncoder.Core
     /// <param name="Pos">Buffer position</param>
     /// <param name="Len">Buffer length</param>
     /// <returns>CRC32</returns>
-    internal static uint CRC32Checksum
-        (
-        byte[] Buffer,
-        int Pos,
-        int Len
-        )
+    internal static uint CRC32Checksum(byte[] Buffer, int Pos, int Len)
     {
       uint CRC = 0xffffffff;
       for (; Len > 0; Len--)
@@ -468,12 +451,7 @@ namespace QRCodeEncoder.Core
     /// <param name="Pos">Buffer position</param>
     /// <param name="Len">Buffer length</param>
     /// <returns>Adler32 checksum</returns>
-    internal static uint Adler32Checksum
-        (
-        byte[] Buffer,
-        int Pos,
-        int Len
-        )
+    internal static uint Adler32Checksum(byte[] Buffer, int Pos, int Len)
     {
       const uint Adler32Base = 65521;
 
@@ -505,10 +483,7 @@ namespace QRCodeEncoder.Core
       return ((AdlerHigh << 16) | AdlerLow);
     }
 
-    internal static byte[] ZLibCompress
-        (
-        byte[] InputBuf
-        )
+    internal static byte[] ZLibCompress(byte[] InputBuf)
     {
       // input length
       int InputLen = InputBuf.Length;
