@@ -229,7 +229,7 @@ namespace QRCodeDecoder.Core
     /// <summary>
     /// Error correction percent (L, M, Q, H)
     /// </summary>
-    private int[] ErrCorrPercent = new[] { 7, 15, 25, 30 };
+    private readonly int[] ErrCorrPercent = { 7, 15, 25, 30 };
 
     private readonly ILogger _logger;
 
