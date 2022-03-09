@@ -131,10 +131,7 @@ namespace QRCodeEncoder.Core
     /// Save QR Code Bitmap image constructor
     /// </summary>
     /// <param name="QRCodeMatrix">QR code matrix</param>
-    public QRSaveBitmapImage
-        (
-        bool[,] QRCodeMatrix
-        )
+    public QRSaveBitmapImage(bool[,] QRCodeMatrix)
     {
       // test argument
       if (QRCodeMatrix == null)
@@ -192,11 +189,7 @@ namespace QRCodeEncoder.Core
     /// Save QRCode image to image file
     /// </summary>
     /// <param name="FileName">Image file name</param>
-    public void SaveQRCodeToImageFile
-        (
-        string FileName,
-        ImageFormat Format
-        )
+    public void SaveQRCodeToImageFile(string FileName, ImageFormat Format)
     {
       // exceptions
       if (FileName == null)
@@ -213,11 +206,7 @@ namespace QRCodeEncoder.Core
     /// Save QRCode image to image file
     /// </summary>
     /// <param name="FileName">Image file name</param>
-    public void SaveQRCodeToImageFile
-        (
-        Stream OutputStream,
-        ImageFormat Format
-        )
+    public void SaveQRCodeToImageFile(Stream OutputStream, ImageFormat Format)
     {
       // exceptions
       if (OutputStream == null)
