@@ -15,8 +15,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRCodeEncoder.Core", "QRCod
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRCodeEncoderDemo", "QRCodeEncoder\QRCodeEncoderDemo\QRCodeEncoderDemo.csproj", "{AE6613DD-8A2A-42C9-9870-F9C0C2BE49F1}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "QRCodeDecoder", "QRCodeDecoder", "{6F605768-550B-422F-AC02-8738556704B4}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRCodeDecoder.Core.Tests", "QRCodeDecoder\QRCodeDecoder.Core.Tests\QRCodeDecoder.Core.Tests.csproj", "{A9CF60CC-2DE6-4F85-BE9D-61A63F028DE4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRCodeEncoder.Core.Tests", "QRCodeEncoder\QRCodeEncoder.Core.Tests\QRCodeEncoder.Core.Tests.csproj", "{68CB6D06-4A37-4C3D-B135-77ADEECC73CF}"
@@ -62,9 +60,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{A9CF60CC-2DE6-4F85-BE9D-61A63F028DE4} = {6F605768-550B-422F-AC02-8738556704B4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D6A1ABC0-DB8D-4DF2-AEFC-D58D8EF59041}
