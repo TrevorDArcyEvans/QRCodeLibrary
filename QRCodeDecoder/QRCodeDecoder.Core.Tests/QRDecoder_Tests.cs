@@ -71,7 +71,7 @@ namespace QRCodeDecoder.Core.Tests
 
     private QRDecoder Create()
     {
-      return new QRDecoder(_mocklogger.Object);
+      return new(_mocklogger.Object);
     }
   }
 }
