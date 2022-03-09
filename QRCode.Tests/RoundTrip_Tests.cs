@@ -1,3 +1,6 @@
+using System.Text;
+using FluentAssertions.Execution;
+
 namespace QRCode.Tests;
 
 using FluentAssertions;
@@ -36,7 +39,13 @@ public class RoundTrip_Tests
 
     var res = qrdec.ImageDecoder(bmp);
 
-    res.Count().Should().Be(1);
+    using (new AssertionScope())
+    {
+      res.Count().Should().Be(1);
+
+      var text = Encoding.UTF8.GetString(res.Single().DataArray);
+      text.Should().Be(Text1 + Text2);
+    }
   }
 
   [Test]
@@ -61,7 +70,13 @@ public class RoundTrip_Tests
 
     var res = qrdec.ImageDecoder((Bitmap)bmp);
 
-    res.Count().Should().Be(1);
+    using (new AssertionScope())
+    {
+      res.Count().Should().Be(1);
+
+      var text = Encoding.UTF8.GetString(res.Single().DataArray);
+      text.Should().Be(Text1 + Text2);
+    }
   }
 
   private static IEnumerable<int> ECIrange => new[] { -1, 0, 127, 16383, 32767 };
