@@ -206,7 +206,6 @@ namespace QRCodeDecoder.Core
     private int CodewordsPtr;
     private uint BitBuffer;
     private int BitBufferLen;
-    private byte[,] BaseMatrix = new byte[1, 1];
     private byte[,] MaskMatrix = new byte[1, 1];
 
     private bool Trans4Mode;
@@ -1203,17 +1202,17 @@ namespace QRCodeDecoder.Core
       try
       {
         // create base matrix
-        BuildBaseMatrix();
+        var BaseMatrix = BuildBaseMatrix();
 
         // create data matrix and test fixed modules
-        ConvertImageToMatrix();
+        ConvertImageToMatrix(BaseMatrix);
 
         // based on version and format information
         // set number of data and error correction codewords length  
         SetDataCodewordsLength();
 
         // apply mask as per get format information step
-        ApplyMask(MaskCode);
+        ApplyMask(MaskCode, BaseMatrix);
 
         // unload data from binary matrix to byte format
         UnloadDataFromMatrix();
@@ -1736,7 +1735,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Convert image to qr code matrix and test fixed modules
     ////////////////////////////////////////////////////////////////////
-    private void ConvertImageToMatrix()
+    private void ConvertImageToMatrix(byte[,] BaseMatrix)
     {
       // loop for all modules
       int FixedCount = 0;
@@ -2295,10 +2294,10 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Build Base Matrix
     ////////////////////////////////////////////////////////////////////
-    private void BuildBaseMatrix()
+    private byte[,] BuildBaseMatrix()
     {
       // allocate base matrix
-      BaseMatrix = new byte[QRCodeDimension + 5, QRCodeDimension + 5];
+      var BaseMatrix = new byte[QRCodeDimension + 5, QRCodeDimension + 5];
 
       // top left finder patterns
       for (int Row = 0; Row < 9; Row++)
@@ -2387,6 +2386,8 @@ namespace QRCodeDecoder.Core
           }
         }
       }
+
+      return BaseMatrix;
     }
 
     #region Masks
@@ -2394,7 +2395,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Apply Mask
     ////////////////////////////////////////////////////////////////////
-    private void ApplyMask(int Mask)
+    private void ApplyMask(int Mask, byte[,] BaseMatrix)
     {
       MaskMatrix = (byte[,])BaseMatrix.Clone();
       switch (Mask)
