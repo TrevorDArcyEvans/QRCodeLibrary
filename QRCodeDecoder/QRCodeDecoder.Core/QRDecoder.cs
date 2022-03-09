@@ -192,7 +192,6 @@ namespace QRCodeDecoder.Core
 
     private int ImageWidth;
     private int ImageHeight;
-    private bool[,] BlackWhiteImage = new bool[1, 1];
     private int MaxCodewords;
     private int MaxDataCodewords;
     private int MaxDataBits;
@@ -283,32 +282,32 @@ namespace QRCodeDecoder.Core
     /// <returns>Output byte arrays</returns>
     public QRCodeResult[] ImageDecoder(Bitmap InputImageBitmap)
     {
-      int Start;
+      int Start = Environment.TickCount;
       var FinderList = new List<QRCodeFinder>();
+
+      // save image dimension
+      ImageWidth = InputImageBitmap.Width;
+      ImageHeight = InputImageBitmap.Height;
+
+      _logger.Information("Convert image to black and white");
+
+      // convert input image to black and white boolean image
+      bool[,] BlackWhiteImage = ConvertImageToBlackAndWhite(InputImageBitmap);
+      if (BlackWhiteImage is null)
+      {
+        return null;
+      }
+
+      _logger.Information($"Time: {Environment.TickCount - Start}");
+      _logger.Information("Finders search");
 
       // empty data string output
       var DataArrayList = new List<QRCodeResult>();
 
       try
       {
-        // save image dimension
-        ImageWidth = InputImageBitmap.Width;
-        ImageHeight = InputImageBitmap.Height;
-
-        Start = Environment.TickCount;
-        _logger.Information("Convert image to black and white");
-
-        // convert input image to black and white boolean image
-        if (!ConvertImageToBlackAndWhite(InputImageBitmap))
-        {
-          return null;
-        }
-
-        _logger.Information($"Time: {Environment.TickCount - Start}");
-        _logger.Information("Finders search");
-
         // horizontal search for finders
-        if (!HorizontalFindersSearch(FinderList))
+        if (!HorizontalFindersSearch(FinderList, BlackWhiteImage))
         {
           return null;
         }
@@ -316,7 +315,7 @@ namespace QRCodeDecoder.Core
         _logger.Information($"Horizontal Finders count: {FinderList.Count}");
 
         // vertical search for finders
-        VerticalFindersSearch(FinderList);
+        VerticalFindersSearch(FinderList, BlackWhiteImage);
 
         int MatchedCount = 0;
         foreach (QRCodeFinder HF in FinderList)
@@ -342,7 +341,6 @@ namespace QRCodeDecoder.Core
         }
         _logger.Information("Search for QR corners");
       }
-
       catch (Exception Ex)
       {
         _logger.Error(Ex, "QR Code decoding failed (no finders).");
@@ -365,39 +363,38 @@ namespace QRCodeDecoder.Core
               QRCodeCorner Corner = QRCodeCorner.CreateCorner(FinderList[Index1], FinderList[Index2], FinderList[Index3]);
 
               // not a valid corner
-              if (Corner == null) continue;
+              if (Corner == null)
+              {
+                continue;
+              }
 
               _logger.Information($"Decode Corner: Top Left:    {Corner.TopLeftFinder.ToString()}");
               _logger.Information($"Decode Corner: Top Right:   {Corner.TopRightFinder.ToString()}");
               _logger.Information($"Decode Corner: Bottom Left: {Corner.BottomLeftFinder.ToString()}");
 
-              // get corner info (version, error code and mask)
-              // continue if failed
-              if (!GetQRCodeCornerInfo(Corner))
+              // get corner info (version, error code and mask) continue if failed
+              if (!GetQRCodeCornerInfo(Corner, BlackWhiteImage))
               {
                 continue;
               }
 
               _logger.Information("Decode QR code using three finders");
 
-              // decode corner using three finders
-              // continue if successful
-              if (DecodeQRCodeCorner(Corner, DataArrayList))
+              // decode corner using three finders continue if successful
+              if (DecodeQRCodeCorner(Corner, DataArrayList, BlackWhiteImage))
               {
                 continue;
               }
 
-              // qr code version 1 has no alignment mark
-              // in other words decode failed 
+              // qr code version 1 has no alignment mark in other words decode failed
               if (QRCodeVersion == 1)
               {
                 continue;
               }
 
-              // find bottom right alignment mark
-              // continue if failed
+              // find bottom right alignment mark continue if failed
               var AlignList = new List<QRCodeFinder>();
-              if (!FindAlignmentMark(Corner, AlignList))
+              if (!FindAlignmentMark(Corner, AlignList, BlackWhiteImage))
               {
                 continue;
               }
@@ -411,13 +408,12 @@ namespace QRCodeDecoder.Core
                 SetTransMatrix(Corner, Align.Row, Align.Col);
 
                 // decode corner using three finders and one alignment mark
-                if (DecodeQRCodeCorner(Corner, DataArrayList))
+                if (DecodeQRCodeCorner(Corner, DataArrayList, BlackWhiteImage))
                 {
                   break;
                 }
               }
             }
-
             catch (Exception Ex)
             {
               _logger.Error(Ex, "Decode corner failed.");
@@ -442,7 +438,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Convert image to black and white boolean matrix
     ////////////////////////////////////////////////////////////////////
-    private bool ConvertImageToBlackAndWhite(Bitmap InputImage)
+    private bool[,] ConvertImageToBlackAndWhite(Bitmap InputImage)
     {
       // lock image bits
       BitmapData BitmapData = InputImage.LockBits(new Rectangle(0, 0, ImageWidth, ImageHeight),
@@ -456,7 +452,7 @@ namespace QRCodeDecoder.Core
       if (ScanLineWidth < 0)
       {
         _logger.Information("Convert image to back and white array. Invalid input image format (upside down).");
-        return false;
+        return null;
       }
 
       // image total bytes
@@ -507,13 +503,13 @@ namespace QRCodeDecoder.Core
       if (LevelEnd - LevelStart < 2)
       {
         _logger.Information("Convert image to back and white array. Input image has no color variations");
-        return false;
+        return null;
       }
 
       int CutoffLevel = (LevelStart + LevelEnd) / 2;
 
       // create boolean image white = false, black = true
-      BlackWhiteImage = new bool[ImageHeight, ImageWidth];
+      var BlackWhiteImage = new bool[ImageHeight, ImageWidth];
       for (int Row = 0; Row < ImageHeight; Row++)
       {
         for (int Col = 0; Col < ImageWidth; Col++)
@@ -523,13 +519,13 @@ namespace QRCodeDecoder.Core
       }
 
       // exit;
-      return true;
+      return BlackWhiteImage;
     }
 
     ////////////////////////////////////////////////////////////////////
     // search row by row for finders blocks
     ////////////////////////////////////////////////////////////////////
-    private bool HorizontalFindersSearch(List<QRCodeFinder> FinderList)
+    private bool HorizontalFindersSearch(List<QRCodeFinder> FinderList, bool[,] BlackWhiteImage)
     {
       // look for finder patterns
       int[] ColPos = new int[ImageWidth + 1];
@@ -622,7 +618,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // search row by row for alignment blocks
     ////////////////////////////////////////////////////////////////////
-    private bool HorizontalAlignmentSearch(int AreaLeft, int AreaTop, int AreaWidth, int AreaHeight, List<QRCodeFinder> AlignList)
+    private bool HorizontalAlignmentSearch(int AreaLeft, int AreaTop, int AreaWidth, int AreaHeight, List<QRCodeFinder> AlignList, bool[,] BlackWhiteImage)
     {
       // look for finder patterns
       int[] ColPos = new int[AreaWidth + 1];
@@ -713,7 +709,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // search column by column for finders blocks
     ////////////////////////////////////////////////////////////////////
-    private void VerticalFindersSearch(List<QRCodeFinder> FinderList)
+    private void VerticalFindersSearch(List<QRCodeFinder> FinderList, bool[,] BlackWhiteImage)
     {
       // active columns
       bool[] ActiveColumn = new bool[ImageWidth];
@@ -815,7 +811,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // search column by column for finders blocks
     ////////////////////////////////////////////////////////////////////
-    private void VerticalAlignmentSearch(int AreaLeft, int AreaTop, int AreaWidth, int AreaHeight, List<QRCodeFinder> AlignList)
+    private void VerticalAlignmentSearch(int AreaLeft, int AreaTop, int AreaWidth, int AreaHeight, List<QRCodeFinder> AlignList, bool[,] BlackWhiteImage)
     {
       // active columns
       bool[] ActiveColumn = new bool[AreaWidth];
@@ -1124,7 +1120,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Get QR Code corner info
     ////////////////////////////////////////////////////////////////////
-    private bool GetQRCodeCornerInfo(QRCodeCorner Corner)
+    private bool GetQRCodeCornerInfo(QRCodeCorner Corner, bool[,] BlackWhiteImage)
     {
       try
       {
@@ -1142,10 +1138,10 @@ namespace QRCodeDecoder.Core
         // if version number is 7 or more, get version code
         if (QRCodeVersion >= 7)
         {
-          int Version = GetVersionOne();
+          int Version = GetVersionOne(BlackWhiteImage);
           if (Version == 0)
           {
-            Version = GetVersionTwo();
+            Version = GetVersionTwo(BlackWhiteImage);
             if (Version == 0)
             {
               return false;
@@ -1169,10 +1165,10 @@ namespace QRCodeDecoder.Core
         }
 
         // get format info arrays
-        int FormatInfo = GetFormatInfoOne();
+        int FormatInfo = GetFormatInfoOne(BlackWhiteImage);
         if (FormatInfo < 0)
         {
-          FormatInfo = GetFormatInfoTwo();
+          FormatInfo = GetFormatInfoTwo(BlackWhiteImage);
           if (FormatInfo < 0) return false;
         }
 
@@ -1196,7 +1192,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Search for QR Code version
     ////////////////////////////////////////////////////////////////////
-    private bool DecodeQRCodeCorner(QRCodeCorner Corner, List<QRCodeResult> DataArrayList)
+    private bool DecodeQRCodeCorner(QRCodeCorner Corner, List<QRCodeResult> DataArrayList, bool[,] BlackWhiteImage)
     {
       try
       {
@@ -1204,7 +1200,7 @@ namespace QRCodeDecoder.Core
         var BaseMatrix = BuildBaseMatrix();
 
         // create data matrix and test fixed modules
-        ConvertImageToMatrix(BaseMatrix);
+        ConvertImageToMatrix(BaseMatrix, BlackWhiteImage);
 
         // based on version and format information
         // set number of data and error correction codewords length  
@@ -1363,7 +1359,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Get image pixel color
     ////////////////////////////////////////////////////////////////////
-    private bool GetModule(int Row, int Col)
+    private bool GetModule(int Row, int Col, bool[,] BlackWhiteImage)
     {
       // get module based on three finders
       if (!Trans4Mode)
@@ -1383,7 +1379,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // search row by row for finders blocks
     ////////////////////////////////////////////////////////////////////
-    private bool FindAlignmentMark(QRCodeCorner Corner, List<QRCodeFinder> AlignList)
+    private bool FindAlignmentMark(QRCodeCorner Corner, List<QRCodeFinder> AlignList, bool[,] BlackWhiteImage)
     {
       // alignment mark estimated position
       int AlignRow = QRCodeDimension - 7;
@@ -1403,13 +1399,13 @@ namespace QRCodeDecoder.Core
       int AreaHeight = Side;
 
       // horizontal search for finders
-      if (!HorizontalAlignmentSearch(AreaLeft, AreaTop, AreaWidth, AreaHeight, AlignList))
+      if (!HorizontalAlignmentSearch(AreaLeft, AreaTop, AreaWidth, AreaHeight, AlignList, BlackWhiteImage))
       {
         return false;
       }
 
       // vertical search for finders
-      VerticalAlignmentSearch(AreaLeft, AreaTop, AreaWidth, AreaHeight, AlignList);
+      VerticalAlignmentSearch(AreaLeft, AreaTop, AreaWidth, AreaHeight, AlignList, BlackWhiteImage);
 
       // remove unused alignment entries
       if (!RemoveUnusedAlignMarks(AlignList))
@@ -1548,12 +1544,12 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Get version code bits top right
     ////////////////////////////////////////////////////////////////////
-    private int GetVersionOne()
+    private int GetVersionOne(bool[,] BlackWhiteImage)
     {
       int VersionCode = 0;
       for (int Index = 0; Index < 18; Index++)
       {
-        if (GetModule(Index / 3, QRCodeDimension - 11 + (Index % 3)))
+        if (GetModule(Index / 3, QRCodeDimension - 11 + (Index % 3), BlackWhiteImage))
         {
           VersionCode |= 1 << Index;
         }
@@ -1565,12 +1561,12 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Get version code bits bottom left
     ////////////////////////////////////////////////////////////////////
-    private int GetVersionTwo()
+    private int GetVersionTwo(bool[,] BlackWhiteImage)
     {
       int VersionCode = 0;
       for (int Index = 0; Index < 18; Index++)
       {
-        if (GetModule(QRCodeDimension - 11 + (Index % 3), Index / 3))
+        if (GetModule(QRCodeDimension - 11 + (Index % 3), Index / 3, BlackWhiteImage))
         {
           VersionCode |= 1 << Index;
         }
@@ -1632,12 +1628,12 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Get format info around top left corner
     ////////////////////////////////////////////////////////////////////
-    private int GetFormatInfoOne()
+    private int GetFormatInfoOne(bool[,] BlackWhiteImage)
     {
       int Info = 0;
       for (int Index = 0; Index < 15; Index++)
       {
-        if (GetModule(FormatInfoOne[Index, 0], FormatInfoOne[Index, 1]))
+        if (GetModule(FormatInfoOne[Index, 0], FormatInfoOne[Index, 1], BlackWhiteImage))
         {
           Info |= 1 << Index;
         }
@@ -1649,7 +1645,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Get format info around top right and bottom left corners
     ////////////////////////////////////////////////////////////////////
-    private int GetFormatInfoTwo()
+    private int GetFormatInfoTwo(bool[,] BlackWhiteImage)
     {
       int Info = 0;
       for (int Index = 0; Index < 15; Index++)
@@ -1666,7 +1662,7 @@ namespace QRCodeDecoder.Core
           Col += QRCodeDimension;
         }
 
-        if (GetModule(Row, Col))
+        if (GetModule(Row, Col, BlackWhiteImage))
         {
           Info |= 1 << Index;
         }
@@ -1734,7 +1730,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Convert image to qr code matrix and test fixed modules
     ////////////////////////////////////////////////////////////////////
-    private void ConvertImageToMatrix(byte[,] BaseMatrix)
+    private void ConvertImageToMatrix(byte[,] BaseMatrix, bool[,] BlackWhiteImage)
     {
       // loop for all modules
       int FixedCount = 0;
@@ -1746,7 +1742,7 @@ namespace QRCodeDecoder.Core
           // the module (Row, Col) is not a fixed module 
           if ((BaseMatrix[Row, Col] & Fixed) == 0)
           {
-            if (GetModule(Row, Col))
+            if (GetModule(Row, Col, BlackWhiteImage))
             {
               BaseMatrix[Row, Col] |= Black;
             }
@@ -1758,7 +1754,7 @@ namespace QRCodeDecoder.Core
             FixedCount++;
 
             // test for error
-            if ((GetModule(Row, Col) ? Black : White) != (BaseMatrix[Row, Col] & 1))
+            if ((GetModule(Row, Col, BlackWhiteImage) ? Black : White) != (BaseMatrix[Row, Col] & 1))
             {
               ErrorCount++;
             }
