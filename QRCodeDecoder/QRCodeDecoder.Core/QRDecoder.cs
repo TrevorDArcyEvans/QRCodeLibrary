@@ -193,7 +193,6 @@ namespace QRCodeDecoder.Core
     private int ImageWidth;
     private int ImageHeight;
     private bool[,] BlackWhiteImage = new bool[1, 1];
-    private List<QRCodeFinder> AlignList = new();
     private List<QRCodeResult> DataArrayList = new();
     private int MaxCodewords;
     private int MaxDataCodewords;
@@ -289,6 +288,7 @@ namespace QRCodeDecoder.Core
     {
       int Start;
       var FinderList = new List<QRCodeFinder>();
+
       try
       {
         // empty data string output
@@ -399,7 +399,8 @@ namespace QRCodeDecoder.Core
 
               // find bottom right alignment mark
               // continue if failed
-              if (!FindAlignmentMark(Corner))
+              var AlignList = new List<QRCodeFinder>();
+              if (!FindAlignmentMark(Corner, AlignList))
               {
                 continue;
               }
@@ -624,11 +625,8 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // search row by row for alignment blocks
     ////////////////////////////////////////////////////////////////////
-    private bool HorizontalAlignmentSearch(int AreaLeft, int AreaTop, int AreaWidth, int AreaHeight)
+    private bool HorizontalAlignmentSearch(int AreaLeft, int AreaTop, int AreaWidth, int AreaHeight, List<QRCodeFinder> AlignList)
     {
-      // create empty finders list
-      AlignList = new List<QRCodeFinder>();
-
       // look for finder patterns
       int[] ColPos = new int[AreaWidth + 1];
       int PosPtr = 0;
@@ -820,7 +818,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // search column by column for finders blocks
     ////////////////////////////////////////////////////////////////////
-    private void VerticalAlignmentSearch(int AreaLeft, int AreaTop, int AreaWidth, int AreaHeight)
+    private void VerticalAlignmentSearch(int AreaLeft, int AreaTop, int AreaWidth, int AreaHeight, List<QRCodeFinder> AlignList)
     {
       // active columns
       bool[] ActiveColumn = new bool[AreaWidth];
@@ -982,7 +980,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // search column by column for finders blocks
     ////////////////////////////////////////////////////////////////////
-    private bool RemoveUnusedAlignMarks()
+    private bool RemoveUnusedAlignMarks(List<QRCodeFinder> AlignList)
     {
       // remove all entries without a match
       for (int Index = 0; Index < AlignList.Count; Index++)
@@ -1388,7 +1386,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // search row by row for finders blocks
     ////////////////////////////////////////////////////////////////////
-    private bool FindAlignmentMark(QRCodeCorner Corner)
+    private bool FindAlignmentMark(QRCodeCorner Corner, List<QRCodeFinder> AlignList)
     {
       // alignment mark estimated position
       int AlignRow = QRCodeDimension - 7;
@@ -1408,16 +1406,16 @@ namespace QRCodeDecoder.Core
       int AreaHeight = Side;
 
       // horizontal search for finders
-      if (!HorizontalAlignmentSearch(AreaLeft, AreaTop, AreaWidth, AreaHeight))
+      if (!HorizontalAlignmentSearch(AreaLeft, AreaTop, AreaWidth, AreaHeight, AlignList))
       {
         return false;
       }
 
       // vertical search for finders
-      VerticalAlignmentSearch(AreaLeft, AreaTop, AreaWidth, AreaHeight);
+      VerticalAlignmentSearch(AreaLeft, AreaTop, AreaWidth, AreaHeight, AlignList);
 
       // remove unused alignment entries
-      if (!RemoveUnusedAlignMarks())
+      if (!RemoveUnusedAlignMarks(AlignList))
       {
         return false;
       }
