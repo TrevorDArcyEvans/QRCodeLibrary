@@ -80,12 +80,12 @@ namespace QRCodeEncoder.Core
     /// <summary>
     /// White brush (default white)
     /// </summary>
-    public Brush WhiteBrush { get; set; }
+    public Brush WhiteBrush { get; set; } = Brushes.White;
 
     /// <summary>
     /// Black brush (default black)
     /// </summary>
-    public Brush BlackBrush { get; set; }
+    public Brush BlackBrush { get; set; } = Brushes.Black;
 
     /// <summary>
     /// QR code matrix (no quiet zone)
