@@ -29,24 +29,44 @@ namespace QRCodeDecoder.Core.Tests
     }
 
     [Test]
-    public void ImageDecoder_Succeeds([ValueSource(nameof(DataFiles))] string filePath)
+    public void ImageDecoder_Single_Succeeds([ValueSource(nameof(SingleDataFiles))] string filePath)
     {
       var qrdec = Create();
 
       var res = qrdec.ImageDecoder(filePath);
 
-      res.Should().NotBeEmpty();
+      res.Length.Should().Be(1);
     }
 
-    private static IEnumerable<string> DataFiles()
+    [Test]
+    public void ImageDecoder_Multiple_Succeeds([ValueSource(nameof(MultipleDataFiles))] string filePath)
+    {
+      var qrdec = Create();
+
+      var res = qrdec.ImageDecoder(filePath);
+
+      res.Length.Should().BeGreaterThan(1);
+    }
+
+    private static IEnumerable<string> GetDataFiles(string subDir)
     {
       var currAssy = Assembly.GetExecutingAssembly().Location;
       var currDir = Path.GetDirectoryName(currAssy);
-      var dataDir = Path.Combine(currDir, "Data");
-      var pngFiles = Directory.EnumerateFiles(dataDir, "*.png", SearchOption.AllDirectories);
-      var jpgFiles = Directory.EnumerateFiles(dataDir, "*.jpg", SearchOption.AllDirectories);
-      var allFiles = pngFiles.Concat(jpgFiles);
-      return allFiles;
+      var dataDir = Path.Combine(currDir, "Data", subDir);
+      var directory = new DirectoryInfo(dataDir);
+      var masks = new[] { "*.png", "*.jpg" };
+      var files = masks.SelectMany(directory.EnumerateFiles).Select(fi => fi.FullName);
+      return files;
+    }
+
+    private static IEnumerable<string> SingleDataFiles()
+    {
+      return GetDataFiles("Single");
+    }
+
+    private static IEnumerable<string> MultipleDataFiles()
+    {
+      return GetDataFiles("Multiple");
     }
 
     private QRDecoder Create()
