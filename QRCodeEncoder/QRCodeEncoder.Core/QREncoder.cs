@@ -250,7 +250,9 @@ namespace QRCodeEncoder.Core
     {
       // empty
       if (string.IsNullOrEmpty(StringDataSegment))
+      {
         throw new ArgumentException("String data segment is null or missing");
+      }
 
       // convert string to byte array
       byte[] BinaryData = Encoding.UTF8.GetBytes(StringDataSegment);

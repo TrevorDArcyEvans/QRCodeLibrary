@@ -34,7 +34,6 @@ public class QREncoder_Tests
 
   [Test]
   public void ECIAssignValue_InRange_Succeeds(
-
     [Values(-1, 0, 1, 10, 100, 1000, 10000, 100000, 999999)] int val)
   {
     var qrenc = Create();
@@ -53,6 +52,18 @@ public class QREncoder_Tests
     Action act = () => qrenc.ECIAssignValue = val;
 
     act.Should().Throw<ArgumentOutOfRangeException>();
+  }
+
+  [Test]
+  public void Encode_EmptyNull_Throws(
+    [Values(null, "")]string val)
+  {
+    var qrenc = Create();
+
+    Action act = () => qrenc.Encode(val);
+
+    act.Should().Throw<ArgumentException>();
+
   }
 
   private QREncoder Create()
