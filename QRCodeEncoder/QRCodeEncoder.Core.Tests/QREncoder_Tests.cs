@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-public class QREncoder_Tests
+public sealed class QREncoder_Tests
 {
   [Test]
   public void Constructor_Succeeds()
