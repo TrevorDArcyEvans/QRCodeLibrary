@@ -48,14 +48,7 @@ namespace QRCodeEncoderDemo
     private readonly double CamPosY;
     private readonly double CamPosZ;
 
-    internal Perspective
-        (
-        double CenterX,
-        double CenterY,
-        double ImageRot,
-        double CamDist,
-        double RotX
-        )
+    internal Perspective(double CenterX, double CenterY, double ImageRot, double CamDist, double RotX)
     {
       // center position
       this.CenterX = CenterX;
@@ -81,9 +74,6 @@ namespace QRCodeEncoderDemo
       // camera position relative to barcode image
       CamPosY = CamDist * CamVectY;
       CamPosZ = CamDist * CamVectZ;
-
-      // exit
-      return;
     }
 
     // screen equation
@@ -107,11 +97,7 @@ namespace QRCodeEncoderDemo
     //	Q = CamVectX * PosX + CamVectY * PosY + CamVectZ * PosZ
     //	T = Q / (Q - CamDist)
 
-    internal PointF ScreenPosition
-        (
-        double BarcodePosX,
-        double BarcodePosY
-        )
+    internal PointF ScreenPosition(double BarcodePosX, double BarcodePosY)
     {
       // rotation
       double PosX = CosRot * BarcodePosX - SinRot * BarcodePosY;
@@ -138,20 +124,12 @@ namespace QRCodeEncoderDemo
       return new PointF((float)ScrnPosX, (float)ScrnPosY);
     }
 
-    internal void GetPolygon
-        (
-        double PosX,
-        double PosY,
-        double Width,
-        double Height,
-        PointF[] Polygon
-        )
+    internal void GetPolygon(double PosX, double PosY, double Width, double Height, PointF[] Polygon)
     {
       Polygon[0] = ScreenPosition(PosX, PosY);
       Polygon[1] = ScreenPosition(PosX + Width, PosY);
       Polygon[2] = ScreenPosition(PosX + Width, PosY + Height);
       Polygon[3] = ScreenPosition(PosX, PosY + Height);
-      return;
     }
   }
 }
