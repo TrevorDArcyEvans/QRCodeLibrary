@@ -222,7 +222,8 @@ namespace QRCodeEncoder.Core
     }
     private int _ECIAssignValue = -1;
 
-    // private variables
+    #region private variables
+
     private byte[][] DataSegArray;
     private int EncodedDataBits;
     private int MaxCodewords;
@@ -243,14 +244,13 @@ namespace QRCodeEncoder.Core
     private byte[,] MaskMatrix;
     private byte[,] ResultMatrix;
 
+    #endregion
+
     /// <summary>
     /// Encode one string into QRCode boolean matrix
     /// </summary>
     /// <param name="StringDataSegment">string data segment</param>
-    public bool[,] Encode
-        (
-        string StringDataSegment
-        )
+    public bool[,] Encode(string StringDataSegment)
     {
       // empty
       if (string.IsNullOrEmpty(StringDataSegment))
@@ -267,10 +267,7 @@ namespace QRCodeEncoder.Core
     /// Encode array of strings into QRCode boolean matrix
     /// </summary>
     /// <param name="StringDataSegments">string data segments</param>
-    public bool[,] Encode
-        (
-        string[] StringDataSegments
-        )
+    public bool[,] Encode(string[] StringDataSegments)
     {
       // empty
       if (StringDataSegments == null || StringDataSegments.Length == 0)
@@ -303,10 +300,7 @@ namespace QRCodeEncoder.Core
     /// </summary>
     /// <param name="SingleDataSeg">Data segment byte array</param>
     /// <returns>QR Code boolean matrix</returns>
-    public bool[,] Encode
-        (
-        byte[] SingleDataSeg
-        )
+    public bool[,] Encode(byte[] SingleDataSeg)
     {
       // test data segments array
       if (SingleDataSeg == null || SingleDataSeg.Length == 0)
@@ -321,10 +315,7 @@ namespace QRCodeEncoder.Core
     /// </summary>
     /// <param name="DataSegArray">Data array of byte arrays</param>
     /// <returns>QR Code boolean matrix</returns>
-    public bool[,] Encode
-        (
-        byte[][] DataSegArray
-        )
+    public bool[,] Encode(byte[][] DataSegArray)
     {
       // test data segments array
       if (DataSegArray == null || DataSegArray.Length == 0)
@@ -590,11 +581,7 @@ namespace QRCodeEncoder.Core
     }
 
     // Save data to codeword array
-    private void SaveBitsToCodewordsArray
-        (
-        int Data,
-        int Bits
-        )
+    private void SaveBitsToCodewordsArray(int Data, int Bits)
     {
       BitBuffer |= (uint)Data << (32 - BitBufferLen - Bits);
       BitBufferLen += Bits;
@@ -654,13 +641,7 @@ namespace QRCodeEncoder.Core
     }
 
     // Polynomial division for error correction
-    private static void PolynominalDivision
-        (
-        byte[] Polynomial,
-        int PolyLength,
-        byte[] Generator,
-        int ErrCorrCodewords
-        )
+    private static void PolynominalDivision(byte[] Polynomial, int PolyLength, byte[] Generator, int ErrCorrCodewords)
     {
       int DataCodewords = PolyLength - ErrCorrCodewords;
 
@@ -1019,7 +1000,7 @@ namespace QRCodeEncoder.Core
     }
 
     // Evaluation condition #4
-    // blak to white ratio
+    // black to white ratio
     private int EvaluationCondition4()
     {
       // count black cells
@@ -1041,24 +1022,14 @@ namespace QRCodeEncoder.Core
     }
 
     // Test horizontal dark light pattern
-    private bool TestHorizontalDarkLight
-        (
-        int Row,
-        int Col
-        )
+    private bool TestHorizontalDarkLight(int Row, int Col)
     {
       return (MaskMatrix[Row, Col] & ~MaskMatrix[Row, Col + 1] & MaskMatrix[Row, Col + 2] & MaskMatrix[Row, Col + 3] &
             MaskMatrix[Row, Col + 4] & ~MaskMatrix[Row, Col + 5] & MaskMatrix[Row, Col + 6] & 1) != 0;
     }
 
-    ////////////////////////////////////////////////////////////////////
     // Test vertical dark light pattern
-    ////////////////////////////////////////////////////////////////////
-    private bool TestVerticalDarkLight
-        (
-        int Row,
-        int Col
-        )
+    private bool TestVerticalDarkLight(int Row, int Col)
     {
       return (MaskMatrix[Row, Col] & ~MaskMatrix[Row + 1, Col] & MaskMatrix[Row + 2, Col] & MaskMatrix[Row + 3, Col] &
             MaskMatrix[Row + 4, Col] & ~MaskMatrix[Row + 5, Col] & MaskMatrix[Row + 6, Col] & 1) != 0;
@@ -1135,10 +1106,7 @@ namespace QRCodeEncoder.Core
     }
 
     // Set encoded data bits length
-    private int DataLengthBits
-        (
-        EncodingMode EncodingMode
-        )
+    private int DataLengthBits(EncodingMode EncodingMode)
     {
       // numeric mode
       if (EncodingMode == EncodingMode.Numeric)
@@ -1250,11 +1218,10 @@ namespace QRCodeEncoder.Core
       }
     }
 
+    #region Masks
+
     // Apply Mask
-    private void ApplyMask
-        (
-        int Mask
-        )
+    private void ApplyMask(int Mask)
     {
       MaskMatrix = (byte[,])BaseMatrix.Clone();
       switch (Mask)
@@ -1494,6 +1461,9 @@ namespace QRCodeEncoder.Core
             MaskMatrix[Row + 5, Col + 3] ^= 1;
         }
     }
+
+    #endregion
+
     // alignment symbols position as function of dimension
     internal static readonly byte[][] AlignmentPositionArray =
       {
@@ -1556,7 +1526,6 @@ namespace QRCodeEncoder.Core
     // 4) Kanji characters (Shift JIS character set in accordance with JIS X 0208 Annex 1 Shift Coded
     //    Representation. Note that Kanji characters in QR Code can have values 8140HEX -9FFCHEX and E040HEX -
     //    EBBFHEX , which can be compacted into 13 bits.)
-
     internal static readonly byte[] EncodingTable =
       {
        45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45,
@@ -1755,6 +1724,8 @@ namespace QRCodeEncoder.Core
 			{ 20,  15,  61,  16},	// 40-H
 			};
 
+    #region Generators
+
     private static readonly byte[] Generator7 =
       {  87, 229, 146, 149, 238, 102,  21};
     private static readonly byte[] Generator10 =
@@ -1884,8 +1855,10 @@ namespace QRCodeEncoder.Core
       null, Generator68
       };
 
-    internal static readonly byte[] ExpToInt = //	ExpToInt =
-				{
+    #endregion
+
+    internal static readonly byte[] ExpToInt =
+        {
            1,   2,   4,   8,  16,  32,  64, 128,  29,  58, 116, 232, 205, 135,  19,  38,
           76, 152,  45,  90, 180, 117, 234, 201, 143,   3,   6,  12,  24,  48,  96, 192,
          157,  39,  78, 156,  37,  74, 148,  53, 106, 212, 181, 119, 238, 193, 159,  35,
@@ -1921,8 +1894,8 @@ namespace QRCodeEncoder.Core
           44,  88, 176, 125, 250, 233, 207, 131,  27,  54, 108, 216, 173,  71, 142,   1
         };
 
-    internal static readonly byte[] IntToExp = //	IntToExp =
-				{
+    internal static readonly byte[] IntToExp =
+        {
            0,   0,   1,  25,   2,  50,  26, 198,   3, 223,  51, 238,  27, 104, 199,  75,
            4, 100, 224,  14,  52, 141, 239, 129,  28, 193, 105, 248, 200,   8,  76, 113,
            5, 138, 101,  47, 225,  36,  15,  33,  53, 147, 142, 218, 240,  18, 130,  69,
