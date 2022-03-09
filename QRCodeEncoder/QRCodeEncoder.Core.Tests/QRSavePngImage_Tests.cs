@@ -5,14 +5,12 @@ using NUnit.Framework;
 using System;
 using System.IO;
 
-public sealed class QRSavePngImage_Tests
+public sealed class QRSavePngImage_Tests : QRSaveImage_Base
 {
   [Test]
   public void Constructor_Succeeds()
   {
-    var qrenc = CreateEncoder();
-    var data = new[] { Text1, Text2 };
-    var matrix = qrenc.Encode(data);
+    var matrix = GetMatrix();
 
     Action act = () => Create(matrix);
 
@@ -22,9 +20,7 @@ public sealed class QRSavePngImage_Tests
   [Test]
   public void SaveQRCodeToPngFile_Returns()
   {
-    var qrenc = CreateEncoder();
-    var data = new[] { Text1, Text2 };
-    var matrix = qrenc.Encode(data);
+    var matrix = GetMatrix();
     var saver = Create(matrix);
     using var stream = new MemoryStream();
 
@@ -33,16 +29,8 @@ public sealed class QRSavePngImage_Tests
     act.Should().NotThrow();
   }
 
-  private const string Text1 = "0123456789";
-  private const string Text2 = "some arbitrary text SOME OTHER ARBITRARY TEXT 0123456789 $ % * + - . / : []{}()&^£!?@|";
-
   private QRSavePngImage Create(bool[,] matrix)
   {
     return new QRSavePngImage(matrix);
-  }
-
-  private QREncoder CreateEncoder()
-  {
-    return new QREncoder();
   }
 }
