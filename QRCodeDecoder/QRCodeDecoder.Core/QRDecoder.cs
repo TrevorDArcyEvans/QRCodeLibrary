@@ -498,14 +498,13 @@ namespace QRCodeDecoder.Core
       for (LevelStart = 0; LevelStart < 256 && GrayLevel[LevelStart] == 0; LevelStart++)
       {
         // DO_NOTHING
-        ;
       }
 
       for (LevelEnd = 255; LevelEnd >= LevelStart && GrayLevel[LevelEnd] == 0; LevelEnd--)
       {
         // DO_NOTHING
-        ;
       }
+
       LevelEnd++;
       if (LevelEnd - LevelStart < 2)
       {
@@ -549,7 +548,6 @@ namespace QRCodeDecoder.Core
         for (Col = 0; Col < ImageWidth && !BlackWhiteImage[Row, Col]; Col++)
         {
           // DO_NOTHING
-          ;
         }
 
         if (Col == ImageWidth)
@@ -570,6 +568,7 @@ namespace QRCodeDecoder.Core
           {
             // DO_NOTHING
           }
+
           ColPos[PosPtr++] = Col;
           if (Col == ImageWidth)
           {
@@ -581,6 +580,7 @@ namespace QRCodeDecoder.Core
           {
             // DO_NOTHING
           }
+
           if (Col == ImageWidth)
           {
             break;
@@ -770,6 +770,7 @@ namespace QRCodeDecoder.Core
           {
             // DO_NOTHING
           }
+
           RowPos[PosPtr++] = Row;
           if (Row == ImageHeight)
           {
@@ -876,6 +877,7 @@ namespace QRCodeDecoder.Core
           {
             // DO_NOTHING
           }
+
           RowPos[PosPtr++] = Row;
           if (Row == AreaBottom)
           {
@@ -2010,6 +2012,7 @@ namespace QRCodeDecoder.Core
         {
           // DO_NOTHING
         }
+
         if (Index < ErrCorrCodewords)
         {
           // correct the error
@@ -2181,7 +2184,7 @@ namespace QRCodeDecoder.Core
             }
             break;
 
-          // byte mode					
+          // byte mode
           case EncodingMode.Byte:
             // append the data after mode and character count
             for (int Index = 0; Index < DataLength; Index++)
@@ -3630,7 +3633,7 @@ namespace QRCodeDecoder.Core
 
     #endregion
 
-    private static readonly byte[] ExpToInt = //	ExpToInt =
+    private static readonly byte[] ExpToInt =
     {
       1, 2, 4, 8, 16, 32, 64, 128, 29, 58, 116, 232, 205, 135, 19, 38,
       76, 152, 45, 90, 180, 117, 234, 201, 143, 3, 6, 12, 24, 48, 96, 192,
@@ -3667,7 +3670,7 @@ namespace QRCodeDecoder.Core
       44, 88, 176, 125, 250, 233, 207, 131, 27, 54, 108, 216, 173, 71, 142, 1
     };
 
-    private static readonly byte[] IntToExp = //	IntToExp =
+    private static readonly byte[] IntToExp =
     {
       0, 0, 1, 25, 2, 50, 26, 198, 3, 223, 51, 238, 27, 104, 199, 75,
       4, 100, 224, 14, 52, 141, 239, 129, 28, 193, 105, 248, 200, 8, 76, 113,
