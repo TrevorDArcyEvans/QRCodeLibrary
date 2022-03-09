@@ -51,7 +51,6 @@ namespace QRCodeEncoder.Core
         if (value < 1 || value > 100)
           throw new ArgumentException("Module size error. Default is 2.");
         _ModuleSize = value;
-        return;
       }
     }
     private int _ModuleSize = 2;
@@ -72,7 +71,6 @@ namespace QRCodeEncoder.Core
         if (value < 0 || value > 400)
           throw new ArgumentException("Quiet zone must be 0 to 400. Default is 8.");
         _QuietZone = value;
-        return;
       }
     }
     private int _QuietZone = 8;
@@ -120,7 +118,6 @@ namespace QRCodeEncoder.Core
       // save argument
       this.QRCodeMatrix = QRCodeMatrix;
       QRCodeDimension = Width;
-      return;
     }
 
     /// <summary>
@@ -144,7 +141,6 @@ namespace QRCodeEncoder.Core
 
       // save file
       SaveQRCodeToPngFile(OutputStream);
-      return;
     }
 
     /// <summary>
@@ -167,7 +163,6 @@ namespace QRCodeEncoder.Core
 
       // flush all buffers
       Writer.Flush();
-      return;
     }
 
     /// <summary>
