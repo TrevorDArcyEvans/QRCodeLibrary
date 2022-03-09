@@ -35,7 +35,7 @@ namespace QRCodeDecoder.Core.Tests
 
       var res = qrdec.ImageDecoder(filePath);
 
-      res.Length.Should().Be(1);
+      res.Count().Should().Be(1);
     }
 
     [Test]
@@ -45,7 +45,7 @@ namespace QRCodeDecoder.Core.Tests
 
       var res = qrdec.ImageDecoder(filePath);
 
-      res.Length.Should().BeGreaterThan(1);
+      res.Count().Should().BeGreaterThan(1);
     }
 
     private static IEnumerable<string> GetDataFiles(string subDir)

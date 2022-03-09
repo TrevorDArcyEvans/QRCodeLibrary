@@ -175,7 +175,7 @@ namespace QRCodeDecoderDemo
 
       // decode image into array of QR codes
       // each QR code matrix is made of one byte per module
-      QRCodeResult[] QRCodeResultArray = QRCodeDecoder.ImageDecoder(QRCodeInputImage);
+      var QRCodeResultArray = QRCodeDecoder.ImageDecoder(QRCodeInputImage).ToList();
 
       // trace
       _logger.Information("****");
@@ -183,7 +183,7 @@ namespace QRCodeDecoderDemo
       _logger.Information($"Image width: {QRCodeInputImage.Width}, Height: {QRCodeInputImage.Height}");
 
       // we have at least one QR Code
-      if (QRCodeResultArray != null)
+      if (QRCodeResultArray.Any())
       {
         // display dimension value
         QRCodeDimensionLabel.Text = QRCodeResultArray[0].QRCodeDimension.ToString();
@@ -195,9 +195,9 @@ namespace QRCodeDecoderDemo
         ECIValueLabel.Text = QRCodeResultArray[0].ECIAssignValue >= 0 ? QRCodeResultArray[0].ECIAssignValue.ToString() : null;
 
         // convert results to text
-        DataTextBox.Text = ConvertResultToDisplayString(QRCodeResultArray);
+        DataTextBox.Text = ConvertResultToDisplayString(QRCodeResultArray.ToArray());
 
-        if (QRCodeResultArray != null && QRCodeResultArray.Length > 0)
+        if (QRCodeResultArray != null && QRCodeResultArray.Count > 0)
         {
           byte[] Data = QRCodeResultArray[0].DataArray;
           for (int Index = 0; Index < Data.Length; Index++)
@@ -329,8 +329,12 @@ namespace QRCodeDecoderDemo
       }
 
       // decode image
-      QRCodeResult[] DataByteArray = QRCodeDecoder.ImageDecoder(QRCodeImage);
-      string Text = ConvertResultToDisplayString(DataByteArray);
+      var DataByteArray = QRCodeDecoder.ImageDecoder(QRCodeImage);
+      if (!DataByteArray.Any())
+      {
+        return;
+      }
+      string Text = ConvertResultToDisplayString(DataByteArray.ToArray());
 
       // save image for debugging
       QRCodeImage.Save("VideoCaptureImage.png", ImageFormat.Png);
