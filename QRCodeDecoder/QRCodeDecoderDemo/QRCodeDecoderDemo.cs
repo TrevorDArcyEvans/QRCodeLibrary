@@ -175,7 +175,7 @@ namespace QRCodeDecoderDemo
 
       // decode image into array of QR codes
       // each QR code matrix is made of one byte per module
-      var QRCodeResultArray = QRCodeDecoder.ImageDecoder(QRCodeInputImage).ToList();
+      QRCodeResult[] QRCodeResultArray = QRCodeDecoder.ImageDecoder(QRCodeInputImage);
 
       // trace
       _logger.Information("****");
@@ -197,7 +197,7 @@ namespace QRCodeDecoderDemo
         // convert results to text
         DataTextBox.Text = ConvertResultToDisplayString(QRCodeResultArray);
 
-        if (QRCodeResultArray != null && QRCodeResultArray.Count > 0)
+        if (QRCodeResultArray != null && QRCodeResultArray.Length > 0)
         {
           byte[] Data = QRCodeResultArray[0].DataArray;
           for (int Index = 0; Index < Data.Length; Index++)
@@ -329,7 +329,7 @@ namespace QRCodeDecoderDemo
       }
 
       // decode image
-      var DataByteArray = QRCodeDecoder.ImageDecoder(QRCodeImage).ToList();
+      QRCodeResult[] DataByteArray = QRCodeDecoder.ImageDecoder(QRCodeImage);
       string Text = ConvertResultToDisplayString(DataByteArray);
 
       // save image for debugging
@@ -400,6 +400,7 @@ namespace QRCodeDecoderDemo
            Index++)
       {
         // DO_NOTHING
+        ;
       }
 
       // our default frame size is available
@@ -418,25 +419,11 @@ namespace QRCodeDecoderDemo
     }
 
     /// <summary>
-    /// Convert byte array to string using UTF8 encoding
-    /// </summary>
-    /// <param name="DataArray">Input array</param>
-    /// <returns>Output string</returns>
-    private static string ByteArrayToStr(byte[] DataArray)
-    {
-      Decoder Decoder = Encoding.UTF8.GetDecoder();
-      int CharCount = Decoder.GetCharCount(DataArray, 0, DataArray.Length);
-      char[] CharArray = new char[CharCount];
-      Decoder.GetChars(DataArray, 0, DataArray.Length, CharArray, 0);
-      return new string(CharArray);
-    }
-
-    /// <summary>
     /// Format result for display
     /// </summary>
     /// <param name="DataByteArray">QR Decoded byte arrays</param>
     /// <returns>Display string</returns>
-    private static string ConvertResultToDisplayString(List<QRCodeResult> DataByteArray)
+    private static string ConvertResultToDisplayString(QRCodeResult[] DataByteArray)
     {
       // no QR code
       if (DataByteArray == null)
@@ -445,21 +432,21 @@ namespace QRCodeDecoderDemo
       }
 
       // image has one QR code
-      if (DataByteArray.Count == 1)
+      if (DataByteArray.Length == 1)
       {
-        return SingleQRCodeResult(ByteArrayToStr(DataByteArray[0].DataArray));
+        return SingleQRCodeResult(QRDecoder.ByteArrayToStr(DataByteArray[0].DataArray));
       }
 
       // image has more than one QR code
       StringBuilder Str = new();
-      for (int Index = 0; Index < DataByteArray.Count; Index++)
+      for (int Index = 0; Index < DataByteArray.Length; Index++)
       {
         if (Index != 0)
         {
           Str.Append("\r\n");
         }
         Str.AppendFormat("QR Code {0}\r\n", Index + 1);
-        Str.Append(SingleQRCodeResult(ByteArrayToStr(DataByteArray[Index].DataArray)));
+        Str.Append(SingleQRCodeResult(QRDecoder.ByteArrayToStr(DataByteArray[Index].DataArray)));
       }
       return Str.ToString();
     }
@@ -477,6 +464,7 @@ namespace QRCodeDecoderDemo
            Index++)
       {
         // DO_NOTHING
+        ;
       }
 
       if (Index == Result.Length)
