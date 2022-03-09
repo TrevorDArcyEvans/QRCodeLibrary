@@ -1,8 +1,10 @@
 namespace QRCodeEncoder.Core.Tests;
 
-using System;
 using FluentAssertions;
 using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 public class QREncoder_Tests
 {
@@ -30,6 +32,16 @@ public class QREncoder_Tests
     qrenc.ErrorCorrection = val;
 
     qrenc.ErrorCorrection.Should().Be(val);
+  }
+
+  [Test]
+  public void ErrorCorrection_OutOfRange_Throws([Values(-1, 4, 5, 10)] int val)
+  {
+    var qrenc = Create();
+
+    Action act = () => qrenc.ErrorCorrection = (ErrorCorrection) val;
+
+    act.Should().Throw<ArgumentOutOfRangeException>();
   }
 
   [Test]
@@ -63,11 +75,68 @@ public class QREncoder_Tests
     Action act = () => qrenc.Encode(val);
 
     act.Should().Throw<ArgumentException>();
-
   }
 
-  private QREncoder Create()
+  [Test]
+  public void Encode_Bytes_Returns(
+    [Values] ErrorCorrection err,
+    [ValueSource(nameof(ECIrange))] int eci)
   {
-    return new QREncoder();
+    var qrenc = Create(err, eci);
+
+    var data = Encoding.UTF8.GetBytes(Text1);
+    var res = qrenc.Encode(data);
+
+    res.Should().NotBeNull();
+  }
+
+  [Test]
+  public void Encode_SingleString_Returns(
+    [Values] ErrorCorrection err,
+    [ValueSource(nameof(ECIrange))] int eci)
+  {
+    var qrenc = Create(err, eci);
+
+    var data = Text1;
+    var res = qrenc.Encode(data);
+
+    res.Should().NotBeNull();
+  }
+
+  [Test]
+  public void Encode_MultipleString_Returns(
+    [Values] ErrorCorrection err,
+    [ValueSource(nameof(ECIrange))] int eci)
+  {
+    var qrenc = Create(err, eci);
+
+    var data = new[] { Text1, Text2 };
+    var res = qrenc.Encode(data);
+
+    res.Should().NotBeNull();
+  }
+
+  private static IEnumerable<int> ECIrange => new[] { -1, 0, 127, 16383, 32767 };
+
+  private const string Text1 = "0123456789";
+  private const string Text2 = "some arbitrary text SOME OTHER ARBITRARY TEXT 0123456789 $ % * + - . / : []{}()&^£!?@|";
+
+  private QREncoder Create(int eci = 0)
+  {
+    return new QREncoder
+    {
+      ECIAssignValue = eci
+    };
+  }
+
+  private QREncoder Create(
+    ErrorCorrection err,
+    int eci = 0)
+  {
+    return new QREncoder
+    {
+      ECIAssignValue = eci,
+      ErrorCorrection = err
+    };
   }
 }

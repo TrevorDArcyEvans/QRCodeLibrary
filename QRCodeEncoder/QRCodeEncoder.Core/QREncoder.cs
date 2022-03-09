@@ -192,7 +192,7 @@ namespace QRCodeEncoder.Core
         // test error correction
         if (value < ErrorCorrection.L || value > ErrorCorrection.H)
         {
-          throw new ArgumentException("Error correction is invalid. Must be L, M, Q or H. Default is M");
+          throw new ArgumentOutOfRangeException("Error correction is invalid. Must be L, M, Q or H. Default is M");
         }
 
         // save error correction level
@@ -555,7 +555,7 @@ namespace QRCodeEncoder.Core
             break;
 
 
-          // byte mode					
+          // byte mode
           case EncodingMode.Byte:
             // append the data after mode and character count
             for (int Index = 0; Index < DataLength; Index++)
