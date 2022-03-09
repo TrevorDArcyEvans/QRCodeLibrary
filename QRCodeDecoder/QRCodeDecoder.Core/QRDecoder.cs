@@ -193,7 +193,6 @@ namespace QRCodeDecoder.Core
     private int ImageWidth;
     private int ImageHeight;
     private bool[,] BlackWhiteImage = new bool[1, 1];
-    private List<QRCodeResult> DataArrayList = new();
     private int MaxCodewords;
     private int MaxDataCodewords;
     private int MaxDataBits;
@@ -289,11 +288,11 @@ namespace QRCodeDecoder.Core
       int Start;
       var FinderList = new List<QRCodeFinder>();
 
+      // empty data string output
+      var DataArrayList = new List<QRCodeResult>();
+
       try
       {
-        // empty data string output
-        DataArrayList = new List<QRCodeResult>();
-
         // save image dimension
         ImageWidth = InputImageBitmap.Width;
         ImageHeight = InputImageBitmap.Height;
@@ -385,7 +384,7 @@ namespace QRCodeDecoder.Core
 
               // decode corner using three finders
               // continue if successful
-              if (DecodeQRCodeCorner(Corner))
+              if (DecodeQRCodeCorner(Corner, DataArrayList))
               {
                 continue;
               }
@@ -414,7 +413,7 @@ namespace QRCodeDecoder.Core
                 SetTransMatrix(Corner, Align.Row, Align.Col);
 
                 // decode corner using three finders and one alignment mark
-                if (DecodeQRCodeCorner(Corner))
+                if (DecodeQRCodeCorner(Corner, DataArrayList))
                 {
                   break;
                 }
@@ -1199,7 +1198,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Search for QR Code version
     ////////////////////////////////////////////////////////////////////
-    private bool DecodeQRCodeCorner(QRCodeCorner Corner)
+    private bool DecodeQRCodeCorner(QRCodeCorner Corner, List<QRCodeResult> DataArrayList)
     {
       try
       {
