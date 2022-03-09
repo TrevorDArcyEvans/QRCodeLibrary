@@ -15,7 +15,26 @@ public class QREncoder_Tests
   }
 
   [Test]
+  public void ErrorCorrection_Default_IsM()
+  {
+    var qrenc = Create();
+
+    qrenc.ErrorCorrection.Should().Be(ErrorCorrection.M);
+  }
+
+  [Test]
+  public void ErrorCorrection_InRange_Succeeds([Values]ErrorCorrection val)
+  {
+    var qrenc = Create();
+
+    qrenc.ErrorCorrection = val;
+
+    qrenc.ErrorCorrection.Should().Be(val);
+  }
+
+  [Test]
   public void ECIAssignValue_InRange_Succeeds(
+
     [Values(-1, 0, 1, 10, 100, 1000, 10000, 100000, 999999)] int val)
   {
     var qrenc = Create();
