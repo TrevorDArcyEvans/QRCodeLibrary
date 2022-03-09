@@ -282,7 +282,7 @@ namespace QRCodeDecoder.Core
       try
       {
         // convert input image to black and white boolean image
-        bool[,] BlackWhiteImage = ConvertImageToBlackAndWhite(InputImageBitmap);
+        var BlackWhiteImage = ConvertImageToBlackAndWhite(InputImageBitmap);
         if (BlackWhiteImage is null)
         {
           return Enumerable.Empty<QRCodeResult>();
@@ -342,7 +342,7 @@ namespace QRCodeDecoder.Core
                 QRCodeCorner Corner = QRCodeCorner.CreateCorner(FinderList[Index1], FinderList[Index2], FinderList[Index3]);
 
                 // not a valid corner
-                if (Corner == null)
+                if (Corner is null)
                 {
                   continue;
                 }
@@ -662,13 +662,18 @@ namespace QRCodeDecoder.Core
         }
 
         // we must have at least 6 positions
-        if (PosPtr < 6) continue;
+        if (PosPtr < 6)
+        {
+          continue;
+        }
 
         // build length array
         int PosLen = PosPtr - 1;
         int[] Len = new int[PosLen];
         for (int Ptr = 0; Ptr < PosLen; Ptr++)
+        {
           Len[Ptr] = ColPos[Ptr + 1] - ColPos[Ptr];
+        }
 
         // test signature
         int SigLen = PosPtr - 5;
@@ -785,6 +790,7 @@ namespace QRCodeDecoder.Core
           {
             continue;
           }
+
           foreach (QRCodeFinder HF in FinderList)
           {
             HF.Match(Col, RowPos[SigPtr + 2], RowPos[SigPtr + 3], ModuleSize);
@@ -1085,7 +1091,9 @@ namespace QRCodeDecoder.Core
       int Index2End = FinderList.Count - 1;
       int Index3End = FinderList.Count;
       for (int Index1 = 0; Index1 < Index1End; Index1++)
+      {
         for (int Index2 = Index1 + 1; Index2 < Index2End; Index2++)
+        {
           for (int Index3 = Index2 + 1; Index3 < Index3End; Index3++)
           {
             // find 3 finders arranged in L shape
@@ -1097,6 +1105,8 @@ namespace QRCodeDecoder.Core
               Corners.Add(Corner);
             }
           }
+        }
+      }
 
       // exit
       return Corners.Count == 0 ? null : Corners;
@@ -1154,7 +1164,10 @@ namespace QRCodeDecoder.Core
         if (FormatInfo < 0)
         {
           FormatInfo = GetFormatInfoTwo(BlackWhiteImage);
-          if (FormatInfo < 0) return false;
+          if (FormatInfo < 0)
+          {
+            return false;
+          }
         }
 
         // set error correction code and mask code
@@ -2135,7 +2148,6 @@ namespace QRCodeDecoder.Core
               }
               DataSeg.Add(DecodingTable[Temp]);
             }
-
             // we have two character remaining
             else if (DataLength - NumericEnd == 2)
             {
