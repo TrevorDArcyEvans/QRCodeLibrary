@@ -87,10 +87,7 @@ namespace QRCodeEncoder.Core
     /// <summary>
     /// Convert QR code matrix to boolean image constructor
     /// </summary>
-    public QRSaveImagePixels
-        (
-        bool[,] QRCodeMatrix
-        )
+    public QRSaveImagePixels(bool[,] QRCodeMatrix)
     {
       // test argument
       if (QRCodeMatrix == null)
