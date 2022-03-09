@@ -46,14 +46,13 @@ namespace QRCodeEncoder.Core
     /// </summary>
     public int ModuleSize
     {
-      get
-      {
-        return _ModuleSize;
-      }
+      get => _ModuleSize;
       set
       {
         if (value < 1 || value > 100)
+        {
           throw new ArgumentException("Module size error. Default is 2.");
+        }
         _ModuleSize = value;
       }
     }
@@ -66,14 +65,13 @@ namespace QRCodeEncoder.Core
     /// </summary>
     public int QuietZone
     {
-      get
-      {
-        return _QuietZone;
-      }
+      get => _QuietZone;
       set
       {
         if (value < 0 || value > 400)
+        {
           throw new ArgumentException("Quiet zone must be 0 to 400. Default is 8.");
+        }
         _QuietZone = value;
       }
     }
@@ -82,34 +80,12 @@ namespace QRCodeEncoder.Core
     /// <summary>
     /// White brush (default white)
     /// </summary>
-    public Brush WhiteBrush
-    {
-      get
-      {
-        return _WhiteBrush;
-      }
-      set
-      {
-        _WhiteBrush = value;
-      }
-    }
-    private Brush _WhiteBrush = Brushes.White;
+    public Brush WhiteBrush { get; set; }
 
     /// <summary>
     /// Black brush (default black)
     /// </summary>
-    public Brush BlackBrush
-    {
-      get
-      {
-        return _BlackBrush;
-      }
-      set
-      {
-        _BlackBrush = value;
-      }
-    }
-    private Brush _BlackBrush = Brushes.Black;
+    public Brush BlackBrush { get; set; }
 
     /// <summary>
     /// QR code matrix (no quiet zone)
@@ -135,15 +111,22 @@ namespace QRCodeEncoder.Core
     {
       // test argument
       if (QRCodeMatrix == null)
+      {
         throw new ArgumentException("QRSaveBitmapImage: QRCodeMatrix is null");
+      }
 
       // test matrix dimensions
       int Width = QRCodeMatrix.GetLength(0);
       int Height = QRCodeMatrix.GetLength(1);
       if (Width != Height)
+      {
         throw new ArgumentException("QRSaveBitmapImage: QRCodeMatrix width and height are not equal");
+      }
+
       if (Width < 21 || Width > 177 || ((Width - 21) % 4) != 0)
+      {
         throw new ArgumentException("QRSaveBitmapImage: Invalid QRCodeMatrix dimension");
+      }
 
       // save argument
       this.QRCodeMatrix = QRCodeMatrix;
@@ -174,7 +157,10 @@ namespace QRCodeEncoder.Core
         for (int Col = 0; Col < QRCodeDimension; Col++)
         {
           // bar is black
-          if (QRCodeMatrix[Row, Col]) graphics.FillRectangle(_BlackBrush, XOffset, YOffset, ModuleSize, ModuleSize);
+          if (QRCodeMatrix[Row, Col])
+          {
+            graphics.FillRectangle(_BlackBrush, XOffset, YOffset, ModuleSize, ModuleSize);
+          }
           XOffset += ModuleSize;
         }
         XOffset = QuietZone;
@@ -193,7 +179,9 @@ namespace QRCodeEncoder.Core
     {
       // exceptions
       if (FileName == null)
+      {
         throw new ArgumentException("SaveQRCodeToPngFile: FileName is null");
+      }
 
       // create Bitmap
       Bitmap ImageBitmap = CreateQRCodeBitmap();
@@ -210,7 +198,9 @@ namespace QRCodeEncoder.Core
     {
       // exceptions
       if (OutputStream == null)
-        throw new ArgumentException("SaveQRCodeToImageFile: Output stream is null");
+      {
+        llthrow new ArgumentException("SaveQRCodeToImageFile: Output stream is null");
+      }
 
       // create Bitmap
       Bitmap ImageBitmap = CreateQRCodeBitmap();
