@@ -47,7 +47,6 @@ namespace QRCodeDecoder.Windows
   using System.Runtime.InteropServices;
   using System.Runtime.InteropServices.ComTypes;
   using Microsoft.Win32;
-  using Core;
 
   /// <summary>
   /// The Camera class is an main class that is a wrapper for video device.

@@ -41,7 +41,7 @@
 //	For version history please refer to QRDecoder.cs
 /////////////////////////////////////////////////////////////////////
 
-namespace QRCodeDecoder.Core
+namespace QRCodeDecoder.Windows
 {
   /// <summary>
   /// Frame Size
