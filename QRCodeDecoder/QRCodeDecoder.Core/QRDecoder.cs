@@ -193,7 +193,6 @@ namespace QRCodeDecoder.Core
     private int ImageWidth;
     private int ImageHeight;
     private bool[,] BlackWhiteImage = new bool[1, 1];
-    private List<QRCodeFinder> FinderList = new();
     private List<QRCodeFinder> AlignList = new();
     private List<QRCodeResult> DataArrayList = new();
     private int MaxCodewords;
@@ -289,6 +288,7 @@ namespace QRCodeDecoder.Core
     public QRCodeResult[] ImageDecoder(Bitmap InputImageBitmap)
     {
       int Start;
+      var FinderList = new List<QRCodeFinder>();
       try
       {
         // empty data string output
@@ -311,7 +311,7 @@ namespace QRCodeDecoder.Core
         _logger.Information("Finders search");
 
         // horizontal search for finders
-        if (!HorizontalFindersSearch())
+        if (!HorizontalFindersSearch(FinderList))
         {
           return null;
         }
@@ -319,7 +319,7 @@ namespace QRCodeDecoder.Core
         _logger.Information($"Horizontal Finders count: {FinderList.Count}");
 
         // vertical search for finders
-        VerticalFindersSearch();
+        VerticalFindersSearch(FinderList);
 
         int MatchedCount = 0;
         foreach (QRCodeFinder HF in FinderList)
@@ -333,7 +333,7 @@ namespace QRCodeDecoder.Core
         _logger.Information("Remove all unused finders");
 
         // remove unused finders
-        if (!RemoveUnusedFinders())
+        if (!RemoveUnusedFinders(FinderList))
         {
           return null;
         }
@@ -531,11 +531,8 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // search row by row for finders blocks
     ////////////////////////////////////////////////////////////////////
-    private bool HorizontalFindersSearch()
+    private bool HorizontalFindersSearch(List<QRCodeFinder> FinderList)
     {
-      // create empty finders list
-      FinderList = new List<QRCodeFinder>();
-
       // look for finder patterns
       int[] ColPos = new int[ImageWidth + 1];
       int PosPtr = 0;
@@ -721,7 +718,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // search column by column for finders blocks
     ////////////////////////////////////////////////////////////////////
-    private void VerticalFindersSearch()
+    private void VerticalFindersSearch(List<QRCodeFinder> FinderList)
     {
       // active columns
       bool[] ActiveColumn = new bool[ImageWidth];
@@ -930,7 +927,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // search column by column for finders blocks
     ////////////////////////////////////////////////////////////////////
-    private bool RemoveUnusedFinders()
+    private bool RemoveUnusedFinders(List<QRCodeFinder> FinderList)
     {
       // remove all entries without a match
       for (int Index = 0; Index < FinderList.Count; Index++)
@@ -1102,7 +1099,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Build corner list
     ////////////////////////////////////////////////////////////////////
-    private List<QRCodeCorner> BuildCornerList()
+    private List<QRCodeCorner> BuildCornerList(List<QRCodeFinder> FinderList)
     {
       // empty list
       List<QRCodeCorner> Corners = new();
