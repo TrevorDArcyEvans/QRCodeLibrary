@@ -145,7 +145,7 @@ namespace QRCodeEncoder.Core
       // create picture object and make it white
       Bitmap Image = new(QRCodeImageDimension, QRCodeImageDimension);
       Graphics graphics = Graphics.FromImage(Image);
-      graphics.FillRectangle(_WhiteBrush, 0, 0, QRCodeImageDimension, QRCodeImageDimension);
+      graphics.FillRectangle(WhiteBrush, 0, 0, QRCodeImageDimension, QRCodeImageDimension);
 
       // x and y image pointers
       int XOffset = QuietZone;
@@ -159,7 +159,7 @@ namespace QRCodeEncoder.Core
           // bar is black
           if (QRCodeMatrix[Row, Col])
           {
-            graphics.FillRectangle(_BlackBrush, XOffset, YOffset, ModuleSize, ModuleSize);
+            graphics.FillRectangle(BlackBrush, XOffset, YOffset, ModuleSize, ModuleSize);
           }
           XOffset += ModuleSize;
         }
@@ -199,7 +199,7 @@ namespace QRCodeEncoder.Core
       // exceptions
       if (OutputStream == null)
       {
-        llthrow new ArgumentException("SaveQRCodeToImageFile: Output stream is null");
+        throw new ArgumentException("SaveQRCodeToImageFile: Output stream is null");
       }
 
       // create Bitmap
