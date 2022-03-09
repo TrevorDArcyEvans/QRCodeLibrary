@@ -35,7 +35,6 @@ namespace QRCodeEncoderDemo
   using System.Diagnostics;
   using System.Drawing.Imaging;
   using System.Text;
-  using QRCodeEncoder;
   using QRCodeEncoder.Core;
 
   /// <summary>
@@ -49,7 +48,7 @@ namespace QRCodeEncoderDemo
     private int QuietZone;
     private ImageFormat FileFormat;
     private Bitmap QRCodeImage;
-    private Rectangle QRCodeImageArea = new();
+    private Rectangle QRCodeImageArea;
 
     /// <summary>
     /// Constructor
@@ -57,7 +56,6 @@ namespace QRCodeEncoderDemo
     public QRCodeEncoderDemo()
     {
       InitializeComponent();
-      return;
     }
 
     /// <summary>
@@ -77,7 +75,10 @@ namespace QRCodeEncoderDemo
       if (Index > 0)
       {
         string WorkDir = string.Concat(CurDir.AsSpan(0, Index), "\\Work");
-        if (Directory.Exists(WorkDir)) Environment.CurrentDirectory = WorkDir;
+        if (Directory.Exists(WorkDir))
+        {
+          Environment.CurrentDirectory = WorkDir;
+        }
       }
 #endif
 
@@ -105,7 +106,6 @@ namespace QRCodeEncoderDemo
 
       // force resize
       OnResize(sender, e);
-      return;
     }
 
     /// <summary>
@@ -215,7 +215,6 @@ namespace QRCodeEncoderDemo
         // create bitmap image
         QRCodeImage = BitmapImage.CreateQRCodeBitmap();
       }
-
       catch (Exception Ex)
       {
         DimensionLabel.Text = null;
@@ -228,7 +227,6 @@ namespace QRCodeEncoderDemo
 
       // repaint panel
       Invalidate();
-      return;
     }
 
     /// <summary>
@@ -245,7 +243,10 @@ namespace QRCodeEncoderDemo
       SaveImageDialog.FileFormat = FileFormat;
 
       // display dialog
-      if (SaveImageDialog.ShowDialog() != DialogResult.OK) return;
+      if (SaveImageDialog.ShowDialog() != DialogResult.OK)
+      {
+        return;
+      }
 
       // get result
       ModuleSize = SaveImageDialog.ModuleSize;
@@ -267,7 +268,6 @@ namespace QRCodeEncoderDemo
           SaveSpecial();
           break;
       }
-      return;
     }
 
     /////////////////////////////////////////////////////////////////////
@@ -278,7 +278,10 @@ namespace QRCodeEncoderDemo
     {
       // save file name dialog box
       string FileName = SaveFileName(ImageFormat.Png);
-      if (FileName == null) return;
+      if (FileName == null)
+      {
+        return;
+      }
 
       // save image as png file
       QRSavePngImage PngImage = new(QRCodeMatrix);
@@ -290,7 +293,6 @@ namespace QRCodeEncoderDemo
       Process Proc = new();
       Proc.StartInfo = new ProcessStartInfo(FileName) { UseShellExecute = true };
       Proc.Start();
-      return;
     }
 
     /////////////////////////////////////////////////////////////////////
@@ -301,7 +303,10 @@ namespace QRCodeEncoderDemo
     {
       // save file name dialog box
       string FileName = SaveFileName(FileFormat);
-      if (FileName == null) return;
+      if (FileName == null)
+      {
+        return;
+      }
 
       // save image as png file
       QRSaveBitmapImage BitmapImage = new(QRCodeMatrix);
@@ -313,7 +318,6 @@ namespace QRCodeEncoderDemo
       Process Proc = new();
       Proc.StartInfo = new ProcessStartInfo(FileName) { UseShellExecute = true };
       Proc.Start();
-      return;
     }
 
     /// <summary>
@@ -330,7 +334,6 @@ namespace QRCodeEncoderDemo
       Dialog.QuietZone = QuietZone;
       Dialog.FileFormat = FileFormat;
       Dialog.ShowDialog(this);
-      return;
     }
 
     /// <summary>
@@ -338,10 +341,7 @@ namespace QRCodeEncoderDemo
     /// </summary>
     /// <param name="ImageFormat">Image format</param>
     /// <returns>File Name</returns>
-    internal static string SaveFileName
-        (
-        ImageFormat ImageFormat
-        )
+    internal static string SaveFileName(ImageFormat ImageFormat)
     {
       // save file dialog box
       SaveFileDialog Dialog = new();
@@ -351,7 +351,10 @@ namespace QRCodeEncoderDemo
       Dialog.InitialDirectory = Directory.GetCurrentDirectory();
       Dialog.RestoreDirectory = true;
       Dialog.FileName = string.Format("QRCodeImage.{0}", ImageFormat.ToString().ToLower());
-      if (Dialog.ShowDialog() == DialogResult.OK) return Dialog.FileName;
+      if (Dialog.ShowDialog() == DialogResult.OK)
+      {
+        return Dialog.FileName;
+      }
       return Dialog.ShowDialog() == DialogResult.OK ? Dialog.FileName : null;
     }
 
@@ -363,7 +366,10 @@ namespace QRCodeEncoderDemo
     private void OnPaint(object sender, PaintEventArgs e)
     {
       // no image
-      if (QRCodeImage == null) return;
+      if (QRCodeImage == null)
+      {
+        return;
+      }
 
       // image height to preserve aspect ratio
       int ImageHeight = (QRCodeImageArea.Width * QRCodeImage.Height) / QRCodeImage.Width;
@@ -382,20 +388,15 @@ namespace QRCodeEncoderDemo
       int ImageX = QRCodeImageArea.X + (QRCodeImageArea.Width - ImageWidth) / 2;
       int ImageY = QRCodeImageArea.Y + (QRCodeImageArea.Height - ImageHeight) / 2;
       e.Graphics.DrawImage(QRCodeImage, new Rectangle(ImageX, ImageY, ImageWidth, ImageHeight));
-      return;
     }
 
     /// <summary>
     /// Enabled buttons
     /// </summary>
-    private void EnableButtons
-        (
-        bool Enabled
-        )
+    private void EnableButtons(bool Enabled)
     {
       EncodeButton.Enabled = Enabled;
       SaveImageButton.Enabled = QRCodeImage != null && Enabled;
-      return;
     }
 
     /// <summary>
@@ -405,7 +406,10 @@ namespace QRCodeEncoderDemo
     /// <param name="e">Event arguments</param>
     private void OnResize(object sender, EventArgs e)
     {
-      if (ClientSize.Width == 0) return;
+      if (ClientSize.Width == 0)
+      {
+        return;
+      }
 
       // center header label
       HeaderLabel.Left = (ClientSize.Width - HeaderLabel.Width) / 2;
@@ -432,7 +436,6 @@ namespace QRCodeEncoderDemo
 
       // force re-paint
       Invalidate();
-      return;
     }
   }
 }
