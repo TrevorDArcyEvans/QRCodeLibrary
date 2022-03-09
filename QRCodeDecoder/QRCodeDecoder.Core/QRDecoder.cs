@@ -206,7 +206,6 @@ namespace QRCodeDecoder.Core
     private int CodewordsPtr;
     private uint BitBuffer;
     private int BitBufferLen;
-    private byte[,] MaskMatrix = new byte[1, 1];
 
     private bool Trans4Mode;
 
@@ -1212,10 +1211,10 @@ namespace QRCodeDecoder.Core
         SetDataCodewordsLength();
 
         // apply mask as per get format information step
-        ApplyMask(MaskCode, BaseMatrix);
+        var MaskMatrix = ApplyMask(MaskCode, BaseMatrix);
 
         // unload data from binary matrix to byte format
-        UnloadDataFromMatrix();
+        UnloadDataFromMatrix(MaskMatrix);
 
         // restore blocks (undo interleave)
         RestoreBlocks();
@@ -1789,7 +1788,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Unload matrix data from base matrix
     ////////////////////////////////////////////////////////////////////
-    private void UnloadDataFromMatrix()
+    private void UnloadDataFromMatrix(byte[,] MaskMatrix)
     {
       // input array pointer initialization
       int Ptr = 0;
@@ -2395,50 +2394,52 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Apply Mask
     ////////////////////////////////////////////////////////////////////
-    private void ApplyMask(int Mask, byte[,] BaseMatrix)
+    private byte[,] ApplyMask(int Mask, byte[,] BaseMatrix)
     {
-      MaskMatrix = (byte[,])BaseMatrix.Clone();
+      var MaskMatrix = (byte[,])BaseMatrix.Clone();
       switch (Mask)
       {
         case 0:
-          ApplyMask0();
+          ApplyMask0(MaskMatrix);
           break;
 
         case 1:
-          ApplyMask1();
+          ApplyMask1(MaskMatrix);
           break;
 
         case 2:
-          ApplyMask2();
+          ApplyMask2(MaskMatrix);
           break;
 
         case 3:
-          ApplyMask3();
+          ApplyMask3(MaskMatrix);
           break;
 
         case 4:
-          ApplyMask4();
+          ApplyMask4(MaskMatrix);
           break;
 
         case 5:
-          ApplyMask5();
+          ApplyMask5(MaskMatrix);
           break;
 
         case 6:
-          ApplyMask6();
+          ApplyMask6(MaskMatrix);
           break;
 
         case 7:
-          ApplyMask7();
+          ApplyMask7(MaskMatrix);
           break;
       }
+
+      return MaskMatrix;
     }
 
     ////////////////////////////////////////////////////////////////////
     // Apply Mask 0
     // (row + column) % 2 == 0
     ////////////////////////////////////////////////////////////////////
-    private void ApplyMask0()
+    private void ApplyMask0(byte[,] MaskMatrix)
     {
       for (int Row = 0; Row < QRCodeDimension; Row += 2)
       {
@@ -2461,7 +2462,7 @@ namespace QRCodeDecoder.Core
     // Apply Mask 1
     // row % 2 == 0
     ////////////////////////////////////////////////////////////////////
-    private void ApplyMask1()
+    private void ApplyMask1(byte[,] MaskMatrix)
     {
       for (int Row = 0; Row < QRCodeDimension; Row += 2)
       {
@@ -2479,7 +2480,7 @@ namespace QRCodeDecoder.Core
     // Apply Mask 2
     // column % 3 == 0
     ////////////////////////////////////////////////////////////////////
-    private void ApplyMask2()
+    private void ApplyMask2(byte[,] MaskMatrix)
     {
       for (int Row = 0; Row < QRCodeDimension; Row++)
       {
@@ -2497,7 +2498,7 @@ namespace QRCodeDecoder.Core
     // Apply Mask 3
     // (row + column) % 3 == 0
     ////////////////////////////////////////////////////////////////////
-    private void ApplyMask3()
+    private void ApplyMask3(byte[,] MaskMatrix)
     {
       for (int Row = 0; Row < QRCodeDimension; Row += 3)
       {
@@ -2523,7 +2524,7 @@ namespace QRCodeDecoder.Core
     // Apply Mask 4
     // ((row / 2) + (column / 3)) % 2 == 0
     ////////////////////////////////////////////////////////////////////
-    private void ApplyMask4()
+    private void ApplyMask4(byte[,] MaskMatrix)
     {
       for (int Row = 0; Row < QRCodeDimension; Row += 4)
       {
@@ -2588,7 +2589,7 @@ namespace QRCodeDecoder.Core
     // Apply Mask 5
     // ((row * column) % 2) + ((row * column) % 3) == 0
     ////////////////////////////////////////////////////////////////////
-    private void ApplyMask5()
+    private void ApplyMask5(byte[,] MaskMatrix)
     {
       for (int Row = 0; Row < QRCodeDimension; Row += 6)
       {
@@ -2632,7 +2633,7 @@ namespace QRCodeDecoder.Core
     // Apply Mask 6
     // (((row * column) % 2) + ((row * column) mod 3)) mod 2 == 0
     ////////////////////////////////////////////////////////////////////
-    private void ApplyMask6()
+    private void ApplyMask6(byte[,] MaskMatrix)
     {
       for (int Row = 0; Row < QRCodeDimension; Row += 6)
       {
@@ -2708,7 +2709,7 @@ namespace QRCodeDecoder.Core
     // Apply Mask 7
     // (((row + column) % 2) + ((row * column) mod 3)) mod 2 == 0
     ////////////////////////////////////////////////////////////////////
-    private void ApplyMask7()
+    private void ApplyMask7(byte[,] MaskMatrix)
     {
       for (int Row = 0; Row < QRCodeDimension; Row += 6)
       {
