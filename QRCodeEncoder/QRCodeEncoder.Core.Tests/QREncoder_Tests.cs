@@ -23,7 +23,7 @@ public class QREncoder_Tests
   }
 
   [Test]
-  public void ErrorCorrection_InRange_Succeeds([Values]ErrorCorrection val)
+  public void ErrorCorrection_InRange_Succeeds([Values] ErrorCorrection val)
   {
     var qrenc = Create();
 
@@ -56,7 +56,7 @@ public class QREncoder_Tests
 
   [Test]
   public void Encode_EmptyNull_Throws(
-    [Values(null, "")]string val)
+    [Values(null, "")] string val)
   {
     var qrenc = Create();
 
