@@ -208,7 +208,7 @@ namespace QRCodeDecoder.Core
 
     private bool Trans4Mode;
 
-    // transformation cooefficients from QR modules to image pixels
+    // transformation coefficients from QR modules to image pixels
     private double Trans3a;
     private double Trans3b;
     private double Trans3c;
@@ -234,20 +234,6 @@ namespace QRCodeDecoder.Core
     private readonly ILogger _logger;
 
     #endregion
-
-    /// <summary>
-    /// Convert byte array to string using UTF8 encoding
-    /// </summary>
-    /// <param name="DataArray">Input array</param>
-    /// <returns>Output string</returns>
-    public static string ByteArrayToStr(byte[] DataArray)
-    {
-      Decoder Decoder = Encoding.UTF8.GetDecoder();
-      int CharCount = Decoder.GetCharCount(DataArray, 0, DataArray.Length);
-      char[] CharArray = new char[CharCount];
-      Decoder.GetChars(DataArray, 0, DataArray.Length, CharArray, 0);
-      return new string(CharArray);
-    }
 
     public QRDecoder(ILogger logger)
     {
@@ -1187,6 +1173,20 @@ namespace QRCodeDecoder.Core
         // failed exit
         return false;
       }
+    }
+
+    /// <summary>
+    /// Convert byte array to string using UTF8 encoding
+    /// </summary>
+    /// <param name="DataArray">Input array</param>
+    /// <returns>Output string</returns>
+    private static string ByteArrayToStr(byte[] DataArray)
+    {
+      Decoder Decoder = Encoding.UTF8.GetDecoder();
+      int CharCount = Decoder.GetCharCount(DataArray, 0, DataArray.Length);
+      char[] CharArray = new char[CharCount];
+      Decoder.GetChars(DataArray, 0, DataArray.Length, CharArray, 0);
+      return new string(CharArray);
     }
 
     ////////////////////////////////////////////////////////////////////
