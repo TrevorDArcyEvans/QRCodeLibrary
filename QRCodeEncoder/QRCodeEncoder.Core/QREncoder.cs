@@ -186,15 +186,14 @@ namespace QRCodeEncoder.Core
     /// </summary>
     public ErrorCorrection ErrorCorrection
     {
-      get
-      {
-        return _ErrorCorrection;
-      }
+      get => _ErrorCorrection;
       set
       {
         // test error correction
         if (value < ErrorCorrection.L || value > ErrorCorrection.H)
+        {
           throw new ArgumentException("Error correction is invalid. Must be L, M, Q or H. Default is M");
+        }
 
         // save error correction level
         _ErrorCorrection = value;
@@ -207,10 +206,7 @@ namespace QRCodeEncoder.Core
     /// </summary>
     public int ECIAssignValue
     {
-      get
-      {
-        return _ECIAssignValue;
-      }
+      get => _ECIAssignValue;
       set
       {
         if (value < -1 || value > 999999)
