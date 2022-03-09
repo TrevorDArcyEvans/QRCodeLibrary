@@ -31,6 +31,6 @@ public sealed class QRSavePngImage_Tests : QRSaveImage_Base
 
   private QRSavePngImage Create(bool[,] matrix)
   {
-    return new QRSavePngImage(matrix);
+    return new(matrix);
   }
 }

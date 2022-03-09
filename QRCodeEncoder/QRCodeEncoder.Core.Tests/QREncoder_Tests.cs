@@ -123,7 +123,7 @@ public sealed class QREncoder_Tests
 
   private QREncoder Create(int eci = 0)
   {
-    return new QREncoder
+    return new()
     {
       ECIAssignValue = eci
     };
@@ -133,7 +133,7 @@ public sealed class QREncoder_Tests
     ErrorCorrection err,
     int eci = 0)
   {
-    return new QREncoder
+    return new()
     {
       ECIAssignValue = eci,
       ErrorCorrection = err

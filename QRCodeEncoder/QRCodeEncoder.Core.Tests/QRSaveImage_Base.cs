@@ -15,6 +15,6 @@ public abstract class QRSaveImage_Base
 
   private QREncoder CreateEncoder()
   {
-    return new QREncoder();
+    return new();
   }
 }
