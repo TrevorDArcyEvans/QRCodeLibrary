@@ -46,7 +46,7 @@ namespace QRCodeDecoder.Core
   /// <summary>
   /// Frame Size
   /// </summary>
-  public class FrameSize
+  public sealed class FrameSize
   {
     /// <summary>
     /// Width of frame of video output.
