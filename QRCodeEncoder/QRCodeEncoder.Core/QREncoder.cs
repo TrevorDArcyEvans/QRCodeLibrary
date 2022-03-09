@@ -211,7 +211,7 @@ namespace QRCodeEncoder.Core
       {
         if (value < -1 || value > 999999)
         {
-          throw new ArgumentException("ECI Assignment Value must be 0-999999 or -1 for none");
+          throw new ArgumentOutOfRangeException("ECI Assignment Value must be 0-999999 or -1 for none");
         }
         _ECIAssignValue = value;
       }

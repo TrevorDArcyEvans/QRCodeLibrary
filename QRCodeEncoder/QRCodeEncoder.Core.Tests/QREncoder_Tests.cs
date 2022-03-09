@@ -52,7 +52,7 @@ public class QREncoder_Tests
 
     Action act = () => qrenc.ECIAssignValue = val;
 
-    act.Should().Throw<Exception>();
+    act.Should().Throw<ArgumentOutOfRangeException>();
   }
 
   private QREncoder Create()
