@@ -269,14 +269,18 @@ namespace QRCodeEncoder.Core
     {
       // empty
       if (StringDataSegments == null || StringDataSegments.Length == 0)
+      {
         throw new ArgumentException("String data segments are null or empty");
+      }
 
       // loop for all segments
       for (int SegIndex = 0; SegIndex < StringDataSegments.Length; SegIndex++)
       {
         // convert string to byte array
         if (StringDataSegments[SegIndex] == null)
+        {
           throw new ArgumentException("One of the string data segments is null or empty");
+        }
       }
 
       // create bytes arrays
@@ -302,7 +306,9 @@ namespace QRCodeEncoder.Core
     {
       // test data segments array
       if (SingleDataSeg == null || SingleDataSeg.Length == 0)
+      {
         throw new ArgumentException("Single data segment argument is null or empty");
+      }
 
       // encode data
       return Encode(new[] { SingleDataSeg });
@@ -317,7 +323,9 @@ namespace QRCodeEncoder.Core
     {
       // test data segments array
       if (DataSegArray == null || DataSegArray.Length == 0)
+      {
         throw new ArgumentException("Data segments argument is null or empty");
+      }
 
       // reset result variables
       QRCodeMatrix = null;
@@ -331,13 +339,19 @@ namespace QRCodeEncoder.Core
         // input string length
         byte[] DataSeg = DataSegArray[SegIndex];
         if (DataSeg == null)
+        {
           DataSegArray[SegIndex] = Array.Empty<byte>();
+        }
         else
+        {
           Bytes += DataSeg.Length;
+        }
       }
 
       if (Bytes == 0)
+      {
         throw new ArgumentException("There is no data to encode.");
+      }
 
       // save data segments array
       this.DataSegArray = DataSegArray;
@@ -375,7 +389,10 @@ namespace QRCodeEncoder.Core
       {
         for (int Col = 0; Col < QRCodeDimension; Col++)
         {
-          if ((ResultMatrix[Row, Col] & 1) != 0) QRCodeMatrix[Row, Col] = true;
+          if ((ResultMatrix[Row, Col] & 1) != 0)
+          {
+            QRCodeMatrix[Row, Col] = true;
+          }
         }
       }
 
@@ -397,11 +414,17 @@ namespace QRCodeEncoder.Core
       if (_ECIAssignValue >= 0)
       {
         if (_ECIAssignValue <= 127)
+        {
           EncodedDataBits = 12;
+        }
         else if (_ECIAssignValue <= 16383)
+        {
           EncodedDataBits = 20;
+        }
         else
+        {
           EncodedDataBits = 28;
+        }
       }
 
       // loop for all segments
@@ -417,7 +440,9 @@ namespace QRCodeEncoder.Core
         {
           int Code = EncodingTable[DataSeg[Index]];
           if (Code < 10)
+          {
             continue;
+          }
           if (Code < 45)
           {
             EncodingMode = EncodingMode.AlphaNumeric;
@@ -433,13 +458,22 @@ namespace QRCodeEncoder.Core
         {
           case EncodingMode.Numeric:
             DataBits += 10 * (DataLength / 3);
-            if ((DataLength % 3) == 1) DataBits += 4;
-            else if ((DataLength % 3) == 2) DataBits += 7;
+            if ((DataLength % 3) == 1)
+            {
+              DataBits += 4;
+            }
+            else if ((DataLength % 3) == 2)
+            {
+              DataBits += 7;
+            }
             break;
 
           case EncodingMode.AlphaNumeric:
             DataBits += 11 * (DataLength / 2);
-            if ((DataLength & 1) != 0) DataBits += 6;
+            if ((DataLength & 1) != 0)
+            {
+              DataBits += 6;
+            }
             break;
 
           case EncodingMode.Byte:
@@ -461,12 +495,20 @@ namespace QRCodeEncoder.Core
         SetDataCodewordsLength();
         TotalDataLenBits = 0;
         for (int Seg = 0; Seg < EncodingSegMode.Length; Seg++)
+        {
           TotalDataLenBits += DataLengthBits(EncodingSegMode[Seg]);
-        if (EncodedDataBits + TotalDataLenBits <= MaxDataBits) break;
+        }
+
+        if (EncodedDataBits + TotalDataLenBits <= MaxDataBits)
+        {
+          break;
+        }
       }
 
       if (QRCodeVersion > 40)
+      {
         throw new ApplicationException("Input data string is too long");
+      }
       EncodedDataBits += TotalDataLenBits;
     }
 
@@ -528,18 +570,24 @@ namespace QRCodeEncoder.Core
             // encode digits in groups of 3
             int NumEnd = (DataLength / 3) * 3;
             for (int Index = 0; Index < NumEnd; Index += 3)
+            {
               SaveBitsToCodewordsArray(100 * EncodingTable[DataSeg[Index]] +
-                          10 * EncodingTable[DataSeg[Index + 1]] +
-                          EncodingTable[DataSeg[Index + 2]], 10);
+                                      10 * EncodingTable[DataSeg[Index + 1]] +
+                                      EncodingTable[DataSeg[Index + 2]], 10);
+            }
 
             // we have one digit remaining
             if (DataLength - NumEnd == 1)
+            {
               SaveBitsToCodewordsArray(EncodingTable[DataSeg[NumEnd]], 4);
+            }
 
             // we have two digits remaining
             else if (DataLength - NumEnd == 2)
+            {
               SaveBitsToCodewordsArray(10 * EncodingTable[DataSeg[NumEnd]] +
-                EncodingTable[DataSeg[NumEnd + 1]], 7);
+                                      EncodingTable[DataSeg[NumEnd + 1]], 7);
+            }
             break;
 
           // alphanumeric mode
@@ -547,11 +595,15 @@ namespace QRCodeEncoder.Core
             // encode digits in groups of 2
             int AlphaNumEnd = (DataLength / 2) * 2;
             for (int Index = 0; Index < AlphaNumEnd; Index += 2)
+            {
               SaveBitsToCodewordsArray(45 * EncodingTable[DataSeg[Index]] + EncodingTable[DataSeg[Index + 1]], 11);
+            }
 
             // we have one character remaining
             if (DataLength - AlphaNumEnd == 1)
+            {
               SaveBitsToCodewordsArray(EncodingTable[DataSeg[AlphaNumEnd]], 6);
+            }
             break;
 
 
@@ -559,23 +611,31 @@ namespace QRCodeEncoder.Core
           case EncodingMode.Byte:
             // append the data after mode and character count
             for (int Index = 0; Index < DataLength; Index++)
+            {
               SaveBitsToCodewordsArray(DataSeg[Index], 8);
+            }
             break;
         }
       }
 
       // set terminator
       if (EncodedDataBits < MaxDataBits)
+      {
         SaveBitsToCodewordsArray(0, MaxDataBits - EncodedDataBits < 4 ? MaxDataBits - EncodedDataBits : 4);
+      }
 
       // flush bit buffer
       if (BitBufferLen > 0)
+      {
         CodewordsArray[CodewordsPtr++] = (byte)(BitBuffer >> 24);
+      }
 
       // add extra padding if there is still space
       int PadEnd = MaxDataCodewords - CodewordsPtr;
       for (int PadPtr = 0; PadPtr < PadEnd; PadPtr++)
+      {
         CodewordsArray[CodewordsPtr + PadPtr] = (byte)((PadPtr & 1) == 0 ? 0xEC : 0x11);
+      }
     }
 
     // Save data to codeword array
@@ -648,7 +708,9 @@ namespace QRCodeEncoder.Core
       {
         // current first codeword is zero
         if (Polynomial[Index] == 0)
+        {
           continue;
+        }
 
         // current first codeword is not zero
         int Multiplier = IntToExp[Polynomial[Index]];
@@ -673,7 +735,9 @@ namespace QRCodeEncoder.Core
       // create array of data blocks starting point
       int[] Start = new int[TotalBlocks];
       for (int Index = 1; Index < TotalBlocks; Index++)
+      {
         Start[Index] = Start[Index - 1] + (Index <= BlocksGroup1 ? DataCodewordsGroup1 : DataCodewordsGroup2);
+      }
 
       // step one. iterleave base on group one length
       int PtrEnd = DataCodewordsGroup1 * TotalBlocks;
@@ -687,7 +751,9 @@ namespace QRCodeEncoder.Core
         Start[Block]++;
         Block++;
         if (Block == TotalBlocks)
+        {
           Block = 0;
+        }
       }
 
       // interleave group two
@@ -703,14 +769,18 @@ namespace QRCodeEncoder.Core
           Start[Block]++;
           Block++;
           if (Block == TotalBlocks)
+          {
             Block = BlocksGroup1;
+          }
         }
       }
 
       // create array of error correction blocks starting point
       Start[0] = MaxDataCodewords;
       for (int Index = 1; Index < TotalBlocks; Index++)
+      {
         Start[Index] = Start[Index - 1] + ErrCorrCodewords;
+      }
 
       // step one. iterleave base on group one length
 
@@ -723,7 +793,9 @@ namespace QRCodeEncoder.Core
         Start[Block]++;
         Block++;
         if (Block == TotalBlocks)
+        {
           Block = 0;
+        }
       }
 
       // save result
@@ -750,14 +822,21 @@ namespace QRCodeEncoder.Core
         {
           // load current module with
           if ((CodewordsArray[Ptr >> 3] & (1 << (7 - (Ptr & 7)))) != 0)
+          {
             BaseMatrix[Row, Col] = DataBlack;
+          }
+
           if (++Ptr == PtrEnd)
+          {
             break;
+          }
         }
 
         // current module is non data and vertical timing line condition is on
         else if (Col == 6)
+        {
           Col--;
+        }
 
         // update matrix position to next module
         switch (State)
@@ -823,16 +902,24 @@ namespace QRCodeEncoder.Core
         // evaluate 4 test conditions
         int Score = EvaluationCondition1();
         if (Score >= BestScore)
+        {
           continue;
+        }
         Score += EvaluationCondition2();
         if (Score >= BestScore)
+        {
           continue;
+        }
         Score += EvaluationCondition3();
         if (Score >= BestScore)
+        {
           continue;
+        }
         Score += EvaluationCondition4();
         if (Score >= BestScore)
+        {
           continue;
+        }
 
         // save as best mask so far
         ResultMatrix = MaskMatrix;
@@ -858,7 +945,9 @@ namespace QRCodeEncoder.Core
           if (((MaskMatrix[Row, Col - 1] ^ MaskMatrix[Row, Col]) & 1) != 0)
           {
             if (Count >= 5)
+            {
               Score += Count - 2;
+            }
             Count = 0;
           }
           Count++;
@@ -866,7 +955,9 @@ namespace QRCodeEncoder.Core
 
         // last run
         if (Count >= 5)
+        {
           Score += Count - 2;
+        }
       }
 
       // test columns
@@ -879,7 +970,9 @@ namespace QRCodeEncoder.Core
           if (((MaskMatrix[Row - 1, Col] ^ MaskMatrix[Row, Col]) & 1) != 0)
           {
             if (Count >= 5)
+            {
               Score += Count - 2;
+            }
             Count = 0;
           }
           Count++;
@@ -887,7 +980,9 @@ namespace QRCodeEncoder.Core
 
         // last run
         if (Count >= 5)
+        {
           Score += Count - 2;
+        }
       }
       return Score;
     }
@@ -902,12 +997,17 @@ namespace QRCodeEncoder.Core
         for (int Col = 1; Col < QRCodeDimension; Col++)
         {
           // all are black
-          if (((MaskMatrix[Row - 1, Col - 1] & MaskMatrix[Row - 1, Col] & MaskMatrix[Row, Col - 1] & MaskMatrix[Row, Col]) & 1) != 0)
+          if (((MaskMatrix[Row - 1, Col - 1] & MaskMatrix[Row - 1, Col] & MaskMatrix[Row, Col - 1] &
+                MaskMatrix[Row, Col]) & 1) != 0)
+          {
             Score += 3;
-
+          }
           // all are white
-          else if (((MaskMatrix[Row - 1, Col - 1] | MaskMatrix[Row - 1, Col] | MaskMatrix[Row, Col - 1] | MaskMatrix[Row, Col]) & 1) == 0)
+          else if (((MaskMatrix[Row - 1, Col - 1] | MaskMatrix[Row - 1, Col] | MaskMatrix[Row, Col - 1] |
+                     MaskMatrix[Row, Col]) & 1) == 0)
+          {
             Score += 3;
+          }
         }
       return Score;
     }
@@ -929,7 +1029,9 @@ namespace QRCodeEncoder.Core
         {
           // current cell is white
           if ((MaskMatrix[Row, Col] & 1) == 0)
+          {
             continue;
+          }
 
           // more or equal to 4
           if (Col - Start >= 4)
@@ -937,7 +1039,9 @@ namespace QRCodeEncoder.Core
             // we have 4 or more white
             // test for pattern before the white space
             if (Start >= 7 && TestHorizontalDarkLight(Row, Start - 7))
+            {
               Score += 40;
+            }
 
             // test for pattern after the white space
             if (QRCodeDimension - Col >= 7 && TestHorizontalDarkLight(Row, Col))
@@ -953,7 +1057,9 @@ namespace QRCodeEncoder.Core
 
         // last run
         if (QRCodeDimension - Start >= 4 && Start >= 7 && TestHorizontalDarkLight(Row, Start - 7))
+        {
           Score += 40;
+        }
       }
 
       // test columns
@@ -966,7 +1072,9 @@ namespace QRCodeEncoder.Core
         {
           // current cell is white
           if ((MaskMatrix[Row, Col] & 1) == 0)
+          {
             continue;
+          }
 
           // more or equal to 4
           if (Row - Start >= 4)
@@ -974,7 +1082,9 @@ namespace QRCodeEncoder.Core
             // we have 4 or more white
             // test for pattern before the white space
             if (Start >= 7 && TestVerticalDarkLight(Start - 7, Col))
+            {
               Score += 40;
+            }
 
             // test for pattern after the white space
             if (QRCodeDimension - Row >= 7 && TestVerticalDarkLight(Row, Col))
@@ -990,7 +1100,9 @@ namespace QRCodeEncoder.Core
 
         // last run
         if (QRCodeDimension - Start >= 4 && Start >= 7 && TestVerticalDarkLight(Start - 7, Col))
+        {
           Score += 40;
+        }
       }
 
       // exit
@@ -1004,18 +1116,28 @@ namespace QRCodeEncoder.Core
       // count black cells
       int Black = 0;
       for (int Row = 0; Row < QRCodeDimension; Row++)
+      {
         for (int Col = 0; Col < QRCodeDimension; Col++)
+        {
           if ((MaskMatrix[Row, Col] & 1) != 0)
+          {
             Black++;
+          }
+        }
+      }
 
       // ratio
       double Ratio = Black / (double)(QRCodeDimension * QRCodeDimension);
 
       // there are more black than white
       if (Ratio > 0.55)
+      {
         return (int)(20.0 * (Ratio - 0.5)) * 10;
+      }
       if (Ratio < 0.45)
+      {
         return (int)(20.0 * (0.5 - Ratio)) * 10;
+      }
       return 0;
     }
 
@@ -1048,20 +1170,24 @@ namespace QRCodeEncoder.Core
         // top right
         Mask = 1;
         for (int Row = 0; Row < 6; Row++)
+        {
           for (int Col = 0; Col < 3; Col++)
           {
             ResultMatrix[Row, Pos + Col] = (VerInfo & Mask) != 0 ? FixedBlack : FixedWhite;
             Mask <<= 1;
           }
+        }
 
         // bottom left
         Mask = 1;
         for (int Col = 0; Col < 6; Col++)
+        {
           for (int Row = 0; Row < 3; Row++)
           {
             ResultMatrix[Pos + Row, Col] = (VerInfo & Mask) != 0 ? FixedBlack : FixedWhite;
             Mask <<= 1;
           }
+        }
       }
 
       // error correction code and mask number
@@ -1095,10 +1221,14 @@ namespace QRCodeEncoder.Core
         // bottom left and top right corners
         int Row = FormatInfoTwo[Index, 0];
         if (Row < 0)
+        {
           Row += QRCodeDimension;
+        }
         int Col = FormatInfoTwo[Index, 1];
         if (Col < 0)
+        {
           Col += QRCodeDimension;
+        }
         ResultMatrix[Row, Col] = (byte)FormatBit;
       }
     }
@@ -1108,15 +1238,21 @@ namespace QRCodeEncoder.Core
     {
       // numeric mode
       if (EncodingMode == EncodingMode.Numeric)
+      {
         return QRCodeVersion < 10 ? 10 : (QRCodeVersion < 27 ? 12 : 14);
+      }
 
       // alpha numeric mode
       if (EncodingMode == EncodingMode.AlphaNumeric)
+      {
         return QRCodeVersion < 10 ? 9 : (QRCodeVersion < 27 ? 11 : 13);
+      }
 
       // byte mode
       if (EncodingMode == EncodingMode.Byte)
+      {
         return QRCodeVersion < 10 ? 8 : 16;
+      }
 
       // error
       throw new ApplicationException("Encoding mode error");
@@ -1159,23 +1295,37 @@ namespace QRCodeEncoder.Core
 
       // top left finder patterns
       for (int Row = 0; Row < 9; Row++)
+      {
         for (int Col = 0; Col < 9; Col++)
+        {
           BaseMatrix[Row, Col] = FinderPatternTopLeft[Row, Col];
+        }
+      }
 
       // top right finder patterns
       int Pos = QRCodeDimension - 8;
       for (int Row = 0; Row < 9; Row++)
+      {
         for (int Col = 0; Col < 8; Col++)
+        {
           BaseMatrix[Row, Pos + Col] = FinderPatternTopRight[Row, Col];
+        }
+      }
 
       // bottom left finder patterns
       for (int Row = 0; Row < 8; Row++)
+      {
         for (int Col = 0; Col < 9; Col++)
+        {
           BaseMatrix[Pos + Row, Col] = FinderPatternBottomLeft[Row, Col];
+        }
+      }
 
       // Timing pattern
       for (int Z = 8; Z < QRCodeDimension - 8; Z++)
+      {
         BaseMatrix[Z, 6] = BaseMatrix[6, Z] = (Z & 1) == 0 ? FixedBlack : FixedWhite;
+      }
 
       // alignment pattern
       if (QRCodeVersion > 1)
@@ -1183,19 +1333,26 @@ namespace QRCodeEncoder.Core
         byte[] AlignPos = AlignmentPositionArray[QRCodeVersion];
         int AlignmentDimension = AlignPos.Length;
         for (int Row = 0; Row < AlignmentDimension; Row++)
+        {
           for (int Col = 0; Col < AlignmentDimension; Col++)
           {
-            if (Col == 0 && Row == 0 || Col == AlignmentDimension - 1 && Row == 0 || Col == 0 && Row == AlignmentDimension - 1)
+            if (Col == 0 && Row == 0 || Col == AlignmentDimension - 1 && Row == 0 ||
+                Col == 0 && Row == AlignmentDimension - 1)
+            {
               continue;
+            }
 
             int PosRow = AlignPos[Row];
             int PosCol = AlignPos[Col];
             for (int ARow = -2; ARow < 3; ARow++)
+            {
               for (int ACol = -2; ACol < 3; ACol++)
               {
                 BaseMatrix[PosRow + ARow, PosCol + ACol] = AlignmentPattern[ARow + 2, ACol + 2];
               }
+            }
           }
+        }
       }
 
       // reserve version information
@@ -1206,13 +1363,21 @@ namespace QRCodeEncoder.Core
 
         // top right
         for (int Row = 0; Row < 6; Row++)
+        {
           for (int Col = 0; Col < 3; Col++)
+          {
             BaseMatrix[Row, Pos + Col] = FormatWhite;
+          }
+        }
 
         // bottom right
         for (int Col = 0; Col < 6; Col++)
+        {
           for (int Row = 0; Row < 3; Row++)
+          {
             BaseMatrix[Pos + Row, Col] = FormatWhite;
+          }
+        }
       }
     }
 
@@ -1266,9 +1431,14 @@ namespace QRCodeEncoder.Core
         for (int Col = 0; Col < QRCodeDimension; Col += 2)
         {
           if ((MaskMatrix[Row, Col] & NonData) == 0)
+          {
             MaskMatrix[Row, Col] ^= 1;
+          }
+
           if ((MaskMatrix[Row + 1, Col + 1] & NonData) == 0)
+          {
             MaskMatrix[Row + 1, Col + 1] ^= 1;
+          }
         }
     }
 
@@ -1277,9 +1447,15 @@ namespace QRCodeEncoder.Core
     private void ApplyMask1()
     {
       for (int Row = 0; Row < QRCodeDimension; Row += 2)
+      {
         for (int Col = 0; Col < QRCodeDimension; Col++)
+        {
           if ((MaskMatrix[Row, Col] & NonData) == 0)
+          {
             MaskMatrix[Row, Col] ^= 1;
+          }
+        }
+      }
     }
 
     // Apply Mask 2
@@ -1287,9 +1463,15 @@ namespace QRCodeEncoder.Core
     private void ApplyMask2()
     {
       for (int Row = 0; Row < QRCodeDimension; Row++)
+      {
         for (int Col = 0; Col < QRCodeDimension; Col += 3)
+        {
           if ((MaskMatrix[Row, Col] & NonData) == 0)
+          {
             MaskMatrix[Row, Col] ^= 1;
+          }
+        }
+      }
     }
 
     // Apply Mask 3
@@ -1297,15 +1479,25 @@ namespace QRCodeEncoder.Core
     private void ApplyMask3()
     {
       for (int Row = 0; Row < QRCodeDimension; Row += 3)
+      {
         for (int Col = 0; Col < QRCodeDimension; Col += 3)
         {
           if ((MaskMatrix[Row, Col] & NonData) == 0)
+          {
             MaskMatrix[Row, Col] ^= 1;
+          }
+
           if ((MaskMatrix[Row + 1, Col + 2] & NonData) == 0)
+          {
             MaskMatrix[Row + 1, Col + 2] ^= 1;
+          }
+
           if ((MaskMatrix[Row + 2, Col + 1] & NonData) == 0)
+          {
             MaskMatrix[Row + 2, Col + 1] ^= 1;
+          }
         }
+      }
     }
 
     // Apply Mask 4
@@ -1313,36 +1505,70 @@ namespace QRCodeEncoder.Core
     private void ApplyMask4()
     {
       for (int Row = 0; Row < QRCodeDimension; Row += 4)
+      {
         for (int Col = 0; Col < QRCodeDimension; Col += 6)
         {
           if ((MaskMatrix[Row, Col] & NonData) == 0)
+          {
             MaskMatrix[Row, Col] ^= 1;
+          }
+
           if ((MaskMatrix[Row, Col + 1] & NonData) == 0)
+          {
             MaskMatrix[Row, Col + 1] ^= 1;
+          }
+
           if ((MaskMatrix[Row, Col + 2] & NonData) == 0)
+          {
             MaskMatrix[Row, Col + 2] ^= 1;
+          }
 
           if ((MaskMatrix[Row + 1, Col] & NonData) == 0)
+          {
             MaskMatrix[Row + 1, Col] ^= 1;
+          }
+
           if ((MaskMatrix[Row + 1, Col + 1] & NonData) == 0)
+          {
             MaskMatrix[Row + 1, Col + 1] ^= 1;
+          }
+
           if ((MaskMatrix[Row + 1, Col + 2] & NonData) == 0)
+          {
             MaskMatrix[Row + 1, Col + 2] ^= 1;
+          }
 
           if ((MaskMatrix[Row + 2, Col + 3] & NonData) == 0)
+          {
             MaskMatrix[Row + 2, Col + 3] ^= 1;
+          }
+
           if ((MaskMatrix[Row + 2, Col + 4] & NonData) == 0)
+          {
             MaskMatrix[Row + 2, Col + 4] ^= 1;
+          }
+
           if ((MaskMatrix[Row + 2, Col + 5] & NonData) == 0)
+          {
             MaskMatrix[Row + 2, Col + 5] ^= 1;
+          }
 
           if ((MaskMatrix[Row + 3, Col + 3] & NonData) == 0)
+          {
             MaskMatrix[Row + 3, Col + 3] ^= 1;
+          }
+
           if ((MaskMatrix[Row + 3, Col + 4] & NonData) == 0)
+          {
             MaskMatrix[Row + 3, Col + 4] ^= 1;
+          }
+
           if ((MaskMatrix[Row + 3, Col + 5] & NonData) == 0)
+          {
             MaskMatrix[Row + 3, Col + 5] ^= 1;
+          }
         }
+      }
     }
 
     // Apply Mask 5
@@ -1350,23 +1576,45 @@ namespace QRCodeEncoder.Core
     private void ApplyMask5()
     {
       for (int Row = 0; Row < QRCodeDimension; Row += 6)
+      {
         for (int Col = 0; Col < QRCodeDimension; Col += 6)
         {
           for (int Delta = 0; Delta < 6; Delta++)
+          {
             if ((MaskMatrix[Row, Col + Delta] & NonData) == 0)
+            {
               MaskMatrix[Row, Col + Delta] ^= 1;
+            }
+          }
           for (int Delta = 1; Delta < 6; Delta++)
+          {
             if ((MaskMatrix[Row + Delta, Col] & NonData) == 0)
+            {
               MaskMatrix[Row + Delta, Col] ^= 1;
+            }
+          }
+
           if ((MaskMatrix[Row + 2, Col + 3] & NonData) == 0)
+          {
             MaskMatrix[Row + 2, Col + 3] ^= 1;
+          }
+
           if ((MaskMatrix[Row + 3, Col + 2] & NonData) == 0)
+          {
             MaskMatrix[Row + 3, Col + 2] ^= 1;
+          }
+
           if ((MaskMatrix[Row + 3, Col + 4] & NonData) == 0)
+          {
             MaskMatrix[Row + 3, Col + 4] ^= 1;
+          }
+
           if ((MaskMatrix[Row + 4, Col + 3] & NonData) == 0)
+          {
             MaskMatrix[Row + 4, Col + 3] ^= 1;
+          }
         }
+      }
     }
 
     // Apply Mask 6
@@ -1374,39 +1622,85 @@ namespace QRCodeEncoder.Core
     private void ApplyMask6()
     {
       for (int Row = 0; Row < QRCodeDimension; Row += 6)
+      {
         for (int Col = 0; Col < QRCodeDimension; Col += 6)
         {
           for (int Delta = 0; Delta < 6; Delta++)
+          {
             if ((MaskMatrix[Row, Col + Delta] & NonData) == 0)
+            {
               MaskMatrix[Row, Col + Delta] ^= 1;
+            }
+          }
           for (int Delta = 1; Delta < 6; Delta++)
+          {
             if ((MaskMatrix[Row + Delta, Col] & NonData) == 0)
+            {
               MaskMatrix[Row + Delta, Col] ^= 1;
+            }
+          }
+
           if ((MaskMatrix[Row + 1, Col + 1] & NonData) == 0)
+          {
             MaskMatrix[Row + 1, Col + 1] ^= 1;
+          }
+
           if ((MaskMatrix[Row + 1, Col + 2] & NonData) == 0)
+          {
             MaskMatrix[Row + 1, Col + 2] ^= 1;
+          }
+
           if ((MaskMatrix[Row + 2, Col + 1] & NonData) == 0)
+          {
             MaskMatrix[Row + 2, Col + 1] ^= 1;
+          }
+
           if ((MaskMatrix[Row + 2, Col + 3] & NonData) == 0)
+          {
             MaskMatrix[Row + 2, Col + 3] ^= 1;
+          }
+
           if ((MaskMatrix[Row + 2, Col + 4] & NonData) == 0)
+          {
             MaskMatrix[Row + 2, Col + 4] ^= 1;
+          }
+
           if ((MaskMatrix[Row + 3, Col + 2] & NonData) == 0)
+          {
             MaskMatrix[Row + 3, Col + 2] ^= 1;
+          }
+
           if ((MaskMatrix[Row + 3, Col + 4] & NonData) == 0)
+          {
             MaskMatrix[Row + 3, Col + 4] ^= 1;
+          }
+
           if ((MaskMatrix[Row + 4, Col + 2] & NonData) == 0)
+          {
             MaskMatrix[Row + 4, Col + 2] ^= 1;
+          }
+
           if ((MaskMatrix[Row + 4, Col + 3] & NonData) == 0)
+          {
             MaskMatrix[Row + 4, Col + 3] ^= 1;
+          }
+
           if ((MaskMatrix[Row + 4, Col + 5] & NonData) == 0)
+          {
             MaskMatrix[Row + 4, Col + 5] ^= 1;
+          }
+
           if ((MaskMatrix[Row + 5, Col + 4] & NonData) == 0)
+          {
             MaskMatrix[Row + 5, Col + 4] ^= 1;
+          }
+
           if ((MaskMatrix[Row + 5, Col + 5] & NonData) == 0)
+          {
             MaskMatrix[Row + 5, Col + 5] ^= 1;
+          }
         }
+      }
     }
 
     // Apply Mask 7
@@ -1414,57 +1708,107 @@ namespace QRCodeEncoder.Core
     private void ApplyMask7()
     {
       for (int Row = 0; Row < QRCodeDimension; Row += 6)
+      {
         for (int Col = 0; Col < QRCodeDimension; Col += 6)
         {
           if ((MaskMatrix[Row, Col] & NonData) == 0)
+          {
             MaskMatrix[Row, Col] ^= 1;
+          }
+
           if ((MaskMatrix[Row, Col + 2] & NonData) == 0)
+          {
             MaskMatrix[Row, Col + 2] ^= 1;
+          }
+
           if ((MaskMatrix[Row, Col + 4] & NonData) == 0)
+          {
             MaskMatrix[Row, Col + 4] ^= 1;
+          }
 
           if ((MaskMatrix[Row + 1, Col + 3] & NonData) == 0)
+          {
             MaskMatrix[Row + 1, Col + 3] ^= 1;
+          }
+
           if ((MaskMatrix[Row + 1, Col + 4] & NonData) == 0)
+          {
             MaskMatrix[Row + 1, Col + 4] ^= 1;
+          }
+
           if ((MaskMatrix[Row + 1, Col + 5] & NonData) == 0)
+          {
             MaskMatrix[Row + 1, Col + 5] ^= 1;
+          }
 
           if ((MaskMatrix[Row + 2, Col] & NonData) == 0)
+          {
             MaskMatrix[Row + 2, Col] ^= 1;
+          }
+
           if ((MaskMatrix[Row + 2, Col + 4] & NonData) == 0)
+          {
             MaskMatrix[Row + 2, Col + 4] ^= 1;
+          }
+
           if ((MaskMatrix[Row + 2, Col + 5] & NonData) == 0)
+          {
             MaskMatrix[Row + 2, Col + 5] ^= 1;
+          }
 
           if ((MaskMatrix[Row + 3, Col + 1] & NonData) == 0)
+          {
             MaskMatrix[Row + 3, Col + 1] ^= 1;
+          }
+
           if ((MaskMatrix[Row + 3, Col + 3] & NonData) == 0)
+          {
             MaskMatrix[Row + 3, Col + 3] ^= 1;
+          }
+
           if ((MaskMatrix[Row + 3, Col + 5] & NonData) == 0)
+          {
             MaskMatrix[Row + 3, Col + 5] ^= 1;
+          }
 
           if ((MaskMatrix[Row + 4, Col] & NonData) == 0)
+          {
             MaskMatrix[Row + 4, Col] ^= 1;
+          }
+
           if ((MaskMatrix[Row + 4, Col + 1] & NonData) == 0)
+          {
             MaskMatrix[Row + 4, Col + 1] ^= 1;
+          }
+
           if ((MaskMatrix[Row + 4, Col + 2] & NonData) == 0)
+          {
             MaskMatrix[Row + 4, Col + 2] ^= 1;
+          }
 
           if ((MaskMatrix[Row + 5, Col + 1] & NonData) == 0)
+          {
             MaskMatrix[Row + 5, Col + 1] ^= 1;
+          }
+
           if ((MaskMatrix[Row + 5, Col + 2] & NonData) == 0)
+          {
             MaskMatrix[Row + 5, Col + 2] ^= 1;
+          }
+
           if ((MaskMatrix[Row + 5, Col + 3] & NonData) == 0)
+          {
             MaskMatrix[Row + 5, Col + 3] ^= 1;
+          }
         }
+      }
     }
 
     #endregion
 
     // alignment symbols position as function of dimension
     internal static readonly byte[][] AlignmentPositionArray =
-      {
+    {
       null,
       null,
       new byte[] {  6,  18},
@@ -1506,16 +1850,17 @@ namespace QRCodeEncoder.Core
       new byte[] {  6,  32,  58,  84, 110, 136, 162},
       new byte[] {  6,  26,  54,  82, 110, 138, 166},
       new byte[] {  6,  30,  58,  86, 114, 142, 170},
-      };
+    };
 
     // maximum code words as function of dimension
     internal static readonly int[] MaxCodewordsArray =
-      {0,
+    {
+         0,
         26,   44,   70,  100,  134,  172,  196,  242,  292,  346,
        404,  466,  532,  581,  655,  733,  815,  901,  991, 1085,
       1156, 1258, 1364, 1474, 1588, 1706, 1828, 1921, 2051, 2185,
       2323, 2465, 2611, 2761, 2876, 3034, 3196, 3362, 3532, 3706
-      };
+    };
 
     // Encodable character set:
     // 1) numeric data (digits 0 - 9);
@@ -1525,7 +1870,7 @@ namespace QRCodeEncoder.Core
     //    Representation. Note that Kanji characters in QR Code can have values 8140HEX -9FFCHEX and E040HEX -
     //    EBBFHEX , which can be compacted into 13 bits.)
     internal static readonly byte[] EncodingTable =
-      {
+    {
        45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45,
        45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45,
        36, 45, 45, 45, 37, 38, 45, 45, 45, 45, 39, 40, 45, 41, 42, 43,
@@ -1542,7 +1887,7 @@ namespace QRCodeEncoder.Core
        45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45,
        45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45,
        45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45,
-      };
+    };
 
     // Error correction block information
     // A-Number of blocks in group 1
@@ -1558,7 +1903,7 @@ namespace QRCodeEncoder.Core
     internal const int DATA_CODEWORDS_GROUP2 = 3;
 
     internal static readonly byte[,] ECBlockInfo =
-      {
+    {
 			// A,   B,   C,   D 
 			{  1,  19,   0,   0},	// 1-L
 			{  1,  16,   0,   0},	// 1-M
@@ -1720,7 +2065,7 @@ namespace QRCodeEncoder.Core
 			{ 18,  47,  31,  48},	// 40-M
 			{ 34,  24,  34,  25},	// 40-Q
 			{ 20,  15,  61,  16},	// 40-H
-			};
+		};
 
     #region Generators
 
@@ -1856,87 +2201,89 @@ namespace QRCodeEncoder.Core
     #endregion
 
     internal static readonly byte[] ExpToInt =
-        {
-           1,   2,   4,   8,  16,  32,  64, 128,  29,  58, 116, 232, 205, 135,  19,  38,
-          76, 152,  45,  90, 180, 117, 234, 201, 143,   3,   6,  12,  24,  48,  96, 192,
-         157,  39,  78, 156,  37,  74, 148,  53, 106, 212, 181, 119, 238, 193, 159,  35,
-          70, 140,   5,  10,  20,  40,  80, 160,  93, 186, 105, 210, 185, 111, 222, 161,
-          95, 190,  97, 194, 153,  47,  94, 188, 101, 202, 137,  15,  30,  60, 120, 240,
-         253, 231, 211, 187, 107, 214, 177, 127, 254, 225, 223, 163,  91, 182, 113, 226,
-         217, 175,  67, 134,  17,  34,  68, 136,  13,  26,  52, 104, 208, 189, 103, 206,
-         129,  31,  62, 124, 248, 237, 199, 147,  59, 118, 236, 197, 151,  51, 102, 204,
-         133,  23,  46,  92, 184, 109, 218, 169,  79, 158,  33,  66, 132,  21,  42,  84,
-         168,  77, 154,  41,  82, 164,  85, 170,  73, 146,  57, 114, 228, 213, 183, 115,
-         230, 209, 191,  99, 198, 145,  63, 126, 252, 229, 215, 179, 123, 246, 241, 255,
-         227, 219, 171,  75, 150,  49,  98, 196, 149,  55, 110, 220, 165,  87, 174,  65,
-         130,  25,  50, 100, 200, 141,   7,  14,  28,  56, 112, 224, 221, 167,  83, 166,
-          81, 162,  89, 178, 121, 242, 249, 239, 195, 155,  43,  86, 172,  69, 138,   9,
-          18,  36,  72, 144,  61, 122, 244, 245, 247, 243, 251, 235, 203, 139,  11,  22,
-          44,  88, 176, 125, 250, 233, 207, 131,  27,  54, 108, 216, 173,  71, 142,   1,
+    {
+       1,   2,   4,   8,  16,  32,  64, 128,  29,  58, 116, 232, 205, 135,  19,  38,
+      76, 152,  45,  90, 180, 117, 234, 201, 143,   3,   6,  12,  24,  48,  96, 192,
+     157,  39,  78, 156,  37,  74, 148,  53, 106, 212, 181, 119, 238, 193, 159,  35,
+      70, 140,   5,  10,  20,  40,  80, 160,  93, 186, 105, 210, 185, 111, 222, 161,
+      95, 190,  97, 194, 153,  47,  94, 188, 101, 202, 137,  15,  30,  60, 120, 240,
+     253, 231, 211, 187, 107, 214, 177, 127, 254, 225, 223, 163,  91, 182, 113, 226,
+     217, 175,  67, 134,  17,  34,  68, 136,  13,  26,  52, 104, 208, 189, 103, 206,
+     129,  31,  62, 124, 248, 237, 199, 147,  59, 118, 236, 197, 151,  51, 102, 204,
+     133,  23,  46,  92, 184, 109, 218, 169,  79, 158,  33,  66, 132,  21,  42,  84,
+     168,  77, 154,  41,  82, 164,  85, 170,  73, 146,  57, 114, 228, 213, 183, 115,
+     230, 209, 191,  99, 198, 145,  63, 126, 252, 229, 215, 179, 123, 246, 241, 255,
+     227, 219, 171,  75, 150,  49,  98, 196, 149,  55, 110, 220, 165,  87, 174,  65,
+     130,  25,  50, 100, 200, 141,   7,  14,  28,  56, 112, 224, 221, 167,  83, 166,
+      81, 162,  89, 178, 121, 242, 249, 239, 195, 155,  43,  86, 172,  69, 138,   9,
+      18,  36,  72, 144,  61, 122, 244, 245, 247, 243, 251, 235, 203, 139,  11,  22,
+      44,  88, 176, 125, 250, 233, 207, 131,  27,  54, 108, 216, 173,  71, 142,   1,
 
-          2,   4,   8,  16,  32,  64, 128,  29,  58, 116, 232, 205, 135,  19,  38,
-          76, 152,  45,  90, 180, 117, 234, 201, 143,   3,   6,  12,  24,  48,  96, 192,
-         157,  39,  78, 156,  37,  74, 148,  53, 106, 212, 181, 119, 238, 193, 159,  35,
-          70, 140,   5,  10,  20,  40,  80, 160,  93, 186, 105, 210, 185, 111, 222, 161,
-          95, 190,  97, 194, 153,  47,  94, 188, 101, 202, 137,  15,  30,  60, 120, 240,
-         253, 231, 211, 187, 107, 214, 177, 127, 254, 225, 223, 163,  91, 182, 113, 226,
-         217, 175,  67, 134,  17,  34,  68, 136,  13,  26,  52, 104, 208, 189, 103, 206,
-         129,  31,  62, 124, 248, 237, 199, 147,  59, 118, 236, 197, 151,  51, 102, 204,
-         133,  23,  46,  92, 184, 109, 218, 169,  79, 158,  33,  66, 132,  21,  42,  84,
-         168,  77, 154,  41,  82, 164,  85, 170,  73, 146,  57, 114, 228, 213, 183, 115,
-         230, 209, 191,  99, 198, 145,  63, 126, 252, 229, 215, 179, 123, 246, 241, 255,
-         227, 219, 171,  75, 150,  49,  98, 196, 149,  55, 110, 220, 165,  87, 174,  65,
-         130,  25,  50, 100, 200, 141,   7,  14,  28,  56, 112, 224, 221, 167,  83, 166,
-          81, 162,  89, 178, 121, 242, 249, 239, 195, 155,  43,  86, 172,  69, 138,   9,
-          18,  36,  72, 144,  61, 122, 244, 245, 247, 243, 251, 235, 203, 139,  11,  22,
-          44,  88, 176, 125, 250, 233, 207, 131,  27,  54, 108, 216, 173,  71, 142,   1
-        };
+      2,   4,   8,  16,  32,  64, 128,  29,  58, 116, 232, 205, 135,  19,  38,
+      76, 152,  45,  90, 180, 117, 234, 201, 143,   3,   6,  12,  24,  48,  96, 192,
+     157,  39,  78, 156,  37,  74, 148,  53, 106, 212, 181, 119, 238, 193, 159,  35,
+      70, 140,   5,  10,  20,  40,  80, 160,  93, 186, 105, 210, 185, 111, 222, 161,
+      95, 190,  97, 194, 153,  47,  94, 188, 101, 202, 137,  15,  30,  60, 120, 240,
+     253, 231, 211, 187, 107, 214, 177, 127, 254, 225, 223, 163,  91, 182, 113, 226,
+     217, 175,  67, 134,  17,  34,  68, 136,  13,  26,  52, 104, 208, 189, 103, 206,
+     129,  31,  62, 124, 248, 237, 199, 147,  59, 118, 236, 197, 151,  51, 102, 204,
+     133,  23,  46,  92, 184, 109, 218, 169,  79, 158,  33,  66, 132,  21,  42,  84,
+     168,  77, 154,  41,  82, 164,  85, 170,  73, 146,  57, 114, 228, 213, 183, 115,
+     230, 209, 191,  99, 198, 145,  63, 126, 252, 229, 215, 179, 123, 246, 241, 255,
+     227, 219, 171,  75, 150,  49,  98, 196, 149,  55, 110, 220, 165,  87, 174,  65,
+     130,  25,  50, 100, 200, 141,   7,  14,  28,  56, 112, 224, 221, 167,  83, 166,
+      81, 162,  89, 178, 121, 242, 249, 239, 195, 155,  43,  86, 172,  69, 138,   9,
+      18,  36,  72, 144,  61, 122, 244, 245, 247, 243, 251, 235, 203, 139,  11,  22,
+      44,  88, 176, 125, 250, 233, 207, 131,  27,  54, 108, 216, 173,  71, 142,   1
+    };
 
     internal static readonly byte[] IntToExp =
-        {
-           0,   0,   1,  25,   2,  50,  26, 198,   3, 223,  51, 238,  27, 104, 199,  75,
-           4, 100, 224,  14,  52, 141, 239, 129,  28, 193, 105, 248, 200,   8,  76, 113,
-           5, 138, 101,  47, 225,  36,  15,  33,  53, 147, 142, 218, 240,  18, 130,  69,
-          29, 181, 194, 125, 106,  39, 249, 185, 201, 154,   9, 120,  77, 228, 114, 166,
-           6, 191, 139,  98, 102, 221,  48, 253, 226, 152,  37, 179,  16, 145,  34, 136,
-          54, 208, 148, 206, 143, 150, 219, 189, 241, 210,  19,  92, 131,  56,  70,  64,
-          30,  66, 182, 163, 195,  72, 126, 110, 107,  58,  40,  84, 250, 133, 186,  61,
-         202,  94, 155, 159,  10,  21, 121,  43,  78, 212, 229, 172, 115, 243, 167,  87,
-           7, 112, 192, 247, 140, 128,  99,  13, 103,  74, 222, 237,  49, 197, 254,  24,
-         227, 165, 153, 119,  38, 184, 180, 124,  17,  68, 146, 217,  35,  32, 137,  46,
-          55,  63, 209,  91, 149, 188, 207, 205, 144, 135, 151, 178, 220, 252, 190,  97,
-         242,  86, 211, 171,  20,  42,  93, 158, 132,  60,  57,  83,  71, 109,  65, 162,
-          31,  45,  67, 216, 183, 123, 164, 118, 196,  23,  73, 236, 127,  12, 111, 246,
-         108, 161,  59,  82,  41, 157,  85, 170, 251,  96, 134, 177, 187, 204,  62,  90,
-         203,  89,  95, 176, 156, 169, 160,  81,  11, 245,  22, 235, 122, 117,  44, 215,
-          79, 174, 213, 233, 230, 231, 173, 232, 116, 214, 244, 234, 168,  80,  88, 175
-        };
+    {
+       0,   0,   1,  25,   2,  50,  26, 198,   3, 223,  51, 238,  27, 104, 199,  75,
+       4, 100, 224,  14,  52, 141, 239, 129,  28, 193, 105, 248, 200,   8,  76, 113,
+       5, 138, 101,  47, 225,  36,  15,  33,  53, 147, 142, 218, 240,  18, 130,  69,
+      29, 181, 194, 125, 106,  39, 249, 185, 201, 154,   9, 120,  77, 228, 114, 166,
+       6, 191, 139,  98, 102, 221,  48, 253, 226, 152,  37, 179,  16, 145,  34, 136,
+      54, 208, 148, 206, 143, 150, 219, 189, 241, 210,  19,  92, 131,  56,  70,  64,
+      30,  66, 182, 163, 195,  72, 126, 110, 107,  58,  40,  84, 250, 133, 186,  61,
+     202,  94, 155, 159,  10,  21, 121,  43,  78, 212, 229, 172, 115, 243, 167,  87,
+       7, 112, 192, 247, 140, 128,  99,  13, 103,  74, 222, 237,  49, 197, 254,  24,
+     227, 165, 153, 119,  38, 184, 180, 124,  17,  68, 146, 217,  35,  32, 137,  46,
+      55,  63, 209,  91, 149, 188, 207, 205, 144, 135, 151, 178, 220, 252, 190,  97,
+     242,  86, 211, 171,  20,  42,  93, 158, 132,  60,  57,  83,  71, 109,  65, 162,
+      31,  45,  67, 216, 183, 123, 164, 118, 196,  23,  73, 236, 127,  12, 111, 246,
+     108, 161,  59,  82,  41, 157,  85, 170, 251,  96, 134, 177, 187, 204,  62,  90,
+     203,  89,  95, 176, 156, 169, 160,  81,  11, 245,  22, 235, 122, 117,  44, 215,
+      79, 174, 213, 233, 230, 231, 173, 232, 116, 214, 244, 234, 168,  80,  88, 175
+    };
 
     internal static readonly int[] FormatInfoArray =
-        {
-        0x5412, 0x5125, 0x5E7C, 0x5B4B, 0x45F9, 0x40CE, 0x4F97, 0x4AA0,		// M = 00
-				0x77C4, 0x72F3, 0x7DAA, 0x789D, 0x662F, 0x6318, 0x6C41, 0x6976,		// L = 01
-				0x1689, 0x13BE, 0x1CE7, 0x19D0,  0x762,  0x255,  0xD0C,  0x83B,		// H - 10
-				0x355F, 0x3068, 0x3F31, 0x3A06, 0x24B4, 0x2183, 0x2EDA, 0x2BED,		// Q = 11
-				};
+    {
+      0x5412, 0x5125, 0x5E7C, 0x5B4B, 0x45F9, 0x40CE, 0x4F97, 0x4AA0,		// M = 00
+		  0x77C4, 0x72F3, 0x7DAA, 0x789D, 0x662F, 0x6318, 0x6C41, 0x6976,		// L = 01
+		  0x1689, 0x13BE, 0x1CE7, 0x19D0,  0x762,  0x255,  0xD0C,  0x83B,		// H - 10
+		  0x355F, 0x3068, 0x3F31, 0x3A06, 0x24B4, 0x2183, 0x2EDA, 0x2BED,		// Q = 11
+		};
 
-    internal static readonly int[,] FormatInfoOne = {
-        {0, 8}, {1, 8}, {2, 8}, {3, 8}, {4, 8}, {5, 8}, {7, 8}, {8, 8},
-        {8, 7}, {8, 5}, {8, 4}, {8, 3}, {8, 2}, {8, 1}, {8, 0}
-        };
+    internal static readonly int[,] FormatInfoOne =
+    {
+      {0, 8}, {1, 8}, {2, 8}, {3, 8}, {4, 8}, {5, 8}, {7, 8}, {8, 8},
+      {8, 7}, {8, 5}, {8, 4}, {8, 3}, {8, 2}, {8, 1}, {8, 0}
+    };
 
-    internal static readonly int[,] FormatInfoTwo = {
-        {8, -1}, {8, -2}, {8, -3}, {8, -4}, {8, -5}, {8, -6}, {8, -7}, {8, -8},
-        {-7, 8}, {-6, 8}, {-5, 8}, {-4, 8}, {-3, 8}, {-2, 8}, {-1, 8}
-        };
+    internal static readonly int[,] FormatInfoTwo =
+    {
+      {8, -1}, {8, -2}, {8, -3}, {8, -4}, {8, -5}, {8, -6}, {8, -7}, {8, -8},
+      {-7, 8}, {-6, 8}, {-5, 8}, {-4, 8}, {-3, 8}, {-2, 8}, {-1, 8}
+    };
 
     internal static readonly int[] VersionCodeArray =
-        {
-         0x7c94,  0x85bc,  0x9a99,  0xa4d3,  0xbbf6,  0xc762,  0xd847,  0xe60d,  0xf928, 0x10b78,
-        0x1145d, 0x12a17, 0x13532, 0x149a6, 0x15683, 0x168c9, 0x177ec, 0x18ec4, 0x191e1, 0x1afab,
-        0x1b08e, 0x1cc1a, 0x1d33f, 0x1ed75, 0x1f250, 0x209d5, 0x216f0, 0x228ba, 0x2379f, 0x24b0b,
-        0x2542e, 0x26a64, 0x27541, 0x28c69
-        };
+    {
+       0x7c94,  0x85bc,  0x9a99,  0xa4d3,  0xbbf6,  0xc762,  0xd847,  0xe60d,  0xf928, 0x10b78,
+      0x1145d, 0x12a17, 0x13532, 0x149a6, 0x15683, 0x168c9, 0x177ec, 0x18ec4, 0x191e1, 0x1afab,
+      0x1b08e, 0x1cc1a, 0x1d33f, 0x1ed75, 0x1f250, 0x209d5, 0x216f0, 0x228ba, 0x2379f, 0x24b0b,
+      0x2542e, 0x26a64, 0x27541, 0x28c69
+    };
 
     internal const byte White = 0;
     internal const byte Black = 1;
@@ -1950,7 +2297,7 @@ namespace QRCodeEncoder.Core
     internal const byte FixedBlack = Fixed | NonData | Black;
 
     internal static readonly byte[,] FinderPatternTopLeft =
-      {
+    {
       {FixedBlack,  FixedBlack,  FixedBlack,  FixedBlack,  FixedBlack,  FixedBlack,  FixedBlack,  FixedWhite,  FormatWhite},
       {FixedBlack,  FixedWhite,  FixedWhite,  FixedWhite,  FixedWhite,  FixedWhite,  FixedBlack,  FixedWhite,  FormatWhite},
       {FixedBlack,  FixedWhite,  FixedBlack,  FixedBlack,  FixedBlack,  FixedWhite,  FixedBlack,  FixedWhite,  FormatWhite},
@@ -1960,10 +2307,10 @@ namespace QRCodeEncoder.Core
       {FixedBlack,  FixedBlack,  FixedBlack,  FixedBlack,  FixedBlack,  FixedBlack,  FixedBlack,  FixedWhite,  FormatWhite},
       {FixedWhite,  FixedWhite,  FixedWhite,  FixedWhite,  FixedWhite,  FixedWhite,  FixedWhite,  FixedWhite,  FormatWhite},
       {FormatWhite, FormatWhite, FormatWhite, FormatWhite, FormatWhite, FormatWhite, FormatWhite, FormatWhite, FormatWhite},
-      };
+    };
 
     internal static readonly byte[,] FinderPatternTopRight =
-      {
+    {
       {FixedWhite,  FixedBlack,  FixedBlack,  FixedBlack,  FixedBlack,  FixedBlack,  FixedBlack,  FixedBlack},
       {FixedWhite,  FixedBlack,  FixedWhite,  FixedWhite,  FixedWhite,  FixedWhite,  FixedWhite,  FixedBlack},
       {FixedWhite,  FixedBlack,  FixedWhite,  FixedBlack,  FixedBlack,  FixedBlack,  FixedWhite,  FixedBlack},
@@ -1973,10 +2320,10 @@ namespace QRCodeEncoder.Core
       {FixedWhite,  FixedBlack,  FixedBlack,  FixedBlack,  FixedBlack,  FixedBlack,  FixedBlack,  FixedBlack},
       {FixedWhite,  FixedWhite,  FixedWhite,  FixedWhite,  FixedWhite,  FixedWhite,  FixedWhite,  FixedWhite},
       {FormatWhite, FormatWhite, FormatWhite, FormatWhite, FormatWhite, FormatWhite, FormatWhite, FormatWhite},
-      };
+    };
 
     internal static readonly byte[,] FinderPatternBottomLeft =
-      {
+    {
       {FixedWhite, FixedWhite, FixedWhite, FixedWhite, FixedWhite, FixedWhite, FixedWhite, FixedWhite, FixedBlack},
       {FixedBlack, FixedBlack, FixedBlack, FixedBlack, FixedBlack, FixedBlack, FixedBlack, FixedWhite, FormatWhite},
       {FixedBlack, FixedWhite, FixedWhite, FixedWhite, FixedWhite, FixedWhite, FixedBlack, FixedWhite, FormatWhite},
@@ -1988,12 +2335,12 @@ namespace QRCodeEncoder.Core
       };
 
     internal static readonly byte[,] AlignmentPattern =
-      {
+    {
       {FixedBlack, FixedBlack, FixedBlack, FixedBlack, FixedBlack},
       {FixedBlack, FixedWhite, FixedWhite, FixedWhite, FixedBlack},
       {FixedBlack, FixedWhite, FixedBlack, FixedWhite, FixedBlack},
       {FixedBlack, FixedWhite, FixedWhite, FixedWhite, FixedBlack},
       {FixedBlack, FixedBlack, FixedBlack, FixedBlack, FixedBlack},
-      };
+    };
   }
 }
