@@ -6,10 +6,10 @@ namespace QRCodeEncoderDemo
     ///  The main entry point for the application.
     /// </summary>
     [STAThread]
-    static void Main()
+    public static void Main()
     {
       ApplicationConfiguration.Initialize();
-      Application.Run(new global::QRCodeEncoderDemo.QRCodeEncoderDemo());
+      Application.Run(new QRCodeEncoderDemo());
     }
   }
 }
