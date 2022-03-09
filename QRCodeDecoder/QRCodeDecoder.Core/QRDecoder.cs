@@ -285,27 +285,27 @@ namespace QRCodeDecoder.Core
       int Start = Environment.TickCount;
       var FinderList = new List<QRCodeFinder>();
 
+      // empty data string output
+      var DataArrayList = new List<QRCodeResult>();
+
       // save image dimension
       ImageWidth = InputImageBitmap.Width;
       ImageHeight = InputImageBitmap.Height;
 
       _logger.Information("Convert image to black and white");
 
-      // convert input image to black and white boolean image
-      bool[,] BlackWhiteImage = ConvertImageToBlackAndWhite(InputImageBitmap);
-      if (BlackWhiteImage is null)
-      {
-        return null;
-      }
-
-      _logger.Information($"Time: {Environment.TickCount - Start}");
-      _logger.Information("Finders search");
-
-      // empty data string output
-      var DataArrayList = new List<QRCodeResult>();
-
       try
       {
+        // convert input image to black and white boolean image
+        bool[,] BlackWhiteImage = ConvertImageToBlackAndWhite(InputImageBitmap);
+        if (BlackWhiteImage is null)
+        {
+          return null;
+        }
+
+        _logger.Information($"Time: {Environment.TickCount - Start}");
+        _logger.Information("Finders search");
+
         // horizontal search for finders
         if (!HorizontalFindersSearch(FinderList, BlackWhiteImage))
         {
@@ -340,89 +340,89 @@ namespace QRCodeDecoder.Core
           _logger.Information(HF.ToString());
         }
         _logger.Information("Search for QR corners");
+
+        // look for all possible 3 finder patterns
+        int Index1End = FinderList.Count - 2;
+        int Index2End = FinderList.Count - 1;
+        int Index3End = FinderList.Count;
+        for (int Index1 = 0; Index1 < Index1End; Index1++)
+        {
+          for (int Index2 = Index1 + 1; Index2 < Index2End; Index2++)
+          {
+            for (int Index3 = Index2 + 1; Index3 < Index3End; Index3++)
+            {
+              try
+              {
+                // find 3 finders arranged in L shape
+                QRCodeCorner Corner = QRCodeCorner.CreateCorner(FinderList[Index1], FinderList[Index2], FinderList[Index3]);
+
+                // not a valid corner
+                if (Corner == null)
+                {
+                  continue;
+                }
+
+                _logger.Information($"Decode Corner: Top Left:    {Corner.TopLeftFinder.ToString()}");
+                _logger.Information($"Decode Corner: Top Right:   {Corner.TopRightFinder.ToString()}");
+                _logger.Information($"Decode Corner: Bottom Left: {Corner.BottomLeftFinder.ToString()}");
+
+                // get corner info (version, error code and mask) continue if failed
+                if (!GetQRCodeCornerInfo(Corner, BlackWhiteImage))
+                {
+                  continue;
+                }
+
+                _logger.Information("Decode QR code using three finders");
+
+                // decode corner using three finders continue if successful
+                if (DecodeQRCodeCorner(Corner, DataArrayList, BlackWhiteImage))
+                {
+                  continue;
+                }
+
+                // qr code version 1 has no alignment mark in other words decode failed
+                if (QRCodeVersion == 1)
+                {
+                  continue;
+                }
+
+                // find bottom right alignment mark continue if failed
+                var AlignList = new List<QRCodeFinder>();
+                if (!FindAlignmentMark(Corner, AlignList, BlackWhiteImage))
+                {
+                  continue;
+                }
+
+                // decode using 4 points
+                foreach (QRCodeFinder Align in AlignList)
+                {
+                  _logger.Information($"Calculated alignment mark: Row {Align.Row}, Col {Align.Col}");
+
+                  // calculate transformation based on 3 finders and bottom right alignment mark
+                  SetTransMatrix(Corner, Align.Row, Align.Col);
+
+                  // decode corner using three finders and one alignment mark
+                  if (DecodeQRCodeCorner(Corner, DataArrayList, BlackWhiteImage))
+                  {
+                    break;
+                  }
+                }
+              }
+              catch (Exception Ex)
+              {
+                _logger.Error(Ex, "Decode corner failed.");
+              }
+            }
+          }
+        }
+
+        _logger.Information($"Time: {Environment.TickCount - Start}");
       }
       catch (Exception Ex)
       {
         _logger.Error(Ex, "QR Code decoding failed (no finders).");
         return null;
       }
-
-      // look for all possible 3 finder patterns
-      int Index1End = FinderList.Count - 2;
-      int Index2End = FinderList.Count - 1;
-      int Index3End = FinderList.Count;
-      for (int Index1 = 0; Index1 < Index1End; Index1++)
-      {
-        for (int Index2 = Index1 + 1; Index2 < Index2End; Index2++)
-        {
-          for (int Index3 = Index2 + 1; Index3 < Index3End; Index3++)
-          {
-            try
-            {
-              // find 3 finders arranged in L shape
-              QRCodeCorner Corner = QRCodeCorner.CreateCorner(FinderList[Index1], FinderList[Index2], FinderList[Index3]);
-
-              // not a valid corner
-              if (Corner == null)
-              {
-                continue;
-              }
-
-              _logger.Information($"Decode Corner: Top Left:    {Corner.TopLeftFinder.ToString()}");
-              _logger.Information($"Decode Corner: Top Right:   {Corner.TopRightFinder.ToString()}");
-              _logger.Information($"Decode Corner: Bottom Left: {Corner.BottomLeftFinder.ToString()}");
-
-              // get corner info (version, error code and mask) continue if failed
-              if (!GetQRCodeCornerInfo(Corner, BlackWhiteImage))
-              {
-                continue;
-              }
-
-              _logger.Information("Decode QR code using three finders");
-
-              // decode corner using three finders continue if successful
-              if (DecodeQRCodeCorner(Corner, DataArrayList, BlackWhiteImage))
-              {
-                continue;
-              }
-
-              // qr code version 1 has no alignment mark in other words decode failed
-              if (QRCodeVersion == 1)
-              {
-                continue;
-              }
-
-              // find bottom right alignment mark continue if failed
-              var AlignList = new List<QRCodeFinder>();
-              if (!FindAlignmentMark(Corner, AlignList, BlackWhiteImage))
-              {
-                continue;
-              }
-
-              // decode using 4 points
-              foreach (QRCodeFinder Align in AlignList)
-              {
-                _logger.Information($"Calculated alignment mark: Row {Align.Row}, Col {Align.Col}");
-
-                // calculate transformation based on 3 finders and bottom right alignment mark
-                SetTransMatrix(Corner, Align.Row, Align.Col);
-
-                // decode corner using three finders and one alignment mark
-                if (DecodeQRCodeCorner(Corner, DataArrayList, BlackWhiteImage))
-                {
-                  break;
-                }
-              }
-            }
-            catch (Exception Ex)
-            {
-              _logger.Error(Ex, "Decode corner failed.");
-            }
-          }
-        }
-      }
-
-      _logger.Information($"Time: {Environment.TickCount - Start}");
 
       // not found exit
       if (DataArrayList.Count == 0)
