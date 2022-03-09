@@ -47,6 +47,8 @@
 //	2022/03/01: Version 3.0.0 Software was upgraded to VS 2022 and C6.0
 /////////////////////////////////////////////////////////////////////
 
+using System;
+
 namespace QRCodeDecoder.Core
 {
   using System.Drawing;
@@ -201,7 +203,6 @@ namespace QRCodeDecoder.Core
     private int BlocksGroup2;
     private int DataCodewordsGroup2;
 
-    private byte[] CodewordsArray = { };
     private int CodewordsPtr;
     private uint BitBuffer;
     private int BitBufferLen;
@@ -1210,17 +1211,17 @@ namespace QRCodeDecoder.Core
         var MaskMatrix = ApplyMask(MaskCode, BaseMatrix);
 
         // unload data from binary matrix to byte format
-        UnloadDataFromMatrix(MaskMatrix);
+        var CodewordsArray = UnloadDataFromMatrix(MaskMatrix);
 
         // restore blocks (undo interleave)
-        RestoreBlocks();
+        RestoreBlocks(CodewordsArray);
 
         // calculate error correction
         // in case of error try to correct it
-        CalculateErrorCorrection();
+        CalculateErrorCorrection(CodewordsArray);
 
         // decode data
-        byte[] DataArray = DecodeData();
+        byte[] DataArray = DecodeData(CodewordsArray);
 
         // create result class
         QRCodeResult CodeResult = new(DataArray)
@@ -1784,12 +1785,12 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Unload matrix data from base matrix
     ////////////////////////////////////////////////////////////////////
-    private void UnloadDataFromMatrix(byte[,] MaskMatrix)
+    private byte[] UnloadDataFromMatrix(byte[,] MaskMatrix)
     {
       // input array pointer initialization
       int Ptr = 0;
       int PtrEnd = 8 * MaxCodewords;
-      CodewordsArray = new byte[MaxCodewords];
+      var CodewordsArray = new byte[MaxCodewords];
 
       // bottom right corner of output matrix
       int Row = QRCodeDimension - 1;
@@ -1867,12 +1868,14 @@ namespace QRCodeDecoder.Core
             continue;
         }
       }
+
+      return CodewordsArray;
     }
 
     ////////////////////////////////////////////////////////////////////
     // Restore interleave data and error correction blocks
     ////////////////////////////////////////////////////////////////////
-    private void RestoreBlocks()
+    private void RestoreBlocks(byte[] CodewordsArray)
     {
       // allocate temp codewords array
       byte[] TempArray = new byte[MaxCodewords];
@@ -1945,13 +1948,16 @@ namespace QRCodeDecoder.Core
       }
 
       // save result
-      CodewordsArray = TempArray;
+      for (var i = 0; i < TempArray.Length; i++)
+      {
+        CodewordsArray[i] = TempArray[i];
+      }
     }
 
     ////////////////////////////////////////////////////////////////////
     // Calculate Error Correction
     ////////////////////////////////////////////////////////////////////
-    protected void CalculateErrorCorrection()
+    protected void CalculateErrorCorrection(byte[] CodewordsArray)
     {
       // total error count
       int TotalErrorCount = 0;
@@ -2036,7 +2042,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Convert bit array to byte array
     ////////////////////////////////////////////////////////////////////
-    private byte[] DecodeData()
+    private byte[] DecodeData(byte[] CodewordsArray)
     {
       // bit buffer initial condition
       BitBuffer = (UInt32)((CodewordsArray[0] << 24) | (CodewordsArray[1] << 16) | (CodewordsArray[2] << 8) |
@@ -2054,7 +2060,7 @@ namespace QRCodeDecoder.Core
       for (; ; )
       {
         // first 4 bits is mode indicator
-        EncodingMode EncodingMode = (EncodingMode)ReadBitsFromCodewordsArray(4);
+        EncodingMode EncodingMode = (EncodingMode)ReadBitsFromCodewordsArray(4, CodewordsArray);
 
         // end of data
         if (EncodingMode <= 0)
@@ -2066,14 +2072,14 @@ namespace QRCodeDecoder.Core
         if (EncodingMode == EncodingMode.ECI)
         {
           // one byte assinment value
-          ECIAssignValue = ReadBitsFromCodewordsArray(8);
+          ECIAssignValue = ReadBitsFromCodewordsArray(8, CodewordsArray);
           if ((ECIAssignValue & 0x80) == 0)
           {
             continue;
           }
 
           // two bytes assinment value
-          ECIAssignValue = (ECIAssignValue << 8) | ReadBitsFromCodewordsArray(8);
+          ECIAssignValue = (ECIAssignValue << 8) | ReadBitsFromCodewordsArray(8, CodewordsArray);
           if ((ECIAssignValue & 0x4000) == 0)
           {
             ECIAssignValue &= 0x3fff;
@@ -2081,7 +2087,7 @@ namespace QRCodeDecoder.Core
           }
 
           // three bytes assinment value
-          ECIAssignValue = (ECIAssignValue << 8) | ReadBitsFromCodewordsArray(8);
+          ECIAssignValue = (ECIAssignValue << 8) | ReadBitsFromCodewordsArray(8, CodewordsArray);
           if ((ECIAssignValue & 0x200000) == 0)
           {
             ECIAssignValue &= 0x1fffff;
@@ -2092,7 +2098,7 @@ namespace QRCodeDecoder.Core
         }
 
         // read data length
-        int DataLength = ReadBitsFromCodewordsArray(DataLengthBits(EncodingMode));
+        int DataLength = ReadBitsFromCodewordsArray(DataLengthBits(EncodingMode), CodewordsArray);
         if (DataLength < 0)
         {
           throw new ApplicationException("Premature end of data (DataLengh)");
@@ -2111,7 +2117,7 @@ namespace QRCodeDecoder.Core
             int NumericEnd = (DataLength / 3) * 3;
             for (int Index = 0; Index < NumericEnd; Index += 3)
             {
-              int Temp = ReadBitsFromCodewordsArray(10);
+              int Temp = ReadBitsFromCodewordsArray(10, CodewordsArray);
               if (Temp < 0)
               {
                 throw new ApplicationException("Premature end of data (Numeric 1)");
@@ -2124,7 +2130,7 @@ namespace QRCodeDecoder.Core
             // we have one character remaining
             if (DataLength - NumericEnd == 1)
             {
-              int Temp = ReadBitsFromCodewordsArray(4);
+              int Temp = ReadBitsFromCodewordsArray(4, CodewordsArray);
               if (Temp < 0)
               {
                 throw new ApplicationException("Premature end of data (Numeric 2)");
@@ -2135,7 +2141,7 @@ namespace QRCodeDecoder.Core
             // we have two character remaining
             else if (DataLength - NumericEnd == 2)
             {
-              int Temp = ReadBitsFromCodewordsArray(7);
+              int Temp = ReadBitsFromCodewordsArray(7, CodewordsArray);
               if (Temp < 0)
               {
                 throw new ApplicationException("Premature end of data (Numeric 3)");
@@ -2151,7 +2157,7 @@ namespace QRCodeDecoder.Core
             int AlphaNumEnd = (DataLength / 2) * 2;
             for (int Index = 0; Index < AlphaNumEnd; Index += 2)
             {
-              int Temp = ReadBitsFromCodewordsArray(11);
+              int Temp = ReadBitsFromCodewordsArray(11, CodewordsArray);
               if (Temp < 0)
               {
                 throw new ApplicationException("Premature end of data (Alpha Numeric 1)");
@@ -2163,7 +2169,7 @@ namespace QRCodeDecoder.Core
             // we have one character remaining
             if (DataLength - AlphaNumEnd == 1)
             {
-              int Temp = ReadBitsFromCodewordsArray(6);
+              int Temp = ReadBitsFromCodewordsArray(6, CodewordsArray);
               if (Temp < 0)
               {
                 throw new ApplicationException("Premature end of data (Alpha Numeric 2)");
@@ -2177,7 +2183,7 @@ namespace QRCodeDecoder.Core
             // append the data after mode and character count
             for (int Index = 0; Index < DataLength; Index++)
             {
-              int Temp = ReadBitsFromCodewordsArray(8);
+              int Temp = ReadBitsFromCodewordsArray(8, CodewordsArray);
               if (Temp < 0)
               {
                 throw new ApplicationException("Premature end of data (byte mode)");
@@ -2203,7 +2209,7 @@ namespace QRCodeDecoder.Core
     ////////////////////////////////////////////////////////////////////
     // Read data from codeword array
     ////////////////////////////////////////////////////////////////////
-    private int ReadBitsFromCodewordsArray(int Bits)
+    private int ReadBitsFromCodewordsArray(int Bits, byte[] CodewordsArray)
     {
       if (Bits > BitBufferLen)
       {
