@@ -51,21 +51,19 @@ namespace QRCodeDecoder.Core
     /// <summary>
     /// Width of frame of video output.
     /// </summary>
-    public int Width { set; get; }
+    public int Width { get; }
 
     /// <summary>
     /// Height of frame of video output.
     /// </summary>
-    public int Height { set; get; }
+    public int Height { get; }
 
     /// <summary>
     /// Constructor for <see cref="FrameSize"/> class.
     /// </summary>
     /// <param name="width">Width of frame of video output.</param>
     /// <param name="height">Height of frame of video output.</param>
-    public FrameSize(
-      int width,
-      int height)
+    public FrameSize(int width, int height)
     {
       Width = width;
       Height = height;
