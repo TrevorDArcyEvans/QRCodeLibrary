@@ -42,14 +42,13 @@ namespace QRCodeEncoder.Core
     /// </summary>
     public int ModuleSize
     {
-      get
-      {
-        return _ModuleSize;
-      }
+      get => _ModuleSize;
       set
       {
         if (value < 1 || value > 100)
+        {
           throw new ArgumentException("Module size error. Default is 2.");
+        }
         _ModuleSize = value;
       }
     }
@@ -62,14 +61,13 @@ namespace QRCodeEncoder.Core
     /// </summary>
     public int QuietZone
     {
-      get
-      {
-        return _QuietZone;
-      }
+      get => _QuietZone;
       set
       {
         if (value < 0 || value > 400)
+        {
           throw new ArgumentException("Quiet zone must be 0 to 400. Default is 8.");
+        }
         _QuietZone = value;
       }
     }
@@ -102,15 +100,22 @@ namespace QRCodeEncoder.Core
     {
       // test argument
       if (QRCodeMatrix == null)
+      {
         throw new ArgumentException("QRSavePngImage: QRCodeMatrix is null");
+      }
 
       // test matrix dimensions
       int Width = QRCodeMatrix.GetLength(0);
       int Height = QRCodeMatrix.GetLength(1);
       if (Width != Height)
+      {
         throw new ArgumentException("QRSavePngImage: QRCodeMatrix width is not equals height");
+      }
+
       if (Width < 21 || Width > 177 || ((Width - 21) % 4) != 0)
+      {
         throw new ArgumentException("QRSavePngImage: Invalid QRCodeMatrix dimension");
+      }
 
       // save argument
       this.QRCodeMatrix = QRCodeMatrix;
@@ -125,10 +130,14 @@ namespace QRCodeEncoder.Core
     {
       // exceptions
       if (FileName == null)
+      {
         throw new ArgumentException("SaveQRCodeToPngFile: FileName is null");
+      }
 
       if (!FileName.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
+      {
         throw new ArgumentException("SaveQRCodeToPngFile: FileName extension must be .png");
+      }
 
       // file name to stream
       using Stream OutputStream = new FileStream(FileName, FileMode.Create, FileAccess.Write, FileShare.None);
@@ -274,7 +283,10 @@ namespace QRCodeEncoder.Core
 
       // first row is a quiet zone and it is all white (filter is 0 none)
       int PngPtr;
-      for (PngPtr = 1; PngPtr < PngWidth; PngPtr++) PngImage[PngPtr] = 255;
+      for (PngPtr = 1; PngPtr < PngWidth; PngPtr++)
+      {
+        PngImage[PngPtr] = 255;
+      }
 
       // additional quiet zone rows are the same as first line (filter is 2 up)
       int PngEnd = QuietZone * PngWidth;
@@ -285,13 +297,19 @@ namespace QRCodeEncoder.Core
       {
         // make next row all white (filter is 0 none)
         PngEnd = PngPtr + PngWidth;
-        for (int PngCol = PngPtr + 1; PngCol < PngEnd; PngCol++) PngImage[PngCol] = 255;
+        for (int PngCol = PngPtr + 1; PngCol < PngEnd; PngCol++)
+        {
+          PngImage[PngCol] = 255;
+        }
 
         // add black to next row
         for (int MatrixCol = 0; MatrixCol < QRCodeDimension; MatrixCol++)
         {
           // bar is white
-          if (!QRCodeMatrix[MatrixRow, MatrixCol]) continue;
+          if (!QRCodeMatrix[MatrixRow, MatrixCol])
+          {
+            continue;
+          }
 
           int PixelCol = ModuleSize * MatrixCol + QuietZone;
           int PixelEnd = PixelCol + ModuleSize;
@@ -303,15 +321,24 @@ namespace QRCodeEncoder.Core
 
         // additional rows are the same as the one above (filter is 2 up)
         PngEnd = PngPtr + ModuleSize * PngWidth;
-        for (PngPtr += PngWidth; PngPtr < PngEnd; PngPtr += PngWidth) PngImage[PngPtr] = 2;
+        for (PngPtr += PngWidth; PngPtr < PngEnd; PngPtr += PngWidth)
+        {
+          PngImage[PngPtr] = 2;
+        }
       }
 
       // bottom quiet zone and it is all white (filter is 0 none)
       PngEnd = PngPtr + PngWidth;
-      for (PngPtr++; PngPtr < PngEnd; PngPtr++) PngImage[PngPtr] = 255;
+      for (PngPtr++; PngPtr < PngEnd; PngPtr++)
+      {
+        PngImage[PngPtr] = 255;
+      }
 
       // additional quiet zone rows are the same as first line (filter is 2 up)
-      for (; PngPtr < PngLength; PngPtr += PngWidth) PngImage[PngPtr] = 2;
+      for (; PngPtr < PngLength; PngPtr += PngWidth)
+      {
+        PngImage[PngPtr] = 2;
+      }
 
       // exit with Png image in byte array
       return PngImage;
@@ -374,7 +401,7 @@ namespace QRCodeEncoder.Core
 
     // CRC32 Table
     private static readonly uint[] CRC32Table =
-      {
+    {
       0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419,
       0x706af48f, 0xe963a535, 0x9e6495a3, 0x0edb8832, 0x79dcb8a4,
       0xe0d5e91e, 0x97d2d988, 0x09b64c2b, 0x7eb17cbd, 0xe7b82d07,
@@ -427,7 +454,7 @@ namespace QRCodeEncoder.Core
       0xcdd70693, 0x54de5729, 0x23d967bf, 0xb3667a2e, 0xc4614ab8,
       0x5d681b02, 0x2a6f2b94, 0xb40bbe37, 0xc30c8ea1, 0x5a05df1b,
       0x2d02ef8d
-      };
+    };
 
     /// <summary>
     /// Accumulate CRC 32
@@ -440,7 +467,9 @@ namespace QRCodeEncoder.Core
     {
       uint CRC = 0xffffffff;
       for (; Len > 0; Len--)
+      {
         CRC = CRC32Table[(CRC ^ Buffer[Pos++]) & 0xff] ^ (CRC >> 8);
+      }
       return (~CRC);
     }
 
