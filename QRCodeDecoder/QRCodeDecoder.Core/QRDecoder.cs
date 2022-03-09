@@ -1235,13 +1235,7 @@ namespace QRCodeDecoder.Core
         byte[] DataArray = DecodeData(CodewordsArray);
 
         // create result class
-        QRCodeResult CodeResult = new(DataArray)
-        {
-          ECIAssignValue = ECIAssignValue,
-          QRCodeVersion = QRCodeVersion,
-          QRCodeDimension = QRCodeDimension,
-          ErrorCorrection = ErrorCorrection
-        };
+        QRCodeResult CodeResult = new(DataArray, ECIAssignValue, QRCodeVersion, QRCodeDimension, ErrorCorrection);
 
         // add result to the list
         DataArrayList.Add(CodeResult);

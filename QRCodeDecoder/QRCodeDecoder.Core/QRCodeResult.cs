@@ -43,39 +43,46 @@
 
 namespace QRCodeDecoder.Core
 {
-  public class QRCodeResult
+  public sealed class QRCodeResult
   {
     /// <summary>
     /// QR Code Data array
     /// </summary>
-    public byte[] DataArray;
+    public byte[] DataArray { get; }
 
     /// <summary>
     /// ECI Assignment Value
     /// </summary>
-    public int ECIAssignValue;
+    public int ECIAssignValue { get; }
 
     /// <summary>
     /// QR Code matrix version
     /// </summary>
-    public int QRCodeVersion;
+    public int QRCodeVersion { get; }
 
     /// <summary>
     /// QR Code matrix dimension in bits
     /// </summary>
-    public int QRCodeDimension;
+    public int QRCodeDimension { get; }
 
     /// <summary>
     /// QR Code error correction code (L, M, Q, H)
     /// </summary>
-    public ErrorCorrection ErrorCorrection;
+    public ErrorCorrection ErrorCorrection { get; }
 
     public QRCodeResult
     (
-      byte[] DataArray
-    )
+      byte[] DataArray,
+      int eciAssignValue,
+      int qrCodeVersion,
+      int qrCodeDimension,
+      ErrorCorrection errorCorrection)
     {
       this.DataArray = DataArray;
+      ECIAssignValue = eciAssignValue;
+      QRCodeVersion = qrCodeVersion;
+      QRCodeDimension = qrCodeDimension;
+      ErrorCorrection = errorCorrection;
     }
   }
 }
