@@ -23,12 +23,16 @@ Based on code from:
 * ported to .NET Core 6
 * refactored
 * added encoder + decoder unit tests
+* used [ImageSharp](https://github.com/SixLabors/ImageSharp) for graphics operations
 
 ## Notes
 * even though the code compiles on _Linux_, it only runs on _Windows_
   as it uses APIs which are not implemented on non-_Windows_ platforms
 
 ## Further work
-* use [ImageSharp](https://github.com/SixLabors/ImageSharp) for graphics operations
-* support _Linux_
+* ~~use [ImageSharp](https://github.com/SixLabors/ImageSharp) for graphics operations~~
+* ~~support _Linux_~~
+* fixed decoder unit tests
+  * currently 2 failed detections after switching to _ImageSharp_
+
 
