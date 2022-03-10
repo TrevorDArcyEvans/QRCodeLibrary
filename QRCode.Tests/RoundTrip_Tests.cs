@@ -1,19 +1,17 @@
-using System.Text;
-using FluentAssertions.Execution;
-
 namespace QRCode.Tests;
 
 using FluentAssertions;
+using FluentAssertions.Execution;
 using Moq;
 using NUnit.Framework;
 using QRCodeDecoder.Core;
 using QRCodeEncoder.Core;
 using Serilog;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
 using System.Linq;
+using System.Text;
 
 public class RoundTrip_Tests
 {
@@ -57,18 +55,11 @@ public class RoundTrip_Tests
     var data = new[] { Text1, Text2 };
     var matrix = qrenc.Encode(data);
     var saver = CreatePngSaver(matrix);
-    using var stream = new MemoryStream();
-    saver.SaveQRCodeToPngFile(stream);
-    var png = Image.FromStream(stream);
-
-    // have to convert from png to bmp
-    using var bmpStrm = new MemoryStream();
-    png.Save(bmpStrm, ImageFormat.Bmp);
-    var bmp = Image.FromStream(bmpStrm);
-
+    var pngData = saver.QRCodeToPngFormat();
+    var png = Image.Load<Rgba32>(pngData, out _);
     var qrdec = CreateDecoder();
 
-    var res = qrdec.ImageDecoder((Bitmap)bmp);
+    var res = qrdec.ImageDecoder(png);
 
     using (new AssertionScope())
     {
