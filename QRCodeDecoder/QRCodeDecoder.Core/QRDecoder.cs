@@ -49,11 +49,11 @@
 
 namespace QRCodeDecoder.Core
 {
-  using System.Drawing;
-  using System.Drawing.Imaging;
-  using System.Runtime.InteropServices;
-  using System.Text;
   using Serilog;
+  using SixLabors.ImageSharp;
+  using SixLabors.ImageSharp.PixelFormats;
+  using SixLabors.ImageSharp.Processing;
+  using System.Text;
 
   /// <summary>
   /// QR Code error correction code enumeration
@@ -254,7 +254,7 @@ namespace QRCodeDecoder.Core
       }
 
       // load file image to bitmap
-      Bitmap InputImageBitmap = new(FileName);
+      var InputImageBitmap = Image.Load<Rgba32>(FileName);
 
       // decode bitmap
       return ImageDecoder(InputImageBitmap);
@@ -265,7 +265,7 @@ namespace QRCodeDecoder.Core
     /// </summary>
     /// <param name="InputImageBitmap">Input image</param>
     /// <returns>Output byte arrays</returns>
-    public IEnumerable<QRCodeResult> ImageDecoder(Bitmap InputImageBitmap)
+    public IEnumerable<QRCodeResult> ImageDecoder(Image<Rgba32> InputImageBitmap)
     {
       int Start = Environment.TickCount;
       var FinderList = new List<QRCodeFinder>();
@@ -421,55 +421,29 @@ namespace QRCodeDecoder.Core
     }
 
     ////////////////////////////////////////////////////////////////////
-    // Convert image to black and white boolean matrix
+    // Convert image to black and white boolean matrix (height x width)
     ////////////////////////////////////////////////////////////////////
-    private bool[,] ConvertImageToBlackAndWhite(Bitmap InputImage)
+    private bool[,] ConvertImageToBlackAndWhite(Image<Rgba32> inputImg)
     {
-      // lock image bits
-      BitmapData BitmapData = InputImage.LockBits(new Rectangle(0, 0, ImageWidth, ImageHeight),
-        ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
-
-      // address of first line
-      IntPtr BitArrayPtr = BitmapData.Scan0;
-
-      // length in bytes of one scan line
-      int ScanLineWidth = BitmapData.Stride;
-      if (ScanLineWidth < 0)
-      {
-        _logger.Information("Convert image to back and white array. Invalid input image format (upside down).");
-        return null;
-      }
-
-      // image total bytes
-      int TotalBytes = ScanLineWidth * ImageHeight;
-      byte[] BitmapArray = new byte[TotalBytes];
-
-      // Copy the RGB values into the array.
-      Marshal.Copy(BitArrayPtr, BitmapArray, 0, TotalBytes);
-
-      // unlock image
-      InputImage.UnlockBits(BitmapData);
-
-      // allocate gray image 
+      // allocate gray image
       byte[,] GrayImage = new byte[ImageHeight, ImageWidth];
       int[] GrayLevel = new int[256];
 
       // convert to gray
-      int Delta = ScanLineWidth - 3 * ImageWidth;
-      int BitmapPtr = 0;
-      for (int Row = 0; Row < ImageHeight; Row++)
+      inputImg.ProcessPixelRows(acc =>
       {
-        for (int Col = 0; Col < ImageWidth; Col++)
+        for (var y = 0; y < acc.Height; y++)
         {
-          int Module =
-            (30 * BitmapArray[BitmapPtr] + 59 * BitmapArray[BitmapPtr + 1] + 11 * BitmapArray[BitmapPtr + 2]) / 100;
-          GrayLevel[Module]++;
-          GrayImage[Row, Col] = (byte)Module;
-          BitmapPtr += 3;
+          var pxRow = acc.GetRowSpan(y);
+          for (var x = 0; x < pxRow.Length - 1; x++)
+          {
+            ref var px = ref pxRow[x];
+            int Module = (30 * px.R + 59 * px.G + 11 * px.B) / 100;
+            GrayLevel[Module]++;
+            GrayImage[y, x] = (byte)Module;
+          }
         }
-
-        BitmapPtr += Delta;
-      }
+      });
 
       // gray level cutoff between black and white
       int LevelStart;
@@ -503,7 +477,6 @@ namespace QRCodeDecoder.Core
         }
       }
 
-      // exit;
       return BlackWhiteImage;
     }
 
@@ -2016,7 +1989,7 @@ namespace QRCodeDecoder.Core
         {
           // correct the error
           int ErrorCount = CorrectData(CorrectionBuffer, BuffLen, ErrCorrCodewords);
-          if (ErrorCount <= 0)
+          if (ErrorCount <=0)
           {
             throw new ApplicationException("Data is damaged. Error correction failed");
           }

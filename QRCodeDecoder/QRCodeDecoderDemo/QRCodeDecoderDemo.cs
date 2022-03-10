@@ -41,6 +41,8 @@
 //	For version history please refer to QRDecoder.cs
 /////////////////////////////////////////////////////////////////////
 
+using SixLabors.ImageSharp.PixelFormats;
+
 namespace QRCodeDecoderDemo
 {
   using System.Diagnostics;
@@ -175,7 +177,7 @@ namespace QRCodeDecoderDemo
 
       // decode image into array of QR codes
       // each QR code matrix is made of one byte per module
-      var QRCodeResultArray = QRCodeDecoder.ImageDecoder(QRCodeInputImage).ToList();
+      var QRCodeResultArray = QRCodeDecoder.ImageDecoder(Dialog.FileName).ToList();
 
       // trace
       _logger.Information("****");
@@ -329,7 +331,7 @@ namespace QRCodeDecoderDemo
       }
 
       // decode image
-      var DataByteArray = QRCodeDecoder.ImageDecoder(QRCodeImage);
+      var DataByteArray = QRCodeDecoder.ImageDecoder(QRCodeImage.ToImageSharpImage<Rgba32>());
       if (!DataByteArray.Any())
       {
         return;
