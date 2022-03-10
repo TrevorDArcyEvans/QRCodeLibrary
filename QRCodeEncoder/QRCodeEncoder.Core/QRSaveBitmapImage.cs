@@ -30,11 +30,11 @@
 
 namespace QRCodeEncoder.Core
 {
-  using System.Drawing;
-  using System.Drawing.Imaging;
-  using Bitmap = System.Drawing.Bitmap;
-  using Brush = System.Drawing.Brush;
-  using Brushes = System.Drawing.Brushes;
+  using SixLabors.ImageSharp;
+  using SixLabors.ImageSharp.Drawing.Processing;
+  using SixLabors.ImageSharp.Formats;
+  using SixLabors.ImageSharp.PixelFormats;
+  using SixLabors.ImageSharp.Processing;
 
   /// <summary>
   /// Save QR Code image as Bitmap class
@@ -80,12 +80,12 @@ namespace QRCodeEncoder.Core
     /// <summary>
     /// White brush (default white)
     /// </summary>
-    public Brush WhiteBrush { get; set; } = Brushes.White;
+    public SolidBrush WhiteBrush { get; set; } = Brushes.Solid(Color.White);
 
     /// <summary>
     /// Black brush (default black)
     /// </summary>
-    public Brush BlackBrush { get; set; } = Brushes.Black;
+    public SolidBrush BlackBrush { get; set; } = Brushes.Solid(Color.Black);
 
     /// <summary>
     /// QR code matrix (no quiet zone)
@@ -137,15 +137,14 @@ namespace QRCodeEncoder.Core
     /// Create QR Code Bitmap image from boolean black and white matrix
     /// </summary>
     /// <returns>QRCode image</returns>
-    public Bitmap CreateQRCodeBitmap()
+    public Image<Rgba32> CreateQRCodeBitmap()
     {
       // image dimension
       QRCodeImageDimension = ModuleSize * QRCodeDimension + 2 * QuietZone;
 
       // create picture object and make it white
-      Bitmap Image = new(QRCodeImageDimension, QRCodeImageDimension);
-      Graphics graphics = Graphics.FromImage(Image);
-      graphics.FillRectangle(WhiteBrush, 0, 0, QRCodeImageDimension, QRCodeImageDimension);
+      var Image = new Image<Rgba32>(QRCodeImageDimension, QRCodeImageDimension);
+      Image.Mutate(x => x.Fill(WhiteBrush, new RectangleF(0, 0, QRCodeImageDimension, QRCodeImageDimension)));
 
       // x and y image pointers
       int XOffset = QuietZone;
@@ -159,7 +158,7 @@ namespace QRCodeEncoder.Core
           // bar is black
           if (QRCodeMatrix[Row, Col])
           {
-            graphics.FillRectangle(BlackBrush, XOffset, YOffset, ModuleSize, ModuleSize);
+            Image.Mutate(x => x.Fill(BlackBrush, new RectangleF(XOffset, YOffset, ModuleSize, ModuleSize)));
           }
           XOffset += ModuleSize;
         }
@@ -175,7 +174,7 @@ namespace QRCodeEncoder.Core
     /// Save QRCode image to image file
     /// </summary>
     /// <param name="FileName">Image file name</param>
-    public void SaveQRCodeToImageFile(string FileName, ImageFormat Format)
+    public void SaveQRCodeToImageFile(string FileName)
     {
       // exceptions
       if (FileName == null)
@@ -184,17 +183,17 @@ namespace QRCodeEncoder.Core
       }
 
       // create Bitmap
-      Bitmap ImageBitmap = CreateQRCodeBitmap();
+      var ImageBitmap = CreateQRCodeBitmap();
 
       // save bitmap
-      ImageBitmap.Save(FileName, Format);
+      ImageBitmap.Save(FileName);
     }
 
     /// <summary>
     /// Save QRCode image to image file
     /// </summary>
     /// <param name="FileName">Image file name</param>
-    public void SaveQRCodeToImageFile(Stream OutputStream, ImageFormat Format)
+    public void SaveQRCodeToImageFile(Stream OutputStream, IImageFormat Format)
     {
       // exceptions
       if (OutputStream == null)
@@ -203,7 +202,7 @@ namespace QRCodeEncoder.Core
       }
 
       // create Bitmap
-      Bitmap ImageBitmap = CreateQRCodeBitmap();
+      var ImageBitmap = CreateQRCodeBitmap();
 
       // write to stream 
       ImageBitmap.Save(OutputStream, Format);

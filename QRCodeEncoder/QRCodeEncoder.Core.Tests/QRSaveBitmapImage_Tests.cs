@@ -1,11 +1,16 @@
 namespace QRCodeEncoder.Core.Tests;
 
-using System;
-using System.Collections.Generic;
-using System.Drawing.Imaging;
-using System.IO;
 using FluentAssertions;
 using NUnit.Framework;
+using SixLabors.ImageSharp.Formats;
+using SixLabors.ImageSharp.Formats.Bmp;
+using SixLabors.ImageSharp.Formats.Gif;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.Formats.Tiff;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 public sealed class QRSaveBitmapImage_Tests : QRSaveImage_Base
 {
@@ -20,7 +25,7 @@ public sealed class QRSaveBitmapImage_Tests : QRSaveImage_Base
   }
 
   [Test]
-  public void SaveQRCodeToImageFile_Returns([ValueSource(nameof(GetImageFormat))] ImageFormat imgFmt)
+  public void SaveQRCodeToImageFile_Returns([ValueSource(nameof(GetImageFormat))] IImageFormat imgFmt)
   {
     var matrix = GetMatrix();
     var saver = Create(matrix);
@@ -31,13 +36,13 @@ public sealed class QRSaveBitmapImage_Tests : QRSaveImage_Base
     act.Should().NotThrow();
   }
 
-  private static IEnumerable<ImageFormat> GetImageFormat => new[]
+  private static IEnumerable<IImageFormat> GetImageFormat => new IImageFormat[]
   {
-    ImageFormat.Bmp,
-    ImageFormat.Gif,
-    ImageFormat.Jpeg,
-    ImageFormat.Png,
-    ImageFormat.Tiff
+    BmpFormat.Instance,
+    GifFormat.Instance,
+    JpegFormat.Instance,
+    PngFormat.Instance,
+    TiffFormat.Instance
   };
 
   private QRSaveBitmapImage Create(bool[,] matrix)

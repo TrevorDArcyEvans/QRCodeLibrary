@@ -213,7 +213,7 @@ namespace QRCodeEncoderDemo
         BitmapImage.QuietZone = QuietZone;
 
         // create bitmap image
-        QRCodeImage = BitmapImage.CreateQRCodeBitmap();
+        QRCodeImage = BitmapImage.CreateQRCodeBitmap().ToBitmap();
       }
       catch (Exception Ex)
       {
@@ -312,7 +312,7 @@ namespace QRCodeEncoderDemo
       QRSaveBitmapImage BitmapImage = new(QRCodeMatrix);
       BitmapImage.ModuleSize = ModuleSize;
       BitmapImage.QuietZone = QuietZone;
-      BitmapImage.SaveQRCodeToImageFile(FileName, FileFormat);
+      BitmapImage.SaveQRCodeToImageFile(FileName);
 
       // start image editor
       Process Proc = new();
