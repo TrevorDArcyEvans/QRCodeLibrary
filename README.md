@@ -26,8 +26,9 @@ Based on code from:
 * used [ImageSharp](https://github.com/SixLabors/ImageSharp) for graphics operations
 
 ## Notes
-* even though the code compiles on _Linux_, it only runs on _Windows_
-  as it uses APIs which are not implemented on non-_Windows_ platforms
+* _QRCodeDecoder.Core_ + _QRCodeEncode.Core_ run on _Linux_
+* _QRCodeDecoder.Windows_ only runs on _Windows_
+* demo program only runs on _Windows_
 
 ## Further work
 * ~~use [ImageSharp](https://github.com/SixLabors/ImageSharp) for graphics operations~~
